@@ -1,0 +1,109 @@
+{
+  "feed": [
+    {
+      "id": "1",
+      "user": "CryptoEnthusiast",
+      "nftName": "Bored Ape #1234",
+      "offerAmount": 2.5,
+      "timestamp": "2023-09-24T10:30:00Z"
+    },
+    {
+      "id": "2",
+      "user": "NFTCollector",
+      "nftName": "CryptoPunk #5678",
+      "offerAmount": 1.8,
+      "timestamp": "2023-09-23T15:45:00Z"
+    },
+    {
+      "id": "3",
+      "user": "ArtLover",
+      "nftName": "Doodle #9012",
+      "offerAmount": 0.5,
+      "timestamp": "2023-09-22T09:15:00Z"
+    },
+    {
+      "id": "4",
+      "user": "DigitalInvestor",
+      "nftName": "Azuki #3456",
+      "offerAmount": 3.2,
+      "timestamp": "2023-09-21T18:00:00Z"
+    },
+    {
+      "id": "5",
+      "user": "BlockchainBuff",
+      "nftName": "CloneX #7890",
+      "offerAmount": 1.1,
+      "timestamp": "2023-09-20T12:30:00Z"
+    },
+    {
+      "id": "1",
+      "user": "CryptoEnthusiast",
+      "nftName": "Bored Ape #1234",
+      "offerAmount": 2.5,
+      "timestamp": "2023-09-24T10:30:00Z"
+    },
+    {
+      "id": "2",
+      "user": "NFTCollector",
+      "nftName": "CryptoPunk #5678",
+      "offerAmount": 1.8,
+      "timestamp": "2023-09-23T15:45:00Z"
+    },
+    {
+      "id": "3",
+      "user": "ArtLover",
+      "nftName": "Doodle #9012",
+      "offerAmount": 0.5,
+      "timestamp": "2023-09-22T09:15:00Z"
+    },
+    {
+      "id": "4",
+      "user": "DigitalInvestor",
+      "nftName": "Azuki #3456",
+      "offerAmount": 3.2,
+      "timestamp": "2023-09-21T18:00:00Z"
+    },
+    {
+      "id": "5",
+      "user": "BlockchainBuff",
+      "nftName": "CloneX #7890",
+      "offerAmount": 1.1,
+      "timestamp": "2023-09-20T12:30:00Z"
+    },
+    {
+      "id": "1",
+      "user": "CryptoEnthusiast",
+      "nftName": "Bored Ape #1234",
+      "offerAmount": 2.5,
+      "timestamp": "2023-09-24T10:30:00Z"
+    },
+    {
+      "id": "2",
+      "user": "NFTCollector",
+      "nftName": "CryptoPunk #5678",
+      "offerAmount": 1.8,
+      "timestamp": "2023-09-23T15:45:00Z"
+    },
+    {
+      "id": "3",
+      "user": "ArtLover",
+      "nftName": "Doodle #9012",
+      "offerAmount": 0.5,
+      "timestamp": "2023-09-22T09:15:00Z"
+    },
+    {
+      "id": "4",
+      "user": "DigitalInvestor",
+      "nftName": "Azuki #3456",
+      "offerAmount": 3.2,
+      "timestamp": "2023-09-21T18:00:00Z"
+    },
+    {
+      "id": "5",
+      "user": "BlockchainBuff",
+      "nftName": "CloneX #7890",
+      "offerAmount": 1.1,
+      "timestamp": "2023-09-20T12:30:00Z"
+    }
+  ]
+}
