@@ -35,8 +35,8 @@ const Navbar: FC = () => {
           </div>
         </div>
       </div>
-      <button className="bg-gray-800 text-white rounded-md px-4 py-2 cursor-pointer">
-        Join
+      <button className="bg-gray-800 text-white rounded-md px-4 py-2 cursor-pointer font-semibold mr-1">
+        SIGN UP
       </button>
     </nav>
   );
