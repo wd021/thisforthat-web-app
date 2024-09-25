@@ -2,6 +2,7 @@ import { FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Options } from "@/components";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Pin, Verified } from "@/icons";
 
 interface GridItem {

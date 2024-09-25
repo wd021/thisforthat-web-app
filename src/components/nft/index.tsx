@@ -105,7 +105,7 @@ const NFTComponent: FC = () => {
         </div>
         <div className="flex gap-x-4 justify-between gap-x-4 h-[50px] mt-6">
           <button className="bg-gray-300 w-full">Make an offer</button>
-          <button className="bg-gray-300 w-full">I'm interested</button>
+          <button className="bg-gray-300 w-full">I&apos;m interested</button>
         </div>
       </div>
       <div className="w-[550px] bg-white p-4 rounded-lg shadow">

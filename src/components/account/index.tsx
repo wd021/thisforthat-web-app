@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const AccountPage: React.FC = () => {
   const pathname = usePathname();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeNFTSection, setActiveNFTSection] = useState<
     "for-sale" | "not-for-sale"
   >("for-sale");

@@ -48,6 +48,7 @@ const Onboard: React.FC<Props> = ({ closeModal }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleGoogleSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
