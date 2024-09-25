@@ -27,7 +27,10 @@ const Options: FC<OptionsProps> = ({ onOptionSelect }) => {
     };
   }, []);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setIsOpen(!isOpen);
+  };
 
   const handleOptionClick = (option: string) => {
     onOptionSelect(option);
@@ -35,10 +38,9 @@ const Options: FC<OptionsProps> = ({ onOptionSelect }) => {
   };
 
   const options = [
-    { label: "Show interest" },
-    { label: "Make an Offer" },
+    { label: "Pin Collection" },
     { label: "Copy Link" },
-    { label: "View on OpenSea" },
+    { label: "View On OpenSea" },
   ];
 
   return (
@@ -48,13 +50,16 @@ const Options: FC<OptionsProps> = ({ onOptionSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute mt-[-4px] right-[-4px] w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
+        <div className="absolute mt-[-4px] right-[-4px] w-[180px] bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
           <div className="py-1" role="menu" aria-orientation="vertical">
             {options.map((option) => (
               <button
                 key={option.label}
-                className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                onClick={() => handleOptionClick(option.label)}
+                className="flex items-center justify-end w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOptionClick(option.label);
+                }}
                 role="menuitem"
               >
                 {option.label}

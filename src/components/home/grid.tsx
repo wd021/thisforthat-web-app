@@ -1,6 +1,8 @@
 import { FC } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Options } from "@/components";
-import { Verified } from "@/icons";
+import { Pin, Verified } from "@/icons";
 
 interface GridItem {
   id: string;
@@ -13,10 +15,16 @@ interface PinterestGridProps {
 }
 
 const Grid: FC<PinterestGridProps> = ({ items }) => {
+  const router = useRouter();
+
   return (
-    <div className="px-4 py-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {items.map((item) => (
-        <div key={item.id} className="relative">
+        <Link
+          href="/nft/1/1/1"
+          key={item.id}
+          className="relative cursor-pointer"
+        >
           <div className="absolute top-0 right-0">
             <Options onOptionSelect={() => {}} />
           </div>
@@ -29,14 +37,20 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
               className="w-full h-auto object-cover"
             />
             <div className="p-3">
-              <div className="flex items-center">
+              <div
+                className="flex items-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push("/user/fredwilson");
+                }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/temp/profile.webp"
                   alt="profile"
                   className="w-5 h-5 rounded-full"
                 />
-                <div className="ml-1.5 text-base font-semibold">fredwilson</div>
+                <div className="ml-2 text-base font-semibold">fredwilson</div>
               </div>
               <div className="flex items-center mt-1">
                 <div className="mr-0.5 mt-0.5">Cryptopunk #1948</div>
@@ -51,7 +65,7 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

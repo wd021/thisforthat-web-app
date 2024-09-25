@@ -4,7 +4,7 @@ import { Filter } from "@/icons";
 import Checkmark from "@/icons/checkmark";
 import React, { useState } from "react";
 
-type FilterOption = "latest" | "mostOffers" | "mostWanted";
+type FilterOption = "latest" | "followers" | "mostOffers" | "mostWanted";
 
 interface BubbleFilterProps {
   onFilterChange: (filter: FilterOption) => void;
@@ -15,9 +15,10 @@ const BubbleFilter: React.FC<BubbleFilterProps> = ({ onFilterChange }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>("latest");
 
   const filters: { value: FilterOption; label: string }[] = [
-    { value: "latest", label: "Latest" },
+    { value: "latest", label: "Latest Activity" },
     { value: "mostOffers", label: "Most Offers" },
     { value: "mostWanted", label: "Most Wanted" },
+    { value: "followers", label: "My Followers" },
   ];
 
   const handleFilterClick = (filter: FilterOption) => {
