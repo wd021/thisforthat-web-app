@@ -4,7 +4,7 @@ import { FC, useState } from "react";
 import Image from "next/image";
 import { Pin, Verified } from "@/icons";
 
-type NFTCategory = "my-deals" | "my-interests" | "not-for-sale" | "for-sale";
+type NFTCategory = "my-interests" | "not-for-sale" | "for-sale";
 
 interface NFT {
   id: string;
@@ -14,20 +14,15 @@ interface NFT {
 
 const ProfileComponent: FC = () => {
   const [selectedCategory, setSelectedCategory] =
-    useState<NFTCategory>("not-for-sale");
+    useState<NFTCategory>("my-interests");
 
   const categories: { [key in NFTCategory]: string } = {
-    "my-deals": "Negotiations",
-    "my-interests": "Things I Want",
+    "my-interests": "NFTS I Want",
     "for-sale": "My NFTs (For Sale)",
     "not-for-sale": "My NFTs (Not for Sale)",
   };
 
   const nfts: { [key in NFTCategory]: NFT[] } = {
-    "my-deals": [
-      { id: "5", imageUrl: "/temp/nft.png", title: "NFT 5" },
-      { id: "6", imageUrl: "/temp/nft.png", title: "NFT 6" },
-    ],
     "my-interests": [
       { id: "5", imageUrl: "/temp/nft.png", title: "NFT 5" },
       { id: "6", imageUrl: "/temp/nft.png", title: "NFT 6" },
