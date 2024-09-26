@@ -9,15 +9,16 @@ const AccountPage: React.FC = () => {
   const pathname = usePathname();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeNFTSection, setActiveNFTSection] = useState<
-    "for-sale" | "not-for-sale"
-  >("for-sale");
+    "for-swap" | "not-for-swap"
+  >("for-swap");
 
   const tabs = [
-    { name: "Deals", href: "/account/deals" },
-    { name: "Interests", href: "/account/interested" },
-    { name: "Profile", href: "/account/profile" },
-    { name: "My NFTs", href: "/account/nfts" },
-    // { name: "Followers", href: "/account/followers" },
+    { name: "My Activity", href: "/account/activity" },
+    // { name: "DMs", href: "/account/dms" },
+    { name: "Manage My NFTs", href: "/account/nfts" },
+    // { name: "Looking", href: "/account/looking" },
+    { name: "Followers", href: "/account/followers" },
+    { name: "Edit Profile", href: "/account/profile" },
   ];
 
   const isActive = (path: string) => pathname === path;
@@ -34,29 +35,29 @@ const AccountPage: React.FC = () => {
             <div className="mb-4">
               <button
                 className={`mr-2 px-3 py-1 rounded ${
-                  activeNFTSection === "for-sale"
+                  activeNFTSection === "for-swap"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200"
                 }`}
-                // onClick={() => setActiveNFTSection("for-sale")}
+                // onClick={() => setActiveNFTSection("for-swap")}
               >
-                For Sale
+                For Swap
               </button>
               <button
                 className={`px-3 py-1 rounded ${
-                  activeNFTSection === "not-for-sale"
+                  activeNFTSection === "not-for-swap"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200"
                 }`}
-                // onClick={() => setActiveNFTSection("not-for-sale")}
+                // onClick={() => setActiveNFTSection("not-for-swap")}
               >
-                Not For Sale
+                Not For Swap
               </button>
             </div>
-            {activeNFTSection === "for-sale" ? (
-              <div>NFTs For Sale Content</div>
+            {activeNFTSection === "for-swap" ? (
+              <div>NFTs For Swap Content</div>
             ) : (
-              <div>NFTs Not For Sale Content</div>
+              <div>NFTs Not For Swap Content</div>
             )}
           </div>
         );
@@ -71,7 +72,7 @@ const AccountPage: React.FC = () => {
     <div className="absolute top-[75px] bottom-0 w-full flex">
       {/* Left sidebar */}
       <div className="w-64 bg-gray-100 p-4">
-        <div className="ml-2 mb-2 font-bold">Account</div>
+        {/* <div className="ml-2 mb-2 font-bold">Account</div> */}
         <nav>
           <ul>
             {tabs.map((tab) => (
@@ -111,3 +112,6 @@ const AccountPage: React.FC = () => {
 };
 
 export default AccountPage;
+
+// activity page -> deals, interested, transactions
+// add dms in the future

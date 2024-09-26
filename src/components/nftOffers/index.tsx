@@ -6,7 +6,7 @@
 import React, { FC, useState } from "react";
 import Link from "next/link";
 import { Options, VerifiedBadge } from "@/components";
-import { Pin } from "@/icons";
+import { Back, Pin } from "@/icons";
 
 interface ActivityItem {
   id: string;
@@ -20,6 +20,21 @@ interface InfoItemProps {
   label: string;
   value: string;
   link?: string;
+}
+
+interface ChatMessage {
+  id: string;
+  sender: string;
+  message: string;
+  timestamp: Date;
+}
+
+interface OfferDetails {
+  id: string;
+  offeror: string;
+  offerorAvatar: string;
+  amount: string;
+  timestamp: Date;
 }
 
 const InfoItem: React.FC<InfoItemProps> = ({ label, value, link }) => (
@@ -60,7 +75,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   </button>
 );
 
-const NFTComponent: FC = () => {
+const NFTOffersComponent: FC = () => {
   const [dealModalOpen, setDealModalOpen] = React.useState(false);
   const [interestModalOpen, setInterestModalOpen] = React.useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -112,6 +127,56 @@ const NFTComponent: FC = () => {
     if (activeTab === "transactions") return item.type === "transactions";
     return true;
   });
+
+  const [chatInput, setChatInput] = useState("");
+
+  // Mock data - replace with actual data fetching logic
+  const nftDetails = {
+    image: "/temp/nft.png",
+    owner: "Fred Wilson",
+    ownerImage: "/temp/profile.webp",
+    chain: "Ethereum",
+    collection: "CryptoPunks",
+    tokenId: "1",
+    floorPrice: "5 ETH",
+    lastSalePrice: "6 ETH",
+    isVerified: true,
+    verifiedDate: "2024-09-25",
+    openseaLink: "https://opensea.io/collection/cryptopunks",
+  };
+
+  const offerDetails: OfferDetails = {
+    id: "123",
+    offeror: "Alice",
+    offerorAvatar: "/temp/alice-avatar.png",
+    amount: "2.5 ETH",
+    timestamp: new Date("2023-09-25T10:30:00"),
+  };
+
+  const chatMessages: ChatMessage[] = [
+    {
+      id: "1",
+      sender: "Alice",
+      message: "Hi, I'm interested in this NFT. Is the price negotiable?",
+      timestamp: new Date("2023-09-25T10:35:00"),
+    },
+    {
+      id: "2",
+      sender: "Fred Wilson",
+      message:
+        "Hello Alice! I'm open to negotiations. What did you have in mind?",
+      timestamp: new Date("2023-09-25T10:40:00"),
+    },
+    // Add more mock messages as needed
+  ];
+
+  const handleSendMessage = () => {
+    if (chatInput.trim()) {
+      // In a real application, you would send this message to your backend
+      console.log("Sending message:", chatInput);
+      setChatInput("");
+    }
+  };
 
   return (
     <div className="absolute top-[75px] bottom-0 w-full flex">
@@ -192,67 +257,90 @@ const NFTComponent: FC = () => {
             </div>
           </div>
           <div>
-            <div className="w-[550px] bg-white rounded-lg shadow-lg overflow-y-auto hide-scrollbar max-h-[660px]">
-              <div className="flex border-b border-gray-200">
-                <button
-                  className={`flex-1 py-4 px-4 text-base font-medium ${
-                    activeTab === "offers"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("offers")}
-                >
-                  🤝 Offers
-                </button>
-                <button
-                  className={`flex-1 py-4 px-4 text-base font-medium ${
-                    activeTab === "looking"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("looking")}
-                >
-                  👀 Looking
-                </button>
-              </div>
-              <div className="overflow-y-auto hide-scrollbar h-[650px]">
-                {filteredActivities.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/nft/1/1/1/${item.type}/${item.id}`}
-                    className="block hover:bg-gray-50 transition-colors duration-150 ease-in-out"
-                  >
-                    <div className="p-4 flex items-center space-x-4 border-b border-gray-100">
-                      <img
-                        src={item.userAvatar}
-                        alt={item.user}
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div className="flex-grow">
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900">
-                            {item.user}
-                          </span>
-                        </div>
-                        <p className="text-gray-600">
-                          {item.type === "offer" && "🤝 Made an offer"}
-                          {item.type === "interest" && "👀 Expressed interest"}
-                          {item.type === "transaction" &&
-                            "💰 Completed transaction"}
-                          {item.amount && ` - ${item.amount}`}
-                        </p>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {/* Replace with actual time calculation */}
-                        {Math.floor(
-                          (new Date().getTime() - item.timestamp.getTime()) /
-                            60000
-                        )}
-                        m
-                      </span>
+            {/* Right side - Offer details, chat, and actions */}
+            <div className="w-[500px] h-[680px] bg-white flex flex-col">
+              {/* Offer details */}
+              <div className="mt-2 p-6 border-b border-gray-200">
+                <Link href="/nft/1/1/1">
+                  <Back />
+                </Link>
+                <h2 className="text-2xl font-bold mb-4">Offer Details</h2>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <img
+                      src={offerDetails.offerorAvatar}
+                      alt={offerDetails.offeror}
+                      className="w-10 h-10 rounded-full mr-3"
+                    />
+                    <div>
+                      <p className="font-semibold">{offerDetails.offeror}</p>
+                      <p className="text-sm text-gray-500">
+                        Offer made {offerDetails.timestamp.toLocaleString()}
+                      </p>
                     </div>
-                  </Link>
+                  </div>
+                  <div className="text-xl font-bold">{offerDetails.amount}</div>
+                </div>
+              </div>
+
+              {/* Chat feed */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {chatMessages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`mb-4 ${
+                      message.sender === nftDetails.owner ? "text-right" : ""
+                    }`}
+                  >
+                    <div
+                      className={`inline-block p-3 rounded-lg ${
+                        message.sender === nftDetails.owner
+                          ? "bg-blue-100"
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      <p className="font-semibold">{message.sender}</p>
+                      <p>{message.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {message.timestamp.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                 ))}
+              </div>
+
+              {/* Chat input */}
+              <div className="p-4 border-t border-gray-200">
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Type your message..."
+                    className="flex-1 p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {/* <Send className="w-5 h-5" /> */}Send
+                  </button>
+                </div>
+              </div>
+
+              {/* Action items */}
+              <div className="p-4 border-t border-gray-200">
+                <div className="flex justify-between">
+                  <button className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg mr-2 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Accept Deal
+                  </button>
+                  <button className="flex-1 bg-yellow-500 text-white py-2 px-4 rounded-lg mx-2 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    Make Counter Offer
+                  </button>
+                  <button className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg ml-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Remove Deal
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -262,4 +350,6 @@ const NFTComponent: FC = () => {
   );
 };
 
-export default NFTComponent;
+export default NFTOffersComponent;
+
+// add [see current deal]

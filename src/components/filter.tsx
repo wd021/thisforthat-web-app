@@ -4,7 +4,7 @@ import { Filter } from "@/icons";
 import Checkmark from "@/icons/checkmark";
 import React, { useState } from "react";
 
-type FilterOption = "latest" | "followers" | "mostOffers" | "mostWanted";
+type FilterOption = "mostRecent" | "followers" | "mostOffers" | "mostWanted";
 
 interface BubbleFilterProps {
   onFilterChange: (filter: FilterOption) => void;
@@ -12,10 +12,11 @@ interface BubbleFilterProps {
 
 const BubbleFilter: React.FC<BubbleFilterProps> = ({ onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<FilterOption>("latest");
+  const [selectedFilter, setSelectedFilter] =
+    useState<FilterOption>("mostRecent");
 
   const filters: { value: FilterOption; label: string }[] = [
-    { value: "latest", label: "Latest Activity" },
+    { value: "mostRecent", label: "Most Recent" },
     { value: "mostOffers", label: "Most Offers" },
     { value: "mostWanted", label: "Most Wanted" },
     { value: "followers", label: "My Followers" },
@@ -32,7 +33,7 @@ const BubbleFilter: React.FC<BubbleFilterProps> = ({ onFilterChange }) => {
       <div>
         <button
           type="button"
-          className="flex justify-center items-center w-12 h-12 rounded-full border border-gray-200 bg-white text-gray-700 p-2"
+          className="flex justify-center items-center w-12 h-12 text-gray-700"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Filter options"
         >
@@ -41,7 +42,7 @@ const BubbleFilter: React.FC<BubbleFilterProps> = ({ onFilterChange }) => {
       </div>
 
       {isOpen && (
-        <div className="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 mt-[-5px]">
           <div
             className="py-1"
             role="menu"

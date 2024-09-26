@@ -38,8 +38,8 @@ const Options: FC<OptionsProps> = ({ onOptionSelect }) => {
   };
 
   const options = [
-    { label: "Pin Collection" },
     { label: "Copy Link" },
+    { label: "Download" },
     { label: "View On OpenSea" },
   ];
 

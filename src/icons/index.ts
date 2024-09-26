@@ -10,3 +10,5 @@ export { default as User } from "./user";
 export { default as Add } from "./add";
 export { default as Pencil } from "./pencil";
 export { default as Wallet } from "./wallet";
+export { default as Notifications } from "./notifications";
+export { default as Back } from "./back";

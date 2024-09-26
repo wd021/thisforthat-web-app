@@ -8,7 +8,7 @@ import {
   Wallet as WalletModal,
   Login as LoginModal,
 } from "@/components/modals";
-import { Add, Wallet, User } from "@/icons";
+import { Add, Wallet, User, Notifications } from "@/icons";
 
 const Navbar: FC = () => {
   const [modal, setModal] = useState<boolean | "login" | "wallet" | "add">(
@@ -62,6 +62,9 @@ const Navbar: FC = () => {
               onClick={() => setModal("wallet")}
             >
               <Wallet className="w-[22px] h-[22px] text-black" />
+            </button>{" "}
+            <button className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center">
+              <Notifications className="w-[22px] h-[22px] text-black" />
             </button>
             <Link
               href="/account"
