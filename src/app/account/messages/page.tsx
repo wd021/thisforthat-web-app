@@ -1,15 +1,15 @@
 import { FC } from "react";
 import { ActivityFeed, Navbar } from "@/components";
-import AccountComponent from "@/components/account";
+import { AccountDMPage } from "@/components/account";
 
-const Account: FC = () => {
+const AccountFollowers: FC = () => {
   return (
     <div className="h-screen flex items-center justify-center flex-col">
       <Navbar />
-      <AccountComponent />
+      <AccountDMPage />
       <ActivityFeed />
     </div>
   );
 };
 
-export default Account;
+export default AccountFollowers;
