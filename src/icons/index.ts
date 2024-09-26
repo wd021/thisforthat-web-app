@@ -7,7 +7,6 @@ export { default as Close } from "./close";
 export { default as Google } from "./google";
 export { default as Pin } from "./pin";
 export { default as User } from "./user";
-export { default as Add } from "./add";
 export { default as Pencil } from "./pencil";
 export { default as Wallet } from "./wallet";
 export { default as Notifications } from "./notifications";

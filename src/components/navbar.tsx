@@ -3,12 +3,12 @@
 import { FC, useState } from "react";
 import Link from "next/link";
 
+import { NotificationDropdown } from "@/components";
 import {
-  Add as AddModal,
   Wallet as WalletModal,
   Login as LoginModal,
 } from "@/components/modals";
-import { Add, Wallet, User, Notifications } from "@/icons";
+import { Wallet, User } from "@/icons";
 
 const Navbar: FC = () => {
   const [modal, setModal] = useState<boolean | "login" | "wallet" | "add">(
@@ -53,19 +53,11 @@ const Navbar: FC = () => {
           <div className="flex gap-x-2 h-[44px] relative mr-2">
             <button
               className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center"
-              onClick={() => setModal("add")}
-            >
-              <Add className="w-[22px] h-[22px] text-black" />
-            </button>
-            <button
-              className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center"
               onClick={() => setModal("wallet")}
             >
               <Wallet className="w-[22px] h-[22px] text-black" />
             </button>{" "}
-            <button className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center">
-              <Notifications className="w-[22px] h-[22px] text-black" />
-            </button>
+            <NotificationDropdown />
             <Link
               href="/account"
               className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center"
@@ -83,7 +75,6 @@ const Navbar: FC = () => {
           </button>
         )}
       </nav>
-      {modal === "add" && <AddModal closeModal={() => setModal(false)} />}
       {modal === "wallet" && <WalletModal closeModal={() => setModal(false)} />}
       {modal === "login" && <LoginModal closeModal={() => setModal(false)} />}
     </>
