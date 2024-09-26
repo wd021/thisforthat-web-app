@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Options, VerifiedBadge } from "@/components";
-import { Offer, Interest } from "@/components/modals";
+import { Offer } from "@/components/modals";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Pin, Verified } from "@/icons";
 

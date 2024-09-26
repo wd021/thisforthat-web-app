@@ -61,7 +61,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 );
 
 const NFTComponent: FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [dealModalOpen, setDealModalOpen] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [interestModalOpen, setInterestModalOpen] = React.useState(false);
   const [activeTab, setActiveTab] = useState<
     "offers" | "looking" | "transactions"
@@ -85,7 +87,7 @@ const NFTComponent: FC = () => {
       id: "1",
       type: "offers",
       user: "Alice",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       amount: "2.5 ETH",
       timestamp: new Date("2023-09-25T10:30:00"),
     },
@@ -93,14 +95,14 @@ const NFTComponent: FC = () => {
       id: "2",
       type: "looking",
       user: "Bob",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       timestamp: new Date("2023-09-25T09:45:00"),
     },
     {
       id: "3",
       type: "transactions",
       user: "Charlie",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       amount: "3 ETH",
       timestamp: new Date("2023-09-24T14:20:00"),
     },
@@ -224,7 +226,7 @@ const NFTComponent: FC = () => {
                   >
                     <div className="p-4 flex items-center space-x-4 border-b border-gray-100">
                       <img
-                        src={item.userAvatar}
+                        src="/temp/profile.webp"
                         alt={item.user}
                         className="w-10 h-10 rounded-full"
                       />
@@ -235,9 +237,9 @@ const NFTComponent: FC = () => {
                           </span>
                         </div>
                         <p className="text-gray-600">
-                          {item.type === "offer" && "🤝 Made an offer"}
-                          {item.type === "interest" && "👀 Expressed interest"}
-                          {item.type === "transaction" &&
+                          {item.type === "offers" && "🤝 Made an offer"}
+                          {item.type === "looking" && "👀 Expressed interest"}
+                          {item.type === "transactions" &&
                             "💰 Completed transaction"}
                           {item.amount && ` - ${item.amount}`}
                         </p>

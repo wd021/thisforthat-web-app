@@ -76,8 +76,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 );
 
 const NFTOffersComponent: FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [dealModalOpen, setDealModalOpen] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [interestModalOpen, setInterestModalOpen] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeTab, setActiveTab] = useState<
     "offers" | "looking" | "transactions"
   >("offers");
@@ -100,7 +103,7 @@ const NFTOffersComponent: FC = () => {
       id: "1",
       type: "offers",
       user: "Alice",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       amount: "2.5 ETH",
       timestamp: new Date("2023-09-25T10:30:00"),
     },
@@ -108,19 +111,20 @@ const NFTOffersComponent: FC = () => {
       id: "2",
       type: "looking",
       user: "Bob",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       timestamp: new Date("2023-09-25T09:45:00"),
     },
     {
       id: "3",
       type: "transactions",
       user: "Charlie",
-      userAvatar: "/temp/profile.webp",
+      // userAvatar: "/temp/profile.webp",
       amount: "3 ETH",
       timestamp: new Date("2023-09-24T14:20:00"),
     },
     // ... (add more mock data for each type)
   ];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filteredActivities = activities.filter((item) => {
     if (activeTab === "offers") return item.type === "offers";
     if (activeTab === "looking") return item.type === "looking";

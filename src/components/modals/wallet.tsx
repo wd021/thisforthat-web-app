@@ -65,7 +65,8 @@ const Wallet: React.FC<Props> = ({ closeModal }) => {
     Record<number, VerificationStatus>
   >({});
 
-  const fetchNFTs = async (wallet: string): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const fetchNFTs = async (walletInput: string): Promise<void> => {
     // Mock API call to fetch NFTs
     // Replace with actual API call in production
     const mockNFTs: NFT[] = [
@@ -111,13 +112,13 @@ const Wallet: React.FC<Props> = ({ closeModal }) => {
   const handleImport = (): void => {
     // Mock import function
     console.log("Importing NFTs:", selectedNfts);
-    onClose();
+    closeModal();
   };
 
   const handleVerify = async (): Promise<void> => {
     // Mock verification process
     setStep(2);
-    for (let nftId of selectedNfts) {
+    for (const nftId of selectedNfts) {
       setVerificationStatus((prev) => ({ ...prev, [nftId]: "pending" }));
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate blockchain transaction
       setVerificationStatus((prev) => ({ ...prev, [nftId]: "verified" }));
@@ -242,9 +243,7 @@ const Wallet: React.FC<Props> = ({ closeModal }) => {
                   {verificationStatus[nftId] === "pending" ? (
                     <span className="text-yellow-500">Pending...</span>
                   ) : verificationStatus[nftId] === "verified" ? (
-                    <span className="text-green-500">
-                      Verified <Check className="inline-block w-4 h-4" />
-                    </span>
+                    <span className="text-green-500">Verified</span>
                   ) : (
                     <span className="text-red-500">Failed</span>
                   )}
@@ -255,7 +254,7 @@ const Wallet: React.FC<Props> = ({ closeModal }) => {
               (status) => status === "verified"
             ) && (
               <button
-                onClick={onClose}
+                onClick={() => closeModal()}
                 className="w-full py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition duration-200"
               >
                 Done

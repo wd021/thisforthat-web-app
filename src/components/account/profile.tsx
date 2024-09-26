@@ -58,6 +58,7 @@ const AccountProfilePage: FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNFTSelection = (nftImageUrl: string) => {
     setProfile({
       ...profile,

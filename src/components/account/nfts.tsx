@@ -40,7 +40,9 @@ const AccountNFTSPage: FC = () => {
     },
   ]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
 
   const toggleNFTSwapStatus = (id: string) => {

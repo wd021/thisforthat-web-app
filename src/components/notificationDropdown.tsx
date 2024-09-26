@@ -3,9 +3,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Notifications } from "@/icons";
 
+interface Notification {
+  id: number;
+  type: string;
+  user: string;
+  content: string;
+  time: string;
+}
+
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -52,8 +60,8 @@ const NotificationDropdown = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = () => {
+      if (dropdownRef.current) {
         setIsOpen(false);
       }
     };
@@ -66,7 +74,7 @@ const NotificationDropdown = () => {
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type: string) => {
     switch (type) {
       case "offer":
         return "💰";
