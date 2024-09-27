@@ -221,7 +221,7 @@ const NFTComponent: FC = () => {
                 {filteredActivities.map((item) => (
                   <Link
                     key={item.id}
-                    href={`/nft/1/1/1/${item.type}/${item.id}`}
+                    href={`/nft/1/1/1/deal/1`}
                     className="block hover:bg-gray-50 transition-colors duration-150 ease-in-out"
                   >
                     <div className="p-4 flex items-center space-x-4 border-b border-gray-100">

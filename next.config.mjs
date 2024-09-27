@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/account",
-        destination: "/account/swaps",
+        destination: "/account/activity",
         permanent: true,
       },
     ];

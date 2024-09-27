@@ -21,15 +21,7 @@ interface InterestedNFT {
   image: string;
 }
 
-interface Transaction {
-  id: string;
-  nftName: string;
-  price: string;
-  type: "buy" | "sell";
-  date: string;
-}
-
-type ActivityType = "deals" | "interested" | "transactions";
+type ActivityType = "deals" | "interested";
 
 const AccountActivityPage: FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityType>("deals");
@@ -66,23 +58,6 @@ const AccountActivityPage: FC = () => {
       name: "Azuki #101",
       collection: "Azuki",
       image: "/path-to-image2.jpg",
-    },
-  ];
-
-  const transactions: Transaction[] = [
-    {
-      id: "1",
-      nftName: "Moonbird #202",
-      price: "10 ETH",
-      type: "buy",
-      date: "2023-09-15",
-    },
-    {
-      id: "2",
-      nftName: "CryptoPunk #303",
-      price: "75 ETH",
-      type: "sell",
-      date: "2023-09-10",
     },
   ];
 
@@ -124,23 +99,6 @@ const AccountActivityPage: FC = () => {
             ))}
           </div>
         );
-      case "transactions":
-        return (
-          <div className="space-y-4">
-            {transactions.map((tx) => (
-              <Link
-                href={`/transactions/${tx.id}`}
-                key={tx.id}
-                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-bold">{tx.nftName}</h3>
-                <p>Price: {tx.price}</p>
-                <p>Type: {tx.type === "buy" ? "Bought" : "Sold"}</p>
-                <p>Date: {tx.date}</p>
-              </Link>
-            ))}
-          </div>
-        );
     }
   };
 
@@ -150,7 +108,7 @@ const AccountActivityPage: FC = () => {
       <div className="flex-1 p-8 bg-gray-100">
         <div className="mb-6">
           <div className="flex space-x-4 mb-6">
-            {(["deals", "interested", "transactions"] as const).map((tab) => (
+            {(["deals", "interested"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

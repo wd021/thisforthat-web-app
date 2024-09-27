@@ -6,7 +6,7 @@ const AccountSidebar: FC = () => {
   const pathname = usePathname();
 
   const tabs = [
-    { name: "Swaps", href: "/account/swaps" },
+    { name: "Activity", href: "/account/activity" },
     { name: "My NFTs", href: "/account/nfts" },
     { name: "DMs", href: "/account/messages" },
     { name: "Followers", href: "/account/followers" },
