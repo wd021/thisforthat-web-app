@@ -64,8 +64,10 @@ interface ChatMessage {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Deal: React.FC<Props> = ({ itemId, closeModal }) => {
   const [isMobile, setIsMobile] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [dealStatus, setDealStatus] = useState<DealStatus>({
     stage: "negotiation",
   });
@@ -123,6 +125,7 @@ const Deal: React.FC<Props> = ({ itemId, closeModal }) => {
     avatar: "/temp/alice-avatar.png",
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const recipient: DealParty = {
     id: "2",
     name: "Bob",
@@ -209,6 +212,7 @@ const Deal: React.FC<Props> = ({ itemId, closeModal }) => {
     },
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderInteraction = (interaction: DealInteraction) => {
     switch (interaction.type) {
       case "message":
@@ -304,6 +308,7 @@ const Deal: React.FC<Props> = ({ itemId, closeModal }) => {
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderDealProgress = () => {
     if (dealStatus.stage === "negotiation") return null;
 
