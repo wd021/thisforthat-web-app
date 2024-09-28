@@ -26,7 +26,7 @@ const AccountProfilePage: FC = () => {
   const [profile, setProfile] = useState<UserProfile>({
     username: "CryptoUser123",
     bio: "NFT enthusiast and blockchain developer",
-    profilePicture: "/path-to-default-image.jpg",
+    profilePicture: "/temp/profile.webp",
     isProfilePictureNFT: false,
     wallets: [
       { address: "0x1234...5678", isVerified: true },

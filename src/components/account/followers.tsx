@@ -18,19 +18,19 @@ const AccountFollowersPage: FC = () => {
     {
       id: "1",
       username: "cryptoEnthusiast",
-      avatar: "/avatars/user1.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: true,
     },
     {
       id: "2",
       username: "nftCollector",
-      avatar: "/avatars/user2.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: true,
     },
     {
       id: "3",
       username: "blockchainDev",
-      avatar: "/avatars/user3.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: true,
     },
   ]);
@@ -38,19 +38,19 @@ const AccountFollowersPage: FC = () => {
     {
       id: "4",
       username: "artLover",
-      avatar: "/avatars/user4.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: false,
     },
     {
       id: "5",
       username: "techGuru",
-      avatar: "/avatars/user5.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: true,
     },
     {
       id: "6",
       username: "investorPro",
-      avatar: "/avatars/user6.jpg",
+      avatar: "/temp/profile.webp",
       isFollowing: false,
     },
   ]);

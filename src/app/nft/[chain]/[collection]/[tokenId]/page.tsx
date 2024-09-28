@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ActivityFeed, Navbar } from "@/components";
+import { Navbar } from "@/components";
 import NFTComponent from "@/components/nft";
 
 interface NFTPageProps {
@@ -15,7 +15,6 @@ const NFTPage: FC<NFTPageProps> = ({ params }) => {
     <div className="h-screen flex items-center justify-center flex-col">
       <Navbar />
       <NFTComponent />
-      <ActivityFeed />
     </div>
   );
 };

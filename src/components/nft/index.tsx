@@ -5,7 +5,7 @@
 
 import React, { FC, useState } from "react";
 import Link from "next/link";
-import { Options, VerifiedBadge } from "@/components";
+import { Options, PinBar, VerifiedBadge } from "@/components";
 import { Pin } from "@/icons";
 
 interface ActivityItem {
@@ -93,19 +93,28 @@ const NFTComponent: FC = () => {
     },
     {
       id: "2",
-      type: "looking",
+      type: "offers",
       user: "Bob",
       // userAvatar: "/temp/profile.webp",
-      timestamp: new Date("2023-09-25T09:45:00"),
+      amount: "2.5 ETH",
+      timestamp: new Date("2023-09-25T10:30:00"),
     },
     {
       id: "3",
-      type: "transactions",
-      user: "Charlie",
+      type: "looking",
+      user: "Sam",
       // userAvatar: "/temp/profile.webp",
-      amount: "3 ETH",
-      timestamp: new Date("2023-09-24T14:20:00"),
+      timestamp: new Date("2023-09-25T09:45:00"),
     },
+
+    {
+      id: "4",
+      type: "looking",
+      user: "Karel",
+      // userAvatar: "/temp/profile.webp",
+      timestamp: new Date("2023-09-25T09:45:00"),
+    },
+
     // ... (add more mock data for each type)
   ];
   const filteredActivities = activities.filter((item) => {
@@ -119,9 +128,7 @@ const NFTComponent: FC = () => {
     <div className="absolute top-[75px] bottom-0 w-full flex">
       <div className="w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar">
         <div className="flex items-center px-6 pt-4 gap-x-3 w-full">
-          <div className="bg-gray-100 w-12 h-12 rounded-full shrink-0 border-dashed	border-gray-300 border-2 flex items-center justify-center cursor-pointer">
-            <Pin className="h-5 w-5 text-gray-300" />
-          </div>
+          <PinBar />
         </div>
         <div className="flex justify-center mt-6 gap-x-8">
           <div className="relative w-[400px]">
@@ -241,17 +248,15 @@ const NFTComponent: FC = () => {
                           {item.type === "looking" && "👀 Expressed interest"}
                           {item.type === "transactions" &&
                             "💰 Completed transaction"}
-                          {item.amount && ` - ${item.amount}`}
+                          {/* {item.amount && ` - ${item.amount}`} */}
                         </p>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {/* Replace with actual time calculation */}
-                        {Math.floor(
-                          (new Date().getTime() - item.timestamp.getTime()) /
-                            60000
-                        )}
-                        m
-                      </span>
+                      {item.type === "offers" && (
+                        <div className="text-sm font-semibold bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                          Negotiating
+                        </div>
+                      )}
+                      <span className="text-sm text-gray-500">5m</span>
                     </div>
                   </Link>
                 ))}

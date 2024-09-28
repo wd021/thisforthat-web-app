@@ -1,13 +1,14 @@
 import { FC, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { usePinnedImages } from "@/providers/pinbar";
 import { Options, VerifiedBadge } from "@/components";
 import { Offer } from "@/components/modals";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Pin, Verified } from "@/icons";
 
 interface GridItem {
-  id: string;
+  id: number;
   imageUrl: string;
   title: string;
 }
@@ -18,10 +19,11 @@ interface PinterestGridProps {
 
 const Grid: FC<PinterestGridProps> = ({ items }) => {
   const router = useRouter();
+  const { pinImage } = usePinnedImages();
   const [dealModalOpen, setDealModalOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
-  const handleDealModalOpen = (itemId: string) => {
+  const handleDealModalOpen = (itemId: number) => {
     setSelectedItemId(itemId);
     setDealModalOpen(true);
   };
@@ -38,7 +40,9 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
             <div
               className="absolute top-2 left-2 rounded-full w-7 h-7 flex items-center justify-center bg-gray-200 opacity-25"
               onClick={(e) => {
+                console.log("handlePin");
                 e.preventDefault();
+                pinImage(item.id.toString());
               }}
             >
               <Pin className="text-gray-600" />
@@ -106,7 +110,7 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
           {dealModalOpen && (
             <Offer
               closeModal={() => setDealModalOpen(false)}
-              itemId={selectedItemId}
+              itemId={selectedItemId.toString()}
             />
           )}
         </>

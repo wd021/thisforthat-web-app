@@ -4,7 +4,7 @@ import { FC, useState } from "react";
 import Image from "next/image";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Pin, Verified } from "@/icons";
-import { VerifiedBadge } from "@/components";
+import { PinBar, VerifiedBadge } from "@/components";
 
 type NFTCategory = "my-interests" | "not-for-swap" | "for-swap";
 
@@ -43,9 +43,7 @@ const ProfileComponent: FC = () => {
     <div className="absolute top-[75px] bottom-0 w-full flex justify-center">
       <div className="w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar">
         <div className="flex items-center px-6 pt-4 gap-x-3 w-full">
-          <div className="bg-gray-100 w-12 h-12 rounded-full shrink-0 border-dashed	border-gray-300 border-2 flex items-center justify-center cursor-pointer">
-            <Pin className="h-5 w-5 text-gray-300" />
-          </div>
+          <PinBar />
         </div>
         <div className="px-8 container mx-auto">
           {/* Profile Header */}

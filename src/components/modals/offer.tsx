@@ -67,65 +67,60 @@ const Offer: React.FC<Props> = ({ itemId, closeModal }) => {
         onRequestClose={closeModal}
         style={customStyles}
       >
-        <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4">Make a Deal</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Select NFTs to offer:
-              </label>
-              {/* Replace this with your actual NFT selection component */}
-              <select
-                multiple
-                value={selectedNFTs}
-                onChange={(e) =>
-                  setSelectedNFTs(
-                    Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    )
-                  )
-                }
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="nft1">NFT 1</option>
-                <option value="nft2">NFT 2</option>
-                <option value="nft3">NFT 3</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="offerDetails"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Offer Details:
-              </label>
-              <textarea
-                id="offerDetails"
-                value={offerDetails}
-                onChange={(e) => setOfferDetails(e.target.value)}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                rows={4}
-                placeholder="Describe your offer..."
-              />
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => closeModal()}
-                className="mr-2 px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Submit Offer
-              </button>
-            </div>
-          </form>
-        </div>
+        <h2 className="text-2xl font-bold mb-4">Make An Offer</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Select NFTs to offer:
+            </label>
+            {/* Replace this with your actual NFT selection component */}
+            <select
+              multiple
+              value={selectedNFTs}
+              onChange={(e) =>
+                setSelectedNFTs(
+                  Array.from(e.target.selectedOptions, (option) => option.value)
+                )
+              }
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="nft1">NFT 1</option>
+              <option value="nft2">NFT 2</option>
+              <option value="nft3">NFT 3</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="offerDetails"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Message:
+            </label>
+            <textarea
+              id="offerDetails"
+              value={offerDetails}
+              onChange={(e) => setOfferDetails(e.target.value)}
+              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              rows={4}
+              placeholder="Add a message to your offer..."
+            />
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => closeModal()}
+              className="mr-2 px-4 py-2 text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Submit Offer
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

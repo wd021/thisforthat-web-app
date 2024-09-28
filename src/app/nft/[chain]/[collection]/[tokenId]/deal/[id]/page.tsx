@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { useRouter } from "next/navigation";
-import { ActivityFeed, Navbar } from "@/components";
+import { Navbar } from "@/components";
 import NFTComponent from "@/components/nft";
 import { Deal } from "@/components/modals";
 
@@ -20,7 +20,6 @@ const NFTPage: FC<NFTPageProps> = ({ params }) => {
     <div className="h-screen flex items-center justify-center flex-col">
       <Navbar />
       <NFTComponent />
-      <ActivityFeed />
       <Deal
         itemId={""}
         closeModal={() => {

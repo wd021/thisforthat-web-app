@@ -1,97 +1,97 @@
 {
   "gridItems": [
     {
-      "id": "1",
+      "id": 1,
       "imageUrl": "https://picsum.photos/seed/1/300/400",
       "title": "Beautiful Sunset",
       "description": "A stunning view of the sun setting over the ocean."
     },
     {
-      "id": "2",
+      "id": 2,
       "imageUrl": "https://picsum.photos/seed/2/300/500",
       "title": "Mountain Landscape",
       "description": "Majestic mountains under a clear blue sky."
     },
     {
-      "id": "3",
+      "id": 3,
       "imageUrl": "https://picsum.photos/seed/3/300/350",
       "title": "Urban Architecture",
       "description": "Modern city skyline with impressive skyscrapers."
     },
     {
-      "id": "4",
+      "id": 4,
       "imageUrl": "https://picsum.photos/seed/4/300/450",
       "title": "Colorful Flowers",
       "description": "A vibrant field of wildflowers in bloom."
     },
     {
-      "id": "5",
+      "id": 5,
       "imageUrl": "https://picsum.photos/seed/5/300/400",
       "title": "Tranquil Lake",
       "description": "Calm waters reflecting the surrounding forest."
     },
     {
-      "id": "6",
+      "id": 6,
       "imageUrl": "https://picsum.photos/seed/6/300/500",
       "title": "Ancient Ruins",
       "description": "Historical stone structures from a lost civilization."
     },
     {
-      "id": "7",
+      "id": 7,
       "imageUrl": "https://picsum.photos/seed/7/300/350",
       "title": "Delicious Cuisine",
       "description": "A mouthwatering display of gourmet dishes."
     },
     {
-      "id": "8",
+      "id": 8,
       "imageUrl": "https://picsum.photos/seed/8/300/450",
       "title": "Wildlife Safari",
       "description": "Exotic animals in their natural habitat."
     },
     {
-      "id": "1",
+      "id": 9,
       "imageUrl": "https://picsum.photos/seed/1/300/400",
       "title": "Beautiful Sunset",
       "description": "A stunning view of the sun setting over the ocean."
     },
     {
-      "id": "2",
+      "id": 10,
       "imageUrl": "https://picsum.photos/seed/2/300/500",
       "title": "Mountain Landscape",
       "description": "Majestic mountains under a clear blue sky."
     },
     {
-      "id": "3",
+      "id": 11,
       "imageUrl": "https://picsum.photos/seed/3/300/350",
       "title": "Urban Architecture",
       "description": "Modern city skyline with impressive skyscrapers."
     },
     {
-      "id": "4",
+      "id": 12,
       "imageUrl": "https://picsum.photos/seed/4/300/450",
       "title": "Colorful Flowers",
       "description": "A vibrant field of wildflowers in bloom."
     },
     {
-      "id": "5",
+      "id": 13,
       "imageUrl": "https://picsum.photos/seed/5/300/400",
       "title": "Tranquil Lake",
       "description": "Calm waters reflecting the surrounding forest."
     },
     {
-      "id": "6",
+      "id": 14,
       "imageUrl": "https://picsum.photos/seed/6/300/500",
       "title": "Ancient Ruins",
       "description": "Historical stone structures from a lost civilization."
     },
     {
-      "id": "7",
+      "id": 15,
       "imageUrl": "https://picsum.photos/seed/7/300/350",
       "title": "Delicious Cuisine",
       "description": "A mouthwatering display of gourmet dishes."
     },
     {
-      "id": "8",
+      "id": 16,
       "imageUrl": "https://picsum.photos/seed/8/300/450",
       "title": "Wildlife Safari",
       "description": "Exotic animals in their natural habitat."

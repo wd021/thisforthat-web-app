@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Notifications } from "@/icons";
 
+import tempActivityData from "@/temp/activityFeed.json";
+
 interface Notification {
   id: number;
   type: string;
@@ -14,6 +16,7 @@ interface Notification {
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationType, setNotificationType] = useState<"MY" | "ALL">("MY");
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -60,8 +63,8 @@ const NotificationDropdown = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (dropdownRef.current) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -90,12 +93,11 @@ const NotificationDropdown = () => {
         return "🔔";
     }
   };
-
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="h-full w-[45px] h-full rounded-md bg-gray-100 flex items-center justify-center"
+        className="h-full w-[45px] rounded-md bg-gray-100 flex items-center justify-center"
       >
         <Notifications className="w-[22px] h-[22px]" />
         {notifications.length > 0 && (
@@ -106,8 +108,11 @@ const NotificationDropdown = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-[-55px] w-80 bg-white rounded-md shadow-lg overflow-hidden z-10">
-          <div className="py-2">
+        <div
+          className="absolute right-[-55px] mt-[10px] w-80 bg-white rounded-md shadow-lg overflow-hidden z-10 flex flex-col"
+          style={{ height: "calc(100vh - 80px)" }}
+        >
+          <div className="flex-shrink-0">
             <div className="px-4 py-2 bg-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-semibold text-gray-800">
                 Notifications
@@ -119,42 +124,89 @@ const NotificationDropdown = () => {
                 X
               </button>
             </div>
-            <div className="max-h-96 overflow-y-auto">
-              {notifications.length > 0 ? (
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                  >
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mr-3">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      <div className="flex-grow">
-                        <p className="text-sm font-medium text-gray-800">
-                          <span className="font-semibold">
-                            {notification.user}
-                          </span>{" "}
-                          {notification.content}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {notification.time}
-                        </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setNotificationType("MY")}
+                className={`px-4 py-1 w-full ${
+                  notificationType === "MY"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                MY
+              </button>
+              <button
+                onClick={() => setNotificationType("ALL")}
+                className={`px-4 py-1 w-full ${
+                  notificationType === "ALL"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                ALL
+              </button>
+            </div>
+          </div>
+          <div className="flex-grow overflow-y-auto hide-scrollbar">
+            {notificationType === "MY" && (
+              <div>
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    >
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-3">
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        <div className="flex-grow">
+                          <p className="text-sm font-medium text-gray-800">
+                            <span className="font-semibold">
+                              {notification.user}
+                            </span>{" "}
+                            {notification.content}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {notification.time}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-sm text-gray-500">
+                    No new notifications
                   </div>
-                ))
-              ) : (
-                <div className="px-4 py-3 text-sm text-gray-500">
-                  No new notifications
-                </div>
-              )}
-            </div>
-            {notifications.length > 0 && (
-              <div className="px-4 py-2 bg-gray-100 text-center">
-                <button className="text-sm text-blue-500 hover:text-blue-600">
-                  View all notifications
-                </button>
+                )}
+              </div>
+            )}
+            {notificationType === "ALL" && (
+              <div>
+                {tempActivityData.feed.map((offer) => (
+                  <li
+                    key={offer.id}
+                    className="flex items-center p-3 hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer"
+                  >
+                    <div className="flex-shrink-0">
+                      <img
+                        src="/temp/profile.webp"
+                        alt="avatar"
+                        className="w-6 h-6 rounded-full mr-2"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <p className="text-sm font-medium text-gray-900">
+                        <span className="font-semibold">fredwilson</span> made
+                        an offer for{" "}
+                        <span className="font-semibold">{offer.nftName}</span>
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 flex items-center text-sm text-gray-500 mr-1 ml-4">
+                      5m
+                    </div>
+                  </li>
+                ))}
               </div>
             )}
           </div>

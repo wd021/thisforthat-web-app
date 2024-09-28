@@ -1,4 +1,4 @@
-import { ActivityFeed, Navbar } from "@/components";
+import { Navbar } from "@/components";
 import HomeComponent from "@/components/home";
 
 export default function Home() {
@@ -6,7 +6,6 @@ export default function Home() {
     <div className="h-screen flex items-center justify-center flex-col">
       <Navbar />
       <HomeComponent />
-      <ActivityFeed />
     </div>
   );
 }

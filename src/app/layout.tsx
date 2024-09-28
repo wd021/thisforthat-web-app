@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PinBarProvider } from "@/providers/pinbar";
 
 export const metadata: Metadata = {
   title: "TFT - Swap NFTS for NFTs",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PinBarProvider>{children}</PinBarProvider>
+      </body>
     </html>
   );
 }

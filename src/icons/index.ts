@@ -11,3 +11,4 @@ export { default as Pencil } from "./pencil";
 export { default as Wallet } from "./wallet";
 export { default as Notifications } from "./notifications";
 export { default as Back } from "./back";
+export { default as Checkmark } from "./checkmark";
