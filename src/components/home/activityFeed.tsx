@@ -122,7 +122,7 @@ const ActivityFeed: React.FC = () => {
   return (
     <div
       className={`border-l border-gray-200 hidden md:flex flex-col ${
-        feedCollapsed ? "w-12" : "w-[350px]"
+        feedCollapsed ? "w-12" : "w-[400px]"
       } bg-gray-100 transition-all duration-300 ease-in-out shrink-0`}
     >
       <div className="flex-grow overflow-hidden">
