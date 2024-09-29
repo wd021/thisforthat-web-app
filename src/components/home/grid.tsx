@@ -30,7 +30,7 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
 
   return (
     <>
-      <div className="p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+      <div className="p-5 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
         {items.map((item) => (
           <Link
             href="/nft/1/1/1"
@@ -87,7 +87,7 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
                       e.preventDefault();
                       handleDealModalOpen(item.id);
                     }}
-                    className="bg-gray-50 px-2 py-0.5 rounded-md border border-gray-200 cursor-pointer"
+                    className="bg-gray-50 px-2 py-0.5 rounded-md border text-lg border-gray-200 cursor-pointer"
                   >
                     🤝 5
                   </div>
@@ -95,7 +95,7 @@ const Grid: FC<PinterestGridProps> = ({ items }) => {
                     onClick={(e) => {
                       e.preventDefault();
                     }}
-                    className="bg-gray-50 px-2 py-0.5 rounded-md border border-gray-200 cursor-pointer"
+                    className="bg-gray-50 px-2 py-0.5 rounded-md border text-lg border-gray-200 cursor-pointer"
                   >
                     👀 30
                   </div>
