@@ -106,7 +106,7 @@ const FeedItem: React.FC<{ notification: Notification }> = ({ notification }) =>
             <NFTOfferDisplay
               userAOffers={notification.metadata.offer.user}
               userBOffers={notification.metadata.offer.userCounter}
-              size='medium'
+              size='small'
               status={
                 notification.notification_type === 'offer_acepted' ? 'accepted' : 'pending'
               }

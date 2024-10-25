@@ -73,11 +73,7 @@ const FeedItem: React.FC<{
   return (
     <div
       key={activity.id}
-      className={`border-b border-gray-200 p-4 ${
-        isClickable
-          ? 'cursor-pointer hover:bg-gray-100 transition-colors duration-200 group'
-          : ''
-      }`}
+      className={`border-b border-gray-200 p-4 ${isClickable ? 'cursor-pointer hover:bg-gray-100 transition-colors duration-100' : ''}`}
       onClick={() => {
         if (isClickable) {
           const viewOfferItem: SimplifiedOfferItem = {
@@ -244,7 +240,7 @@ const ActivityFeedToggle: React.FC<ActivityFeedToggleProps> = ({ filter, setFilt
                 }}
                 className={`${
                   filter === option ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                } group flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900`}
+                } flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900`}
                 role='menuitem'
               >
                 <span className='mr-2'>{getFilterEmoji(option)}</span>

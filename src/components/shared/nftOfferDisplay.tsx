@@ -126,7 +126,7 @@ const NFTOfferDisplay: React.FC<{
 
   return (
     <div
-      className={`cursor-pointer w-full ${bgGradient[status]} ${containerPadding[size]} rounded-xl shadow-md relative ${!isOpen ? 'pr-10' : ''}`}
+      className={`cursor-pointer w-full ${bgGradient[status]} ${containerPadding[size]} rounded-xl shadow-md hover:shadow-lg transition-all duration-200 relative ${!isOpen ? 'pr-10' : ''}`}
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()

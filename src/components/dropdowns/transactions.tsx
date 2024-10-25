@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 import { NFTOfferDisplay } from '@/components/shared'
-import { Chain } from '@/icons'
+import { Chain, ChainLogo } from '@/icons'
 // import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 interface TransactionProps {
@@ -89,24 +89,38 @@ const FeedItem: React.FC<TransactionProps> = ({ transaction, selectOffer }) => {
 
   return (
     <div
-      className='p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0'
+      className={`group relative px-4 py-3 border-b border-gray-100 hover:bg-white transition-colors duration-200 cursor-pointer`}
       onClick={() => selectOffer(transaction.id)}
     >
-      <div className='flex items-center justify-between mb-4'>
-        <div className='text-sm font-medium'>Ethereum</div>
-        <StatusBadge status={transaction.status} />
+      <div className='flex justify-between items-center mb-3'>
+        {/* Chain Info */}
+        <div className='flex items-center space-x-2'>
+          <ChainLogo chainId={parseInt(transaction.chain_id)} className='w-5 h-5' />
+          <span className='text-sm font-medium text-gray-700'>
+            {parseInt(transaction.chain_id) === 1 ? 'Ethereum' : 'Chain'}
+          </span>
+        </div>
+
+        {/* Progress */}
+        <div className='flex flex-col items-end'>
+          <span className='text-xs text-gray-600 mb-1'>
+            {totalDeposited}/{totalRequired} deposited
+          </span>
+          <div className='w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden'>
+            <div
+              className='h-full bg-blue-500 transition-all duration-500'
+              style={{ width: `${overallProgress}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      <ProgressBar progress={overallProgress} status={transaction.status} />
-
-      <div className='mt-4'>
-        <NFTOfferDisplay
-          userAOffers={transaction.offer.user}
-          userBOffers={transaction.offer.userCounter}
-          size='small'
-          status='completed'
-        />
-      </div>
+      <NFTOfferDisplay
+        userAOffers={transaction.offer.user}
+        userBOffers={transaction.offer.userCounter}
+        size='small'
+        status='completed'
+      />
     </div>
   )
 }

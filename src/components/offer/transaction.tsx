@@ -195,87 +195,85 @@ const Transaction: React.FC<Props> = ({ info, closeModal, onBackToChat, onCancel
   const progress = (uploadedAssets / totalAssets) * 100
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 z-50'>
-      <div className='bg-gray-100 rounded-xl shadow-xl max-w-2xl w-full h-[90vh] flex flex-col overflow-hidden'>
-        <div className='bg-white p-3 flex items-center justify-between shadow-sm'>
-          <div className='flex items-center space-x-2.5'>
-            <ChainLogo chainId={1} className='w-8 h-8' />
-            <h2 className='text-xl font-bold text-gray-800'>Swap</h2>
+    <div className='bg-gray-100 rounded-xl shadow-xl max-w-2xl w-full h-[90vh] flex flex-col overflow-hidden'>
+      <div className='bg-white p-3 flex items-center justify-between shadow-sm'>
+        <div className='flex items-center space-x-2.5'>
+          <ChainLogo chainId={1} className='w-8 h-8' />
+          <h2 className='text-xl font-bold text-gray-800'>Swap</h2>
+        </div>
+        <button
+          onClick={closeModal}
+          className='text-gray-500 hover:text-gray-700 transition-colors'
+        >
+          <Close className='w-5 h-5' />
+        </button>
+      </div>
+
+      <div className='flex-1 overflow-y-auto p-3 space-y-3'>
+        {renderWarningSection()}
+
+        <div className='bg-white p-2.5 rounded-md shadow-sm'>
+          <div className='flex justify-between items-center mb-1.5 text-xs font-medium text-gray-700'>
+            <span>
+              Total Progress: {uploadedAssets}/{totalAssets} deposited
+            </span>
+            <span>{progress.toFixed(0)}%</span>
           </div>
+          <div className='w-full bg-gray-200 rounded-full h-2'>
+            <div
+              className='bg-blue-600 h-2 rounded-full transition-all duration-500 ease-in-out'
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className='space-y-3'>
+          {renderAssetGrid(info.offer.user, info.user, true)}
+          {renderAssetGrid(info.offer.userCounter, info.counter_user, false)}
+        </div>
+      </div>
+
+      <div className='bg-white p-3 border-t border-gray-200'>
+        <button
+          onClick={handleBulkUpload}
+          disabled={selectedAssets.length === 0 || uploadStep !== 'idle'}
+          className={`w-full px-3 py-2.5 ${
+            selectedAssets.length === 0 || uploadStep !== 'idle'
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
+          } text-white rounded-md transition-colors font-semibold flex items-center justify-center text-sm`}
+        >
+          <Upload className='w-4 h-4 mr-1.5' />
+          {uploadStep === 'approving'
+            ? 'Approving...'
+            : uploadStep === 'depositing'
+              ? 'Depositing...'
+              : `Deposit Selected (${selectedAssets.length})`}
+        </button>
+
+        <div className='text-xs text-gray-600 text-center mt-1.5'>
+          {uploadStep === 'approving' && 'Step 1/2: Approving transfers'}
+          {uploadStep === 'depositing' && 'Step 2/2: Depositing assets'}
+        </div>
+
+        <div className='flex justify-between mt-2.5'>
           <button
-            onClick={closeModal}
-            className='text-gray-500 hover:text-gray-700 transition-colors'
+            onClick={onBackToChat}
+            className='px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors font-medium text-xs'
           >
-            <Close className='w-5 h-5' />
+            Back to Chat
           </button>
-        </div>
-
-        <div className='flex-1 overflow-y-auto p-3 space-y-3'>
-          {renderWarningSection()}
-
-          <div className='bg-white p-2.5 rounded-md shadow-sm'>
-            <div className='flex justify-between items-center mb-1.5 text-xs font-medium text-gray-700'>
-              <span>
-                Total Progress: {uploadedAssets}/{totalAssets} deposited
-              </span>
-              <span>{progress.toFixed(0)}%</span>
-            </div>
-            <div className='w-full bg-gray-200 rounded-full h-2'>
-              <div
-                className='bg-blue-600 h-2 rounded-full transition-all duration-500 ease-in-out'
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          </div>
-
-          <div className='space-y-3'>
-            {renderAssetGrid(info.offer.user, info.user, true)}
-            {renderAssetGrid(info.offer.userCounter, info.counter_user, false)}
-          </div>
-        </div>
-
-        <div className='bg-white p-3 border-t border-gray-200'>
           <button
-            onClick={handleBulkUpload}
-            disabled={selectedAssets.length === 0 || uploadStep !== 'idle'}
-            className={`w-full px-3 py-2.5 ${
-              selectedAssets.length === 0 || uploadStep !== 'idle'
+            onClick={onCancelTrade}
+            disabled={isCancelConfirming}
+            className={`px-3 py-1.5 ${
+              isCancelConfirming
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-            } text-white rounded-md transition-colors font-semibold flex items-center justify-center text-sm`}
+                : 'bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800'
+            } rounded-md transition-colors font-medium text-xs`}
           >
-            <Upload className='w-4 h-4 mr-1.5' />
-            {uploadStep === 'approving'
-              ? 'Approving...'
-              : uploadStep === 'depositing'
-                ? 'Depositing...'
-                : `Deposit Selected (${selectedAssets.length})`}
+            Cancel Trade
           </button>
-
-          <div className='text-xs text-gray-600 text-center mt-1.5'>
-            {uploadStep === 'approving' && 'Step 1/2: Approving transfers'}
-            {uploadStep === 'depositing' && 'Step 2/2: Depositing assets'}
-          </div>
-
-          <div className='flex justify-between mt-2.5'>
-            <button
-              onClick={onBackToChat}
-              className='px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors font-medium text-xs'
-            >
-              Back to Chat
-            </button>
-            <button
-              onClick={onCancelTrade}
-              disabled={isCancelConfirming}
-              className={`px-3 py-1.5 ${
-                isCancelConfirming
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800'
-              } rounded-md transition-colors font-medium text-xs`}
-            >
-              Cancel Trade
-            </button>
-          </div>
         </div>
       </div>
     </div>
