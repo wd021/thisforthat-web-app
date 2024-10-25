@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Modal from 'react-modal'
 import { isAddress } from 'viem'
@@ -12,11 +12,7 @@ import { BLOCKED_USERNAMES, MAX_IMAGE_UPLOAD_SIZE } from '@/utils/constants'
 import { uploadFile } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
-interface Props {
-  closeModal: () => void
-}
-
-const Onboard: FC<Props> = ({ closeModal }) => {
+const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
   const { showToast } = useToast()

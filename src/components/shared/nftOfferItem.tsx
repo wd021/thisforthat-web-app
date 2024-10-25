@@ -125,6 +125,7 @@ const NFTOfferItem: React.FC<NFTOfferItemProps> = ({
           userBOffers={item.offer.userCounter}
           size='medium'
           defaultOpen={false}
+          status={item.status}
         />
       </div>
       <div className='mt-auto px-4 py-3 bg-white bg-opacity-60 backdrop-blur-sm flex justify-between items-center transition-all duration-300'>

@@ -1,7 +1,5 @@
 'use client'
 
-import { FC } from 'react'
-
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useRouter } from 'next/navigation'
 import { isAddress } from 'viem'
@@ -14,7 +14,7 @@ import { BLOCKED_USERNAMES, MAX_IMAGE_UPLOAD_SIZE } from '@/utils/constants'
 import { uploadFile } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
-const AccountProfilePage: FC = () => {
+const AccountProfilePage: React.FC = () => {
   const isMobile = useIsMobile()
   const router = useRouter()
   const { user, loading: loadingUser, profile: initialProfile } = useAuth()
@@ -167,7 +167,7 @@ interface ProfilePictureProps {
   loadingFileUpload: boolean
 }
 
-const ProfilePicture: FC<ProfilePictureProps> = ({
+const ProfilePicture: React.FC<ProfilePictureProps> = ({
   profile,
   getRootProps,
   getInputProps,
@@ -227,7 +227,7 @@ interface BasicInformationProps {
   errors: { [key: string]: string }
 }
 
-const BasicInformation: FC<BasicInformationProps> = ({ profile, setProfile, errors }) => (
+const BasicInformation: React.FC<BasicInformationProps> = ({ profile, setProfile, errors }) => (
   <div className='bg-white rounded-lg shadow-md p-6'>
     <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
     <div className='space-y-4'>
@@ -288,7 +288,7 @@ interface SaveButtonProps {
   loading: boolean
 }
 
-const SaveButton: FC<SaveButtonProps> = ({ handleSaveProfile, loading }) => (
+const SaveButton: React.FC<SaveButtonProps> = ({ handleSaveProfile, loading }) => (
   <button
     onClick={handleSaveProfile}
     className='w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50'

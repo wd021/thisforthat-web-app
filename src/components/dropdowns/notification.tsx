@@ -8,24 +8,20 @@ import { NFTOfferDisplay } from '@/components/shared'
 import { Notifications } from '@/icons'
 import { timeAgoShort } from '@/utils/helpers'
 
-interface NotificationMetadata {
-  offer_id?: string
-  username: string
-  profile_pic_url: string
-}
-
 interface Notification {
   id: string
   notification_type: string
-  metadata: NotificationMetadata
+  metadata: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    offer: any
+    offer_id?: string
+    username: string
+    profile_pic_url: string
+  }
   updated_at: string
 }
 
-interface NotificationProps {
-  notification: Notification
-}
-
-const FeedItem: React.FC<NotificationProps> = ({ notification }) => {
+const FeedItem: React.FC<{ notification: Notification }> = ({ notification }) => {
   const isClickable = ['offer_new', 'offer_update', 'offer_accepted'].includes(
     notification.notification_type,
   )
@@ -41,7 +37,7 @@ const FeedItem: React.FC<NotificationProps> = ({ notification }) => {
       case 'offer_update':
         return <>made a counter offer</>
       case 'offer_accepted':
-        return <>✅ accepted your offer</>
+        return <>accepted your offer</>
       default:
         return 'Unknown notification'
     }
@@ -111,6 +107,9 @@ const FeedItem: React.FC<NotificationProps> = ({ notification }) => {
               userAOffers={notification.metadata.offer.user}
               userBOffers={notification.metadata.offer.userCounter}
               size='medium'
+              status={
+                notification.notification_type === 'offer_acepted' ? 'accepted' : 'pending'
+              }
             />
           </div>
         )}
@@ -118,19 +117,12 @@ const FeedItem: React.FC<NotificationProps> = ({ notification }) => {
   )
 }
 
-interface NotificationDropdownProps {
+const NotificationDropdown: React.FC<{
   notifications: Notification[]
   selectOffer: (offerId: string) => void
   newCount: number
   onOpen: () => void
-}
-
-const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
-  notifications,
-  selectOffer,
-  newCount,
-  onOpen,
-}) => {
+}> = ({ notifications, selectOffer, newCount, onOpen }) => {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -155,7 +147,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     setIsOpen(!isOpen)
   }
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: Notification) => {
     if (notification.notification_type !== 'follow') {
       selectOffer(notification.metadata.offer_id!)
     } else {
@@ -182,12 +174,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         <div className='absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden z-10'>
           <div className='flex flex-col h-[480px]'>
             {' '}
-            {/* Fixed height for the dropdown */}
-            {/* Header */}
             <div className='p-4 border-b border-gray-200'>
               <h3 className='text-lg font-semibold'>Notifications</h3>
             </div>
-            {/* Scrollable content */}
             <div className='flex-grow overflow-y-auto hide-scrollbar'>
               {notifications.length > 0 ? (
                 notifications.map((notification) => (
@@ -209,7 +198,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 </div>
               )}
             </div>
-            {/* Footer */}
             <div className='p-4 border-t border-gray-200'>
               <Link
                 href='/notifications'

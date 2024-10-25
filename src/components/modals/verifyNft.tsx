@@ -1,17 +1,13 @@
 'use client'
 
-import { FC } from 'react'
 import Modal from 'react-modal'
 
 import { NftVerifier } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { Close } from '@/icons'
 import { getModalStyles } from '@/styles'
-interface Props {
-  closeModal: () => void
-}
 
-const VerifyNft: FC<Props> = ({ closeModal }) => {
+const VerifyNft: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
 

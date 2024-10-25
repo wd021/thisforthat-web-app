@@ -1,11 +1,9 @@
 'use client'
 
-import { FC } from 'react'
-
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
 
-const SearchPage: FC = () => {
+const SearchPage: React.FC = () => {
   const isMobile = useIsMobile()
 
   return (

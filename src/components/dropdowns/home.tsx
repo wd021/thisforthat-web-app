@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { GridTabOption } from '@/types/main'
 
@@ -8,18 +8,16 @@ interface GridNavItem {
   emoji: string
 }
 
-interface GridNavigationProps {
-  tabOption: GridTabOption
-  onNavigationChange: (tabOption: GridTabOption) => void
-}
-
 const nftSubOptions: GridNavItem[] = [
   { id: 'home', label: 'Explore', emoji: '🖼️' },
   { id: 'followers', label: 'Following', emoji: '👥' },
   { id: 'pinned', label: 'My Pinned', emoji: '📌' },
 ]
 
-const GridNavigation: FC<GridNavigationProps> = ({ tabOption, onNavigationChange }) => {
+const HomeDropdown: React.FC<{
+  tabOption: GridTabOption
+  onNavigationChange: (tabOption: GridTabOption) => void
+}> = ({ tabOption, onNavigationChange }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedNftOption, setSelectedNftOption] = useState<GridTabOption>('home')
   const dropdownRef = useRef<HTMLUListElement>(null)
@@ -133,4 +131,4 @@ const GridNavigation: FC<GridNavigationProps> = ({ tabOption, onNavigationChange
   )
 }
 
-export default GridNavigation
+export default HomeDropdown

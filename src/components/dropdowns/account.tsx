@@ -1,12 +1,12 @@
 'use client'
 
-import { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 import { User } from '@/icons'
 import { supabase } from '@/utils/supabaseClient'
 
-const AccountDropdown: FC<{ username: string }> = ({ username }) => {
+const AccountDropdown: React.FC<{ username: string }> = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 

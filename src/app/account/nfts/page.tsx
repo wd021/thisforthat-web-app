@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
@@ -8,65 +8,14 @@ import { Footer } from '@/components'
 import { AddNft, VerifyNft } from '@/components/modals'
 import { NFTAccountItem } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
+import { useNFTs } from '@/hooks/supabase'
 import { Add, VerifyIcon } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
-import { useToast } from '@/providers/toastProvider'
 import { Profile, UserNFT } from '@/types/supabase'
-import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
-import { supabase } from '@/utils/supabaseClient'
 
-const useNFTs = () => {
-  const [userNfts, setUserNfts] = useState<UserNFT[]>([])
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const { showToast } = useToast()
-
-  const fetchUserNfts = useCallback(
-    async (userId: string, pageNum: number) => {
-      const { data, error } = await supabase
-        .from('user_nfts')
-        .select('*, nfts!user_nfts_nft_id_fkey(*)')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .range((pageNum - 1) * GRID_ITEMS_PER_PAGE, pageNum * GRID_ITEMS_PER_PAGE - 1)
-
-      if (error) {
-        showToast(`⚠️ Error fetching items`, 2500)
-        console.error('Error fetching items:', error)
-        return
-      }
-
-      setUserNfts((prevUserNfts) => {
-        if (pageNum === 1) return data
-        const newUserNfts = data.filter(
-          (newUserNft: UserNFT) =>
-            !prevUserNfts.some((prevUserNft) => prevUserNft.nft_id === newUserNft.nft_id),
-        )
-        return [...prevUserNfts, ...newUserNfts]
-      })
-
-      setHasMore(data.length === GRID_ITEMS_PER_PAGE)
-    },
-    [showToast],
-  )
-
-  const loadMore = useCallback(
-    (userId: string) => {
-      const nextPage = page + 1
-      setPage(nextPage)
-      fetchUserNfts(userId, nextPage)
-    },
-    [page, fetchUserNfts],
-  )
-
-  return { userNfts, hasMore, fetchUserNfts, loadMore }
-}
-
-interface HeaderProps {
-  setModal: (modal: 'add' | 'verify' | null) => void
-}
-
-const Header: React.FC<HeaderProps> = ({ setModal }) => {
+const Header: React.FC<{ setModal: (modal: 'add' | 'verify' | null) => void }> = ({
+  setModal,
+}) => {
   return (
     <header className='border-b border-gray-200'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -86,13 +35,11 @@ const Header: React.FC<HeaderProps> = ({ setModal }) => {
   )
 }
 
-interface HeaderButtonProps {
+const HeaderButton: React.FC<{
   onClick: () => void
   icon: React.ReactNode
   children: React.ReactNode
-}
-
-const HeaderButton: React.FC<HeaderButtonProps> = ({ onClick, icon, children }) => (
+}> = ({ onClick, icon, children }) => (
   <motion.button
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}

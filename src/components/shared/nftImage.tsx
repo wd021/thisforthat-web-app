@@ -1,20 +1,12 @@
 import { FC, useState } from 'react'
 
-interface NFTImageProps {
+const NFTImage: FC<{
   src: string
   alt: string
   fallback: string
   rounded?: 'top' | 'all'
   hoverOn?: boolean
-}
-
-const NFTImage: FC<NFTImageProps> = ({
-  src,
-  alt,
-  fallback,
-  rounded = 'top',
-  hoverOn = false,
-}) => {
+}> = ({ src, alt, fallback, rounded = 'top', hoverOn = false }) => {
   const [error, setError] = useState<boolean>(false)
 
   const imageContent = error ? (

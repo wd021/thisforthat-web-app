@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { NFTOfferDisplay } from '@/components/shared'
 import { Chain } from '@/icons'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
+// import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 interface TransactionProps {
   transaction: {
@@ -104,6 +104,7 @@ const FeedItem: React.FC<TransactionProps> = ({ transaction, selectOffer }) => {
           userAOffers={transaction.offer.user}
           userBOffers={transaction.offer.userCounter}
           size='small'
+          status='completed'
         />
       </div>
     </div>

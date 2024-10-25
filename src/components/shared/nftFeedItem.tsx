@@ -5,13 +5,11 @@ import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { NFTFeedItem as NFTFeedItemType } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
-interface NFTItemProps {
+const NFTFeedItem: FC<{
   item: NFTFeedItemType
   makeOffer: (nft: NFTFeedItemType) => void
   pinItem: (nft: NFTFeedItemType) => void
-}
-
-const NFTFeedItem: FC<NFTItemProps> = ({ item, makeOffer, pinItem }) => {
+}> = ({ item, makeOffer, pinItem }) => {
   const navigateToUser = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
     window.open(`/${item.nft_user_id_username}`, '_blank')

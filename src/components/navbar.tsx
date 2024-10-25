@@ -4,7 +4,11 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { debounce } from 'lodash'
 
-import { AccountDropdown, NotificationDropdown, TransactionsDropdown } from '@/components'
+import {
+  AccountDropdown,
+  NotificationDropdown,
+  TransactionsDropdown,
+} from '@/components/dropdowns'
 import {
   Login as LoginModal,
   Offer as OfferModal,

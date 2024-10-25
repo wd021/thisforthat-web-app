@@ -47,7 +47,7 @@ const ActivityItem: FC<{ item: any; user: any; isLastItem: boolean }> = ({
                   ? 'made an offer'
                   : item.item_type === 'counter_offer'
                     ? 'made a counter offer'
-                    : '✅ accepted the offer'}
+                    : 'accepted the offer'}
               </div>
             )}
           </div>
@@ -60,6 +60,7 @@ const ActivityItem: FC<{ item: any; user: any; isLastItem: boolean }> = ({
               userAOffers={item.offer.user}
               userBOffers={item.offer.userCounter}
               size='medium'
+              status={item.item_type === 'accept' ? 'accepted' : 'pending'}
             />
           </div>
         )}

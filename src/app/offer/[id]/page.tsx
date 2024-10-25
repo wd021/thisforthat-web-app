@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
@@ -16,7 +16,7 @@ interface NFTPageProps {
   }
 }
 
-const Offer: FC<NFTPageProps> = ({ params }) => {
+const Offer: React.FC<NFTPageProps> = ({ params }) => {
   const isMobile = useIsMobile()
   const { showToast } = useToast()
   const [offerInfo, setOfferInfo] = useState<OfferFeedItem | null>(null)
@@ -49,6 +49,7 @@ const Offer: FC<NFTPageProps> = ({ params }) => {
     if (params.id) {
       fetchOfferInfo()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   return (

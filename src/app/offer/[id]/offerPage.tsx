@@ -2,7 +2,7 @@
 
 'use client'
 
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { Offer } from '@/components/modals'
@@ -20,7 +20,7 @@ interface OfferPageProps {
   offerInfo: OfferFeedItem
 }
 
-const OfferPage: FC<OfferPageProps> = ({ offerInfo }) => {
+const OfferPage: React.FC<OfferPageProps> = ({ offerInfo }) => {
   const [view, setView] = useState<'main' | 'select' | 'create_trade' | null>('main')
 
   const createTradeOnChain = useCallback(

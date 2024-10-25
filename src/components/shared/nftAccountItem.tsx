@@ -5,11 +5,6 @@ import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { Profile, UserNFT } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
-interface NFTItemProps {
-  item: UserNFT
-  profile: Profile
-}
-
 const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, profile }) => (
   <div className='flex flex-col bg-white shadow-md rounded-lg relative'>
     <NFTImage src={item.nfts.image} alt={item.nfts.name} fallback={item.nfts.name} />
@@ -37,7 +32,7 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
   </div>
 )
 
-const NFTAccountItem: React.FC<NFTItemProps> = ({ item, profile }) => {
+const NFTAccountItem: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, profile }) => {
   return (
     <Link href={`/nft/${item.nfts.id}`}>
       <NFTImageWrapper item={item} profile={profile} />

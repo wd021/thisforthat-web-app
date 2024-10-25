@@ -1,5 +1,3 @@
-import { FC } from 'react'
-
 import { UserTabOption } from '@/types/main'
 
 interface UserNavItem {
@@ -8,18 +6,16 @@ interface UserNavItem {
   emoji: string
 }
 
-interface UserNavigationProps {
-  tabOption: string
-  onNavigationChange: (id: UserTabOption) => void
-}
-
 const navItems: UserNavItem[] = [
   { id: 'nfts', label: 'My NFTS', emoji: '🖼️' },
   { id: 'pinned', label: 'My Pins', emoji: '📌' },
   { id: 'offers', label: 'Offers', emoji: '🤝' },
 ]
 
-const UserNavigation: FC<UserNavigationProps> = ({ tabOption, onNavigationChange }) => {
+const UserDropdown: React.FC<{
+  tabOption: string
+  onNavigationChange: (id: UserTabOption) => void
+}> = ({ tabOption, onNavigationChange }) => {
   const handleItemClick = (id: string) => {
     onNavigationChange(id as UserTabOption)
   }
@@ -48,4 +44,4 @@ const UserNavigation: FC<UserNavigationProps> = ({ tabOption, onNavigationChange
   )
 }
 
-export default UserNavigation
+export default UserDropdown

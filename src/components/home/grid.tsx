@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { GridNavigation } from '@/components/home'
+import { HomeDropdown } from '@/components/dropdowns'
 import { NFTFeedItem, NFTOfferItem } from '@/components/shared'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
@@ -53,7 +53,7 @@ const LoadMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   </div>
 )
 
-const Grid: FC<{
+const Grid: React.FC<{
   setMakeOfferItem: (item: NFTFeedItemType) => void
   setViewOfferItem: (item: OfferFeedItemType) => void
 }> = ({ setMakeOfferItem, setViewOfferItem }) => {
@@ -212,7 +212,7 @@ const Grid: FC<{
 
   return (
     <div className='w-full overflow-y-auto hide-scrollbar'>
-      {user && <GridNavigation tabOption={tabOption} onNavigationChange={handleTabChange} />}
+      {user && <HomeDropdown tabOption={tabOption} onNavigationChange={handleTabChange} />}
       {user && tabOption === 'offers' ? (
         <OfferGrid
           items={items as OfferFeedItemType[]}

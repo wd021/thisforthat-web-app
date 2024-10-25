@@ -1,6 +1,3 @@
 export { default as Navbar } from './navbar'
-export { default as NotificationDropdown } from './notificationDropdown'
-export { default as TransactionsDropdown } from './transactionsDropdown'
-export { default as AccountDropdown } from './accountDropdown'
 export { default as Footer } from './footer'
 export { default as Toast } from './toast'

@@ -44,6 +44,7 @@ const TransactionTransition: React.FC<TransitionScreenProps> = ({
             userBOffers={counterUserAssets}
             size='medium'
             defaultOpen={false}
+            status='accepted'
           />
 
           <div className='text-lg text-gray-600 text-center'>

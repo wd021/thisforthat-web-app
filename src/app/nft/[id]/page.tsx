@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
@@ -16,7 +16,7 @@ interface NFTPageProps {
   }
 }
 
-const NFT: FC<NFTPageProps> = ({ params }) => {
+const NFT: React.FC<NFTPageProps> = ({ params }) => {
   const isMobile = useIsMobile()
   const { showToast } = useToast()
   const [nftInfo, setNftInfo] = useState<NFTType | null>(null)

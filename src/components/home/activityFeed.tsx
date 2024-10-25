@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 import { NFTOfferDisplay } from '@/components/shared'
@@ -121,7 +121,7 @@ const FeedItem: React.FC<{
                   ? 'made an offer'
                   : activity.activity_type === 'offer_counter'
                     ? 'made a counter offer'
-                    : '✅ accepted an offer'}
+                    : 'accepted an offer'}
               </div>
             )}
           </div>
@@ -155,6 +155,7 @@ const FeedItem: React.FC<{
               (activity.metadata as { offer: { userCounter: never } }).offer.userCounter
             }
             size='medium'
+            status={activity.activity_type === 'offer_accepted' ? 'accepted' : 'pending'}
           />
         </div>
       )}
@@ -257,7 +258,7 @@ const ActivityFeedToggle: React.FC<ActivityFeedToggleProps> = ({ filter, setFilt
   )
 }
 
-const ActivityFeed: FC<{
+const ActivityFeed: React.FC<{
   showCollapsibleTab: boolean
   setViewOfferItem: (item: SimplifiedOfferItem) => void
 }> = ({ showCollapsibleTab = true, setViewOfferItem }) => {

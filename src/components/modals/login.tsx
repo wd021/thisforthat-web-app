@@ -7,11 +7,7 @@ import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
 import { supabase } from '@/utils/supabaseClient'
 
-interface LoginProps {
-  closeModal: () => void
-}
-
-const Login: React.FC<LoginProps> = ({ closeModal }) => {
+const Login: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   const { showToast } = useToast()
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
@@ -97,7 +93,7 @@ const LoginButton: React.FC<{ onClick: () => Promise<void> }> = ({ onClick }) =>
       className='w-[325px] text-xl bg-black text-white font-bold px-4 py-3 rounded-lg transition duration-300 ease-in-out transform lg:hover:-translate-y-1 lg:hover:scale-110 cursor-pointer flex items-center justify-center'
     >
       <Google className='mr-4 w-8 h-8' />
-      <div>Let's Go</div>
+      <div>Let&apos;s Go</div>
     </button>
   </div>
 )

@@ -1,11 +1,9 @@
 'use client'
 
-import { FC } from 'react'
-
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
 
-const NotificationsPage: FC = () => {
+const NotificationsPage: React.FC = () => {
   const isMobile = useIsMobile()
 
   return (
