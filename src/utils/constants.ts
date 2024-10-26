@@ -28,7 +28,7 @@ export const CHAIN_LABELS = {
   zksync: 'ZkSync',
 }
 
-export const CHAIND_TO_CHAIN_IDS = {
+export const CHAIN_SLUGS_TO_CHAIN_IDS = {
   ethereum: 1,
   base: 8453,
   arbitrum: 42161,

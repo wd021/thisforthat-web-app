@@ -40,7 +40,6 @@ export interface NFT {
   created_at: string
   updated_at: string
   wallet_address: string
-  interests: number
   offers: number
   is_verified: boolean
   verified_at: string
@@ -49,6 +48,18 @@ export interface NFT {
   pins: number // not being used
   user_profile: Profile
 }
+
+export type NFTUpload = Omit<
+  NFT,
+  | 'created_at'
+  | 'updated_at'
+  | 'offers'
+  | 'is_verified'
+  | 'verified_at'
+  | 'user_id'
+  | 'pins'
+  | 'user_profile'
+>
 
 export interface NFTFeedItem {
   nft_chain_id: number

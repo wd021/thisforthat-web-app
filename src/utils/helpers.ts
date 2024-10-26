@@ -130,6 +130,28 @@ export async function verifyNFTs(
   }
 }
 
+export async function confirmTrade() {
+  try {
+    const response = await fetch('/api/confirm-trade', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP error ${response.status}: ${errorText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    return {
+      error,
+    }
+  }
+}
+
 export function formatDate(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
