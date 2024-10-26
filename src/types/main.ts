@@ -39,3 +39,13 @@ export const assetTypeMap: Record<AssetType, bigint> = {
   ERC1155: 2n,
   CRYPTOPUNK: 3n,
 }
+
+export interface DepositAsset {
+  id: string
+  name: string
+  image: string
+  uploaded: boolean
+  collection_contract: string
+  token_id: string
+  token_type: string
+}

@@ -18,7 +18,7 @@ const ChainLogo: React.FC<ChainLogoProps> = ({ chainId, ...props }) => {
     // Base
     8453: (
       <svg width='32' height='32' viewBox='0 0 30 30' fill='none' {...props}>
-        <g clip-path='url(#clip0_11060_16750)'>
+        <g clipPath='url(#clip0_11060_16750)'>
           <path
             fillRule='evenodd'
             clipRule='evenodd'
@@ -36,7 +36,7 @@ const ChainLogo: React.FC<ChainLogoProps> = ({ chainId, ...props }) => {
     // Arbitrum
     42161: (
       <svg width='32' height='32' viewBox='0 0 238 238' fill='none' {...props}>
-        <g clip-path='url(#clip0_4057_1924)'>
+        <g clipPath='url(#clip0_4057_1924)'>
           <path
             d='M25.668 74.3076V163.693C25.668 169.4 28.7167 174.676 33.6545 177.52L111.032 222.222C115.969 225.066 122.048 225.066 126.986 222.222L204.363 177.52C209.301 174.676 212.35 169.4 212.35 163.693V74.3076C212.35 68.6005 209.301 63.3239 204.363 60.4797L126.986 15.7779C122.048 12.9337 115.969 12.9337 111.032 15.7779L33.6357 60.4797C28.698 63.3239 25.668 68.6005 25.668 74.3076Z'
             fill='#213147'
@@ -111,7 +111,7 @@ const ChainLogo: React.FC<ChainLogoProps> = ({ chainId, ...props }) => {
     // Zksync
     324: (
       <svg viewBox='0 0 400 400' fill='none' {...props}>
-        <g clip-path='url(#clip0_10983_56502)'>
+        <g clipPath='url(#clip0_10983_56502)'>
           <path
             d='M200 400C310.457 400 400 310.457 400 200C400 89.5431 310.457 0 200 0C89.5431 0 0 89.5431 0 200C0 310.457 89.5431 400 200 400Z'
             fill='black'

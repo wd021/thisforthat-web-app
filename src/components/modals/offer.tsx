@@ -109,7 +109,7 @@ const Offer: FC<Props> = ({ type, offerId = null, initialNFT = null, closeModal 
         const { data, error } = await supabase.rpc('accept_offer', {
           p_offer_id: offerId,
           p_user_id: user?.id,
-          p_trade_id: Number(tradeId),
+          p_trade_id: tradeId.toString(),
           p_tx_id: hash,
         })
         console.log('accept_offer', data, error)
@@ -126,12 +126,7 @@ const Offer: FC<Props> = ({ type, offerId = null, initialNFT = null, closeModal 
             name: 'TradeCreated',
             inputs: [
               { name: 'tradeId', type: 'uint256', indexed: true, internalType: 'uint256' },
-              {
-                name: 'participants',
-                type: 'address[]',
-                indexed: false,
-                internalType: 'address[]',
-              },
+              { name: 'tradeHash', type: 'bytes32', indexed: true, internalType: 'bytes32' },
             ],
             anonymous: false,
           },
