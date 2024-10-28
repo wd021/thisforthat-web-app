@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Footer } from '@/components'
+import { Footer, PWA } from '@/components'
 import { ActivityFeed, Grid } from '@/components/home'
 import { Offer } from '@/components/modals'
 import { useIsMobile } from '@/hooks'
@@ -106,6 +106,7 @@ export default function Home() {
           closeModal={() => setViewOfferItem(null)}
         />
       )}
+      <PWA />
     </div>
   )
 }
