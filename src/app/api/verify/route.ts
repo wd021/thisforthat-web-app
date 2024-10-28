@@ -97,12 +97,9 @@ export async function POST(req: any) {
         .from('user_nfts')
         .select(`*, nfts!inner(*)`)
         .eq('user_id', data.user.id)
-        .eq('nfts.wallet_address', address)
-        .eq('nfts.is_verified', false)
+        .eq('wallet_address', address)
+        .or(`nfts.is_verified.eq.false,nfts.user_id.neq.${data.user.id}`)
         .limit(NFT_VERIFY_LIMIT)
-
-      console.log('userNftData', userNftData)
-      console.log('error', error)
 
       if (error) {
         return new Response('Failed to fetch NFT data', { status: 500 })
@@ -113,8 +110,6 @@ export async function POST(req: any) {
       for (const userNft of userNftData) {
         let isOwner = false
         let newWalletAddress = null
-
-        console.log('userNft', userNft)
 
         if (userNft.nfts.token_type === 'ERC721' || userNft.nfts.token_type === 'ERC1155') {
           const response = await fetchAlchemyOwnership(
@@ -151,7 +146,7 @@ export async function POST(req: any) {
             .update({
               is_verified: true,
               verified_at: new Date().toISOString(),
-              user: data.user.id,
+              user_id: data.user.id,
             })
             .eq('id', userNft.nfts.id)
 

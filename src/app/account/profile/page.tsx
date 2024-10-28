@@ -276,8 +276,8 @@ const BasicInformation: React.FC<BasicInformationProps> = ({ profile, setProfile
         />
         {errors.wallet && <p className='mt-1 text-sm text-red-600'>{errors.wallet}</p>}
       </div>
-      <div className='text-sm text-gray-600'>
-        Your wallet used in trades. This is where NFTs will get sent to you.
+      <div className='mt-2 pl-4 py-3 pr-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r text-sm'>
+        Your receiving wallet - where NFTs will be sent to you in swaps.
       </div>
     </div>
   </div>

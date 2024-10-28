@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import Modal from 'react-modal'
 import { isAddress } from 'viem'
 
-import { NftSelector } from '@/components/shared'
+import { NftImporter } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { User } from '@/icons'
 import { useToast } from '@/providers/toastProvider'
@@ -285,7 +285,7 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
                     </div>
                   </form>
                 )}
-                {step === 2 && <NftSelector onComplete={() => setCompleteScreen(true)} />}
+                {step === 2 && <NftImporter onComplete={() => setCompleteScreen(true)} />}
               </>
             )}
           </div>

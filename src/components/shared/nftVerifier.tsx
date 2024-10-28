@@ -148,6 +148,10 @@ const NftVerifier: React.FC<VerifyNFTProps> = ({ onComplete }) => {
               </div>
             )
           })}
+          <div className='mt-2 pl-4 py-3 pr-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r text-sm'>
+            If you&apos;ve moved any NFTs to a different wallet, simply add the NFT again and
+            the wallet info will refresh.
+          </div>
         </div>
       )}
       {verifiedGroups.length === nftGroups.length && nftGroups.length > 0 && (

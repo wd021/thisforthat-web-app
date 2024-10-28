@@ -2,7 +2,7 @@
 
 import Modal from 'react-modal'
 
-import { NftSelector } from '@/components/shared'
+import { NftImporter } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { Close } from '@/icons'
 import { getModalStyles } from '@/styles'
@@ -27,7 +27,7 @@ const AddNft: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
           </div>
         </div>
         <div className='p-5 flex overflow-hidden'>
-          <NftSelector displaySkipOption={false} onComplete={closeModal} />
+          <NftImporter displaySkipOption={false} onComplete={closeModal} />
         </div>
       </Modal>
     </div>

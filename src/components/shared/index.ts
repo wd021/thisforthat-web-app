@@ -1,4 +1,4 @@
-export { default as NftSelector } from './nftSelector'
+export { default as NftImporter } from './nftImporter'
 export { default as NftVerifier } from './nftVerifier'
 export { default as NFTImage } from './nftImage'
 export { default as NFTFeedItem } from './nftFeedItem'

@@ -33,7 +33,7 @@ const getRpcUrl = (chainId: number) => {
       chainId === mainnet.id
         ? 'mainnet'
         : supportedChains.find((c) => c.id === chainId)?.network
-    }.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+    }.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
   } else if (infuraChains.includes(chainId)) {
     return `https://${
       supportedChains.find((c) => c.id === chainId)?.network

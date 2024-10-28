@@ -1,20 +1,26 @@
 import React, { FC, useCallback, useState } from 'react'
-import { isAddress } from 'viem'
-import { useEnsAddress } from 'wagmi'
+import { getAddress, isAddress } from 'viem'
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
+import { normalize } from 'viem/ens'
 
 import { NFT } from '@/types/supabase'
 import { getNFTFromUrl, getNFTsForWallet } from '@/utils/apis'
 import { CHAIN_LABELS, SUPPORTED_CHAINS } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
-interface NftSelectorProps {
-  displaySkipOption?: boolean
-  onComplete: () => void
-}
+// Create a public client for ENS resolution
+const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: http(),
+})
 
 type SearchMode = 'wallet' | 'link'
 
-const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplete }) => {
+const NftImporter: FC<{
+  displaySkipOption?: boolean
+  onComplete: () => void
+}> = ({ displaySkipOption = true, onComplete }) => {
   const [searchMode, setSearchMode] = useState<SearchMode>('wallet')
   const [currentWallet, setCurrentWallet] = useState<string>('')
   const [nftLink, setNftLink] = useState<string>('')
@@ -22,23 +28,36 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
   const [nfts, setNfts] = useState<NFT[]>([])
   const [nextPageKey, setNextPageKey] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [resolvingEns, setResolvingEns] = useState<boolean>(false)
   const [hasSearched, setHasSearched] = useState<boolean>(false)
   const [selectedNfts, setSelectedNfts] = useState<NFT[]>([])
   const [uploadingNfts, setIsUploadingNfts] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
 
-  const { data: ensAddress, isLoading: isResolvingEns } = useEnsAddress({
-    name: currentWallet,
-    query: {
-      enabled: currentWallet.endsWith('.eth'),
-    },
-  })
+  const resolveAddress = useCallback(async (input: string): Promise<string> => {
+    if (isAddress(input)) {
+      return getAddress(input) // Normalize the address
+    }
 
-  const resolveAddress = useCallback((): string => {
-    if (isAddress(currentWallet)) return currentWallet
-    if (ensAddress) return ensAddress
-    throw new Error('Invalid address or unresolved ENS name')
-  }, [currentWallet, ensAddress])
+    if (input.endsWith('.eth')) {
+      setResolvingEns(true)
+      try {
+        const normalized = normalize(input)
+        const address = await publicClient.getEnsAddress({
+          name: normalized,
+        })
+        if (!address) throw new Error('ENS name not found')
+        return address
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        throw new Error('Failed to resolve ENS name')
+      } finally {
+        setResolvingEns(false)
+      }
+    }
+
+    throw new Error('Invalid address or ENS name')
+  }, [])
 
   const validateNftLink = (link: string): boolean => {
     const supportedPlatforms = ['opensea.io', 'blur.io', 'cryptopunks.app']
@@ -62,30 +81,23 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
             throw new Error('Please enter a valid OpenSea, Blur, or CryptoPunks link')
           }
           const nft = await getNFTFromUrl(nftLink)
-          setNfts([nft])
+          if (nft) {
+            setNfts([nft])
+          }
           setNextPageKey(null)
         } else {
-          const walletAddress = resolveAddress()
+          // Resolve address before proceeding
+          const walletAddress = await resolveAddress(currentWallet)
+
           if (isInitialSearch) {
             setNfts([])
             setNextPageKey(null)
           }
 
           let newNfts: NFT[] = []
-          if (nextPageKey === null && currentChain === 'ethereum') {
-            // const [punks, results] = await Promise.all([
-            //   // getCryptoPunksforWallet(currentChain, walletAddress),
-            //   getNFTsForWallet(currentChain, walletAddress, nextPageKey),
-            // ])
-            const result = await getNFTsForWallet(currentChain, walletAddress, nextPageKey)
-            newNfts = result.nfts
-            setNextPageKey(result.pageKey)
-          } else {
-            const results = await getNFTsForWallet(currentChain, walletAddress, nextPageKey)
-            newNfts = results.nfts
-            setNextPageKey(results.pageKey)
-          }
-
+          const result = await getNFTsForWallet(currentChain, walletAddress, nextPageKey)
+          newNfts = result.nfts
+          setNextPageKey(result.pageKey)
           setNfts((prev) => (isInitialSearch ? newNfts : [...prev, ...newNfts]))
         }
       } catch (error) {
@@ -95,7 +107,7 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
         setIsLoading(false)
       }
     },
-    [searchMode, currentChain, nextPageKey, resolveAddress, nftLink],
+    [searchMode, currentChain, nextPageKey, resolveAddress, nftLink, currentWallet],
   )
 
   const handleSearch = () => handleFetch(true)
@@ -116,11 +128,13 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
       const userId = (await supabase.auth.getSession()).data.session?.user.id
       if (!userId) throw new Error('User session not found')
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const nftsToUpload = selectedNfts.map(({ id, possible_spam, ...rest }) => ({
         ...rest,
         user_id: userId,
       }))
 
+      // Upload NFTs, ignoring duplicates
       const { data: upsertedNfts, error: nftError } = await supabase
         .from('nfts')
         .upsert(nftsToUpload, {
@@ -131,16 +145,24 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
 
       if (nftError) throw nftError
 
-      const userNftUpsertData = upsertedNfts!.map((nft) => ({
+      // Create user_nfts entries directly from selectedNfts and upsertedNfts
+      const userNftUpsertData = selectedNfts.map((nft) => ({
         user_id: userId,
-        nft_id: nft.id,
+        nft_id: upsertedNfts!.find(
+          (inserted) =>
+            inserted.chain_id === nft.chain_id &&
+            inserted.collection_contract === nft.collection_contract &&
+            inserted.token_id === nft.token_id,
+        )?.id,
+        wallet_address: nft.wallet_address,
       }))
 
+      // Upsert to user_nfts, updating wallet_address on conflict
       const { error: userNftError } = await supabase
         .from('user_nfts')
         .upsert(userNftUpsertData, {
           onConflict: 'user_id,nft_id',
-          ignoreDuplicates: true,
+          ignoreDuplicates: false, // Set to false so we can update wallet_address
         })
 
       if (userNftError) throw userNftError
@@ -203,9 +225,6 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
                   onChange={(e) => setCurrentWallet(e.target.value)}
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                 />
-                {isResolvingEns && (
-                  <span className='mt-1 text-xs text-gray-500'>Resolving ENS...</span>
-                )}
               </div>
               <div className='w-full sm:w-32'>
                 <select
@@ -226,10 +245,10 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
           )}
           <button
             onClick={handleSearch}
-            disabled={isLoading || isResolvingEns}
+            disabled={isLoading || resolvingEns}
             className='w-full sm:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            {isLoading ? (
+            {isLoading || resolvingEns ? (
               <div className='flex items-center justify-center'>
                 <div className='w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin' />
                 <span className='ml-2'>Searching...</span>
@@ -279,14 +298,14 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
           </div>
         ) : nfts.length > 0 ? (
           <div className='space-y-4'>
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4'>
               {nfts.map((nft) => (
                 <div
                   key={nft.id}
                   onClick={() => toggleNftSelection(nft)}
                   className={`relative bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 ${
                     selectedNfts.some((item) => item.id === nft.id)
-                      ? 'ring-2 ring-blue-500 shadow-lg'
+                      ? 'ring-4 ring-blue-500 shadow-lg'
                       : 'hover:shadow-lg border border-gray-200'
                   }`}
                 >
@@ -372,4 +391,4 @@ const NftSelector: FC<NftSelectorProps> = ({ displaySkipOption = true, onComplet
   )
 }
 
-export default NftSelector
+export default NftImporter

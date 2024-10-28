@@ -30,10 +30,12 @@ export const CHAIN_LABELS = {
 
 export const CHAIN_SLUGS_TO_CHAIN_IDS = {
   ethereum: 1,
+  eth: 1,
   base: 8453,
   arbitrum: 42161,
   optimism: 10,
   polygon: 137,
+  matic: 137,
   zksync: 324,
 }
 
@@ -48,10 +50,12 @@ export const CHAIN_IDS_TO_CHAINS = {
 
 export const ALCHEMY_CHAIN_SLUGS = {
   ethereum: 'eth-mainnet',
+  eth: 'eth-mainnet',
   base: 'base-mainnet',
   arbitrum: 'arb-mainnet',
   optimism: 'opt-mainnet',
   polygon: 'polygon-mainnet',
+  matic: 'polygon-mainnet',
   zksync: 'zksync-mainnet',
 }
 
