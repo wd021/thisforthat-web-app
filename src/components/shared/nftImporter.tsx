@@ -4,7 +4,7 @@ import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import { normalize } from 'viem/ens'
 
-import { NFT } from '@/types/supabase'
+import { NFTUpload } from '@/types/supabase'
 import { getNFTFromUrl, getNFTsForWallet } from '@/utils/apis'
 import { CHAIN_LABELS, SUPPORTED_CHAINS } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
@@ -24,13 +24,15 @@ const NftImporter: FC<{
   const [searchMode, setSearchMode] = useState<SearchMode>('wallet')
   const [currentWallet, setCurrentWallet] = useState<string>('')
   const [nftLink, setNftLink] = useState<string>('')
-  const [currentChain, setCurrentChain] = useState<string>('ethereum')
-  const [nfts, setNfts] = useState<NFT[]>([])
+  const [currentChain, setCurrentChain] = useState<
+    'ethereum' | 'eth' | 'base' | 'arbitrum' | 'optimism' | 'polygon' | 'matic' | 'zksync'
+  >('ethereum')
+  const [nfts, setNfts] = useState<NFTUpload[]>([])
   const [nextPageKey, setNextPageKey] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [resolvingEns, setResolvingEns] = useState<boolean>(false)
   const [hasSearched, setHasSearched] = useState<boolean>(false)
-  const [selectedNfts, setSelectedNfts] = useState<NFT[]>([])
+  const [selectedNfts, setSelectedNfts] = useState<NFTUpload[]>([])
   const [uploadingNfts, setIsUploadingNfts] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
 
@@ -94,7 +96,7 @@ const NftImporter: FC<{
             setNextPageKey(null)
           }
 
-          let newNfts: NFT[] = []
+          let newNfts: NFTUpload[] = []
           const result = await getNFTsForWallet(currentChain, walletAddress, nextPageKey)
           newNfts = result.nfts
           setNextPageKey(result.pageKey)
@@ -113,7 +115,7 @@ const NftImporter: FC<{
   const handleSearch = () => handleFetch(true)
   const handleLoadMore = () => handleFetch(false)
 
-  const toggleNftSelection = (nft: NFT) => {
+  const toggleNftSelection = (nft: NFTUpload) => {
     setSelectedNfts((prev) =>
       prev.some((item) => item.id === nft.id)
         ? prev.filter((item) => item.id !== nft.id)
@@ -135,7 +137,7 @@ const NftImporter: FC<{
       }))
 
       // Upload NFTs, ignoring duplicates
-      const { data: upsertedNfts, error: nftError } = await supabase
+      const { data: initialUpsert, error: nftError } = await supabase
         .from('nfts')
         .upsert(nftsToUpload, {
           onConflict: 'chain_id,collection_contract,token_id',
@@ -144,6 +146,41 @@ const NftImporter: FC<{
         .select()
 
       if (nftError) throw nftError
+
+      let upsertedNfts = initialUpsert || []
+
+      // Check if we got back fewer records than we tried to upload
+      if (upsertedNfts.length < nftsToUpload.length) {
+        // Find the records that weren't returned in initialUpsert
+        const missingNfts = nftsToUpload.filter(
+          (uploadNft) =>
+            !upsertedNfts.some(
+              (upserted) =>
+                upserted.chain_id === uploadNft.chain_id &&
+                upserted.collection_contract === uploadNft.collection_contract &&
+                upserted.token_id === uploadNft.token_id,
+            ),
+        )
+
+        // Fetch the existing records for the missing NFTs
+        const { data: existingNfts } = await supabase
+          .from('nfts')
+          .select()
+          .in(
+            'chain_id',
+            missingNfts.map((nft) => nft.chain_id),
+          )
+          .in(
+            'collection_contract',
+            missingNfts.map((nft) => nft.collection_contract),
+          )
+          .in(
+            'token_id',
+            missingNfts.map((nft) => nft.token_id),
+          )
+
+        upsertedNfts = [...upsertedNfts, ...(existingNfts || [])]
+      }
 
       // Create user_nfts entries directly from selectedNfts and upsertedNfts
       const userNftUpsertData = selectedNfts.map((nft) => ({
@@ -229,7 +266,19 @@ const NftImporter: FC<{
               <div className='w-full sm:w-32'>
                 <select
                   value={currentChain}
-                  onChange={(e) => setCurrentChain(e.target.value)}
+                  onChange={(e) =>
+                    setCurrentChain(
+                      e.target.value as
+                        | 'ethereum'
+                        | 'eth'
+                        | 'base'
+                        | 'arbitrum'
+                        | 'optimism'
+                        | 'polygon'
+                        | 'matic'
+                        | 'zksync',
+                    )
+                  }
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white'
                 >
                   {SUPPORTED_CHAINS.filter(

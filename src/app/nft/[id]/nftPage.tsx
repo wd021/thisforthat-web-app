@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import { Offer } from '@/components/modals'
+import { Duplicates, Offer } from '@/components/modals'
 import { NFTImage, NFTOfferItem, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
 import { ChainLogo, Etherscan, Opensea } from '@/icons'
@@ -21,43 +21,81 @@ import { supabase } from '@/utils/supabaseClient'
 
 const NFTSidebar: React.FC<{
   nft: NFT
+  nftUsers: any[]
+  showMultiUserModal: () => void
   makeOffer: () => void
   pinItem: () => void
-}> = ({ nft, makeOffer, pinItem }) => (
-  <div className='w-full lg:w-[360px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
-    <div className='bg-white rounded-lg shadow-md mb-4 mx-4 lg:mx-0 max-w-[260px] self-center lg:self-auto lg:max-w-none'>
-      <NFTImage src={nft?.image} alt={nft?.name} fallback={nft?.name} />
-      <div className='p-4 flex items-center justify-between'>
-        <Link
-          href={`/${nft.user_profile.username}`}
-          target='_blank'
-          className='flex items-center'
-        >
-          <img
-            src={
-              process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + nft.user_profile.profile_pic_url
-            }
-            alt={nft.user_profile.username}
-            className='w-8 h-8 rounded-full'
-          />
-          <div className='text-xl font-bold ml-2'>{nft.user_profile.username}</div>
-        </Link>
-        <VerifiedBadge
-          id={nft.id}
-          name={nft.name}
-          chainName={CHAIN_IDS_TO_CHAINS[nft.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]}
-          collectionName={nft.collection_name}
-          tokenId={nft.token_id}
-          isVerified={nft.is_verified}
-          className='w-10 h-10 flex items-center justify-center'
-          chainId={nft.chain_id.toString()}
-          collectionContract={nft.collection_contract}
-        />
+}> = ({ nft, nftUsers, showMultiUserModal, makeOffer, pinItem }) => {
+  const multipleHolders = nftUsers.length > 1
+
+  return (
+    <div className='w-full lg:w-[360px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
+      <div className='bg-white rounded-lg shadow-md mb-4 mx-4 lg:mx-0 max-w-[260px] self-center lg:self-auto lg:max-w-none'>
+        <NFTImage src={nft?.image} alt={nft?.name} fallback={nft?.name} />
+        <div className='p-4 space-y-3'>
+          <div className='flex items-center justify-between'>
+            <Link
+              href={`/${nft.user_profile.username}`}
+              target='_blank'
+              className='flex items-center'
+            >
+              <img
+                src={
+                  process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL +
+                  nft.user_profile.profile_pic_url
+                }
+                alt={nft.user_profile.username}
+                className='w-8 h-8 rounded-full'
+              />
+              <div className='text-xl font-bold ml-2'>{nft.user_profile.username}</div>
+            </Link>
+            <VerifiedBadge
+              id={nft.id}
+              name={nft.name}
+              chainName={CHAIN_IDS_TO_CHAINS[nft.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]}
+              collectionName={nft.collection_name}
+              tokenId={nft.token_id}
+              isVerified={nft.is_verified}
+              className='w-10 h-10 flex items-center justify-center'
+              chainId={nft.chain_id.toString()}
+              collectionContract={nft.collection_contract}
+            />
+          </div>
+
+          {multipleHolders && (
+            <button onClick={showMultiUserModal} className='w-full'>
+              <div className='flex items-center justify-between p-2 rounded-md bg-amber-50 hover:bg-amber-100 transition-all border border-amber-200/50'>
+                <div className='flex items-center gap-2'>
+                  <span className='w-5 h-5 flex items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs'>
+                    {nftUsers.length}
+                  </span>
+                  <span className='text-sm font-medium text-amber-700'>Multiple Users</span>
+                </div>
+                <div className='flex items-center text-amber-600'>
+                  <span className='text-xs mr-1'>View all</span>
+                  <svg
+                    className='w-3 h-3'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M9 5l7 7-7 7'
+                    />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          )}
+        </div>
       </div>
+      <ActionButtons className='hidden lg:flex' makeOffer={makeOffer} pinItem={pinItem} />
     </div>
-    <ActionButtons className='hidden lg:flex' makeOffer={makeOffer} pinItem={pinItem} />
-  </div>
-)
+  )
+}
 
 const NFTTitle: React.FC<{ nft: NFT }> = ({ nft }) => {
   const blockExplorerUrl = getBlockExplorerUrl(
@@ -119,6 +157,14 @@ const OffersGrid: React.FC<{
         userId={userId}
       />
     ))}
+    {items.length === 0 && (
+      <div className='col-span-1 sm:col-span-2 flex flex-col items-center justify-center py-16 px-4'>
+        <h3 className='text-lg font-semibold text-gray-700 mb-1'>No Offers Yet</h3>
+        <p className='text-gray-500 text-center text-sm max-w-sm'>
+          Be the first to make an offer on this NFT. Click the offer button to get started!
+        </p>
+      </div>
+    )}
   </div>
 )
 
@@ -167,13 +213,14 @@ const MobileActionButtons: React.FC<{ makeOffer: () => void; pinItem: () => void
 
 const NFTPage: React.FC<{
   nft: NFT
-  isMobile: boolean
-}> = ({ nft }) => {
+  nftUsers: any[]
+}> = ({ nft, nftUsers }) => {
   const { user } = useAuth()
   const { showToast } = useToast()
   const { items, hasMore, loadMore } = useNFTOffers(nft.id)
   const [makeOfferItem, setMakeOfferItem] = useState<NFTFeedItemType | null>(null)
   const [viewOfferItem, setViewOfferItem] = useState<OfferFeedItemType | null>(null)
+  const [multiUserModal, setShowMultiUserModal] = useState(false)
 
   const makeOffer = async (nft: NFT) => {
     if (!user) {
@@ -243,7 +290,13 @@ const NFTPage: React.FC<{
     <>
       <div className={`flex w-full h-full relative`}>
         <div className='mt-6 lg:my-0 w-full bg-[#f9f9f9] flex flex-col lg:flex-row justify-start lg:justify-center lg:gap-4 lg:gap-8 p-0 lg:p-8 pb-24 lg:pb-16'>
-          <NFTSidebar nft={nft} makeOffer={() => makeOffer(nft)} pinItem={() => pinItem(nft)} />
+          <NFTSidebar
+            nft={nft}
+            nftUsers={nftUsers}
+            showMultiUserModal={() => setShowMultiUserModal(true)}
+            makeOffer={() => makeOffer(nft)}
+            pinItem={() => pinItem(nft)}
+          />
           <div className='flex flex-col flex-grow w-full lg:max-w-3xl px-4 lg:px-0'>
             <NFTTitle nft={nft} />
             <div className='flex-grow overflow-hidden'>
@@ -287,6 +340,9 @@ const NFTPage: React.FC<{
           initialNFT={null}
           closeModal={() => setViewOfferItem(null)}
         />
+      )}
+      {multiUserModal && (
+        <Duplicates users={nftUsers} closeModal={() => setShowMultiUserModal(false)} />
       )}
     </>
   )
