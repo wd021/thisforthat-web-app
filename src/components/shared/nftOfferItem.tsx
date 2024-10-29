@@ -123,7 +123,7 @@ const NFTOfferItem: React.FC<NFTOfferItemProps> = ({
         <NFTOfferDisplay
           userAOffers={item.offer.user}
           userBOffers={item.offer.userCounter}
-          size='medium'
+          size='large'
           defaultOpen={false}
           status={item.status}
         />

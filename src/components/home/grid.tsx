@@ -17,7 +17,7 @@ const OfferGrid: React.FC<{
   userId: string
   viewOffer: (item: OfferFeedItemType) => void
 }> = ({ items, userId, viewOffer }) => (
-  <div className='p-3 md:p-6 grid grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-3 md:gap-6 mb-12'>
+  <div className='max-w-[800px] mx-auto flex flex-col gap-y-8 my-6'>
     {items.map((item) => (
       <NFTOfferItem
         key={item.id}

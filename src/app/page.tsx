@@ -21,9 +21,9 @@ const ContentArea: React.FC<{
     {(!isMobile || activeTab === 'grid') && (
       <Grid setMakeOfferItem={setMakeOfferItem} setViewOfferItem={setViewOfferItem} />
     )}
-    {(!isMobile || activeTab === 'feed') && (
+    {/* {(!isMobile || activeTab === 'feed') && (
       <ActivityFeed showCollapsibleTab={!isMobile} setViewOfferItem={setViewOfferItem} />
-    )}
+    )} */}
   </>
 )
 
