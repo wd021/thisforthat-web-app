@@ -1,6 +1,5 @@
 export { default as AccountDropdown } from './account'
 export { default as NotificationDropdown } from './notification'
-export { default as TransactionsDropdown } from './transactions'
 export { default as HomeDropdown } from './home'
 export { default as UserDropdown } from './user'
 export { default as HomeTabBar } from './homeTabBar'

@@ -4,36 +4,23 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { debounce } from 'lodash'
 
-import {
-  AccountDropdown,
-  NotificationDropdown,
-  // TransactionsDropdown,
-} from '@/components/dropdowns'
-import {
-  Login as LoginModal,
-  Offer as OfferModal,
-  Onboard as OnboardModal,
-} from '@/components/modals'
+import { AccountDropdown, NotificationDropdown } from '@/components/dropdowns'
+import { Login as LoginModal, Onboard as OnboardModal } from '@/components/modals'
 import { useIsMobile } from '@/hooks'
-import { Close, Hamburger, Login, Search } from '@/icons'
+import { ChainLogo, Close, Hamburger, Login, Search } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { supabase } from '@/utils/supabaseClient'
+import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 const Navbar: FC = () => {
   const { user, loading, profile, hasProfile, updateLastSeen } = useAuth()
   const isMobile = useIsMobile()
 
   const [notifications, setNotifications] = useState<any[]>([])
-  // const [transactions, setTransactions] = useState<any[]>([])
   const [newNotificationsCount, setNewNotificationsCount] = useState(0)
-  // const [newTransactionsCount, setNewTransactionsCount] = useState(0)
 
-  const [modal, setModal] = useState<boolean | 'login' | 'onboard' | 'offer'>(false)
+  const [modal, setModal] = useState<boolean | 'login' | 'onboard'>(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [offerModalInfo, setOfferModalInfo] = useState<{
-    type: 'transaction' | 'view_offer'
-    id: string
-  } | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<{ nfts: any[]; users: any[] }>({
@@ -55,7 +42,7 @@ const Navbar: FC = () => {
 
     const nftResults = await supabase
       .from('nfts')
-      .select('id, name, image')
+      .select('id, name, image, chain_id')
       .ilike('name', `%${term}%`)
       .limit(5)
 
@@ -121,13 +108,6 @@ const Navbar: FC = () => {
               >
                 My NFTs
               </Link>
-              {/* <Link
-                className='flex items-center text-xl mb-4'
-                href='/transactions'
-                onClick={toggleMenu}
-              >
-                Transactions
-              </Link> */}
               <Link
                 className='flex items-center text-xl mb-4'
                 href='/notifications'
@@ -215,34 +195,9 @@ const Navbar: FC = () => {
     setNewNotificationsCount(newCount)
   }
 
-  // const getLatestTransactions = async () => {
-  //   const { data, error } = await supabase
-  //     .from('user_offers')
-  //     .select(
-  //       '*, user:user_profile!user_offers_user_id_fkey(*), counter_user:user_profile!user_offers_user_id_counter_fkey(*)',
-  //     )
-  //     .or(`user_id.eq.${user?.id},user_id_counter.eq.${user?.id}`)
-  //     .neq('status', 'pending')
-  //     .order('created_at', { ascending: false })
-  //     .limit(10)
-
-  //   if (error) {
-  //     console.error('Error fetching transactions:', error)
-  //     return
-  //   }
-
-  //   setTransactions(data)
-
-  //   const newCount = data.filter(
-  //     (tx) => new Date(tx.created_at) > new Date(profile?.tx_last_seen || 0),
-  //   ).length
-  //   setNewTransactionsCount(newCount)
-  // }
-
   useEffect(() => {
     if (profile) {
       getLatestNotifications()
-      // getLatestTransactions()
     }
   }, [profile])
 
@@ -281,9 +236,27 @@ const Navbar: FC = () => {
                             key={nft.id}
                             href={`/nfts/${nft.id}`}
                             className='flex items-center hover:bg-gray-100 p-2 rounded'
+                            onClick={() => {
+                              setShowResults(false)
+                              setSearchTerm('')
+                              setSearchResults({ nfts: [], users: [] })
+                            }}
                           >
-                            <img src={nft.image} className='w-8 h-8 rounded-full' />
-                            <div className='ml-1'>{nft.name}</div>
+                            <img src={nft.image} className='w-10 h-10 rounded-md' />
+                            <div className='ml-1 flex flex-col gap-y-1'>
+                              <div className='ml-1 text-sm'>{nft.name}</div>
+                              <div className='flex text-xs'>
+                                <ChainLogo
+                                  chainId={nft.chain_id}
+                                  className='w-3.5 h-3.5 mr-0.5'
+                                />
+                                {
+                                  CHAIN_IDS_TO_CHAINS[
+                                    nft.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS
+                                  ]
+                                }
+                              </div>
+                            </div>
                           </Link>
                         ))}
                       </div>
@@ -296,6 +269,11 @@ const Navbar: FC = () => {
                             key={user.id}
                             href={`/${user.username}`}
                             className='flex items-center hover:bg-gray-100 p-2 rounded'
+                            onClick={() => {
+                              setShowResults(false)
+                              setSearchTerm('')
+                              setSearchResults({ nfts: [], users: [] })
+                            }}
                           >
                             <img
                               src={
@@ -304,7 +282,7 @@ const Navbar: FC = () => {
                               }
                               className='w-8 h-8 rounded-full'
                             />
-                            <div className='ml-1'>{user.username}</div>
+                            <div className='ml-2'>{user.username}</div>
                           </Link>
                         ))}
                       </div>
@@ -314,17 +292,6 @@ const Navbar: FC = () => {
                       searchTerm.length > 0 && (
                         <div className='p-4 text-center text-gray-500'>No results found</div>
                       )}
-                    {/* TODO: implement search result page */}
-                    {/* {searchTerm.length > 0 && (
-                      <div className='p-2 text-center'>
-                        <Link
-                          href={`/search?q=${encodeURIComponent(searchTerm)}`}
-                          className='text-blue-500 hover:underline'
-                        >
-                          View all results
-                        </Link>
-                      </div>
-                    )} */}
                   </>
                 )}
               </div>
@@ -364,14 +331,6 @@ const Navbar: FC = () => {
       )}
       {modal === 'login' && <LoginModal closeModal={() => setModal(false)} />}
       {modal === 'onboard' && <OnboardModal closeModal={() => setModal(false)} />}
-      {modal === 'offer' && offerModalInfo && (
-        <OfferModal
-          type={offerModalInfo.type}
-          offerId={offerModalInfo.id}
-          closeModal={() => setModal(false)}
-          initialNFT={null}
-        />
-      )}
     </>
   )
 }
