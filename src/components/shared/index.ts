@@ -1,7 +1,7 @@
 export { default as NftImporter } from './nftImporter'
 export { default as NftVerifier } from './nftVerifier'
 export { default as NFTImage } from './nftImage'
-export { default as NFTFeedItem } from './nftFeedItem'
+export { default as NFTGridObject } from './nftGridObject'
 export { default as NFTAccountItem } from './nftAccountItem'
 export { default as NFTOfferItem } from './nftOfferItem'
 export { default as VerifiedBadge } from './verifiedBadge'

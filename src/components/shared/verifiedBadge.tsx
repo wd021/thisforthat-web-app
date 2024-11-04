@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-
 import { ChainLogo, Etherscan, Opensea, Verified } from '@/icons'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
+import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 interface NFTInfoPopupProps {
   id: string
@@ -21,6 +21,7 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
   isVerified,
   chainId,
   chainName,
+  collectionName,
   collectionContract,
   tokenId,
   className,
@@ -71,50 +72,37 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
           e.preventDefault()
           togglePopup()
         }}
-        className='focus:outline-none w-full h-full'
+        className='w-full h-full p-1 mb-0.5 rounded-full'
         aria-label='NFT Information'
-        whileHover={{ scale: 1.1, rotate: 12 }}
+        whileHover={{ scale: 1.1, rotate: 8 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       >
-        <Verified isVerified={isVerified} className='w-full h-full' />
+        <Verified chainId={Number(chainId)} isVerified={isVerified} className='w-full h-full' />
       </motion.button>
       <AnimatePresence>
         {isOpen && (
           <motion.div
             ref={popupRef}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className='fixed z-[100] w-52 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 overflow-hidden'
+            className='fixed z-[100] w-64 rounded-xl shadow-lg bg-white ring-1 ring-black/5 overflow-hidden backdrop-blur-sm'
             style={{
-              top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom : 0,
+              top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
               left: buttonRef.current
-                ? buttonRef.current.getBoundingClientRect().left - 160
+                ? buttonRef.current.getBoundingClientRect().left - 200
                 : 0,
             }}
           >
-            <div className='p-3.5'>
-              <div className='text-base font-semibold text-gray-900 truncate mb-1'>{name}</div>
-              <div className='space-y-1.5'>
-                <div>
-                  <span
-                    className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full mb-1 ${
-                      isVerified ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {isVerified ? 'Verified' : 'Unverified'}
-                  </span>
-                </div>
-                <div className='flex items-center space-x-1.5 text-sm text-gray-600'>
-                  <ChainLogo chainId={Number(chainId)} className='w-4 h-4' />
-                  <span>{chainName}</span>
-                </div>
-              </div>
+            <div className='p-4 space-y-1.5'>
+              <div className='text-sm font-semibold text-gray-900 truncate'>{name}</div>
+              {collectionName && <div className='text-sm text-gray-500'>{collectionName}</div>}
             </div>
-            <div className='border-t border-gray-200'>
-              {options.map((option) => (
+
+            <div className='border-t border-gray-100'>
+              {options.map((option, index) => (
                 <button
                   key={option.label}
                   onClick={(e) => {
@@ -122,12 +110,31 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
                     window.open(option.getUrl(), '_blank', 'noopener,noreferrer')
                     togglePopup()
                   }}
-                  className='flex items-center w-full px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200'
+                  className='flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200'
                 >
-                  <option.logo className='w-4 h-4 mr-2.5' />
+                  <option.logo className='w-4 h-4 mr-3 text-gray-400' />
                   {option.label}
                 </button>
               ))}
+            </div>
+
+            <div className='border-t border-gray-100 p-4 bg-gray-50'>
+              <div className='flex items-center space-x-3'>
+                <div className='flex-shrink-0'>
+                  <Verified
+                    chainId={Number(chainId)}
+                    isVerified={isVerified}
+                    className='w-5 h-5'
+                  />
+                </div>
+                <span
+                  className={`text-sm ${isVerified ? 'text-blue-600 font-medium' : 'text-gray-500'}`}
+                >
+                  {isVerified
+                    ? `Verified on ${CHAIN_IDS_TO_CHAINS[String(chainId)]}`
+                    : `Not verified on ${CHAIN_IDS_TO_CHAINS[String(chainId)]}`}
+                </span>
+              </div>
             </div>
           </motion.div>
         )}

@@ -9,31 +9,16 @@ import {
 
 import ABI from '@/contracts/abi.json'
 import { useToast } from '@/providers/toastProvider'
+import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
-
-interface AssetInput {
-  collection_contract: string
-  token_id: string
-  token_type: 'ERC20' | 'ERC721' | 'ERC1155' | 'CRYPTOPUNK'
-  amount?: string
-}
-
-interface OfferInfo {
-  user: {
-    wallet: string
-  }
-  counter_user: {
-    wallet: string
-  }
-  offer: {
-    user: AssetInput[]
-    userCounter: AssetInput[]
-  }
-}
 
 const CRYPTOPUNKS_ADDRESS = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB' as Address
 
-function prepareAsset(asset: AssetInput, depositorAddress: Address, recipientAddress: Address) {
+function prepareAsset(
+  asset: SimplifiedNFTAsset,
+  depositorAddress: Address,
+  recipientAddress: Address,
+) {
   const assetTypeMap = {
     ERC20: 0,
     ERC721: 1,
@@ -46,8 +31,7 @@ function prepareAsset(asset: AssetInput, depositorAddress: Address, recipientAdd
       ? CRYPTOPUNKS_ADDRESS
       : (asset.collection_contract as Address)
 
-  const amount =
-    asset.token_type === 'ERC1155' || asset.token_type === 'ERC20' ? asset.amount || '1' : '1'
+  const amount = '1' // TODO: support multiple amounts
 
   try {
     const preparedAsset = {
@@ -56,7 +40,7 @@ function prepareAsset(asset: AssetInput, depositorAddress: Address, recipientAdd
       depositor: depositorAddress,
       tokenId: BigInt(asset.token_id),
       amount: BigInt(amount),
-      assetType: assetTypeMap[asset.token_type],
+      assetType: assetTypeMap[asset.token_type as keyof typeof assetTypeMap],
       isDeposited: false,
     }
 
@@ -73,22 +57,43 @@ function prepareAsset(asset: AssetInput, depositorAddress: Address, recipientAdd
   }
 }
 
-function prepareAllAssets(offerInfo: OfferInfo) {
-  const userWallet = offerInfo.user.wallet as Address
-  const counterUserWallet = offerInfo.counter_user.wallet as Address
-
-  const userAssets = offerInfo.offer.user.map((asset) =>
-    prepareAsset(asset, userWallet, counterUserWallet),
+function prepareAllAssets({
+  creator,
+  creator_assets,
+  counterparty,
+  counterparty_assets,
+}: {
+  creator: ProfileMinimal
+  creator_assets: SimplifiedNFTAsset[]
+  counterparty: ProfileMinimal
+  counterparty_assets: SimplifiedNFTAsset[]
+}) {
+  const creatorAssets = creator_assets.map((asset) =>
+    prepareAsset(asset, creator.wallet as Address, counterparty.wallet as Address),
   )
 
-  const counterUserAssets = offerInfo.offer.userCounter.map((asset) =>
-    prepareAsset(asset, counterUserWallet, userWallet),
+  const counterpartyAssets = counterparty_assets.map((asset) =>
+    prepareAsset(asset, counterparty.wallet as Address, creator.wallet as Address),
   )
 
-  return [...userAssets, ...counterUserAssets]
+  return [...creatorAssets, ...counterpartyAssets]
 }
 
-export default function useCreateTrade(offerInfo: OfferInfo) {
+export default function useCreateTrade({
+  chainId,
+  users,
+  assets,
+}: {
+  chainId: number
+  users: {
+    creator: ProfileMinimal
+    counterparty: ProfileMinimal
+  }
+  assets: {
+    creator: SimplifiedNFTAsset[]
+    counterparty: SimplifiedNFTAsset[]
+  }
+}) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
@@ -106,26 +111,22 @@ export default function useCreateTrade(offerInfo: OfferInfo) {
 
     try {
       const participants = [
-        offerInfo.user.wallet as Address,
-        offerInfo.counter_user.wallet as Address,
+        users.creator.wallet as Address,
+        users.counterparty.wallet as Address,
       ]
 
-      const assets = prepareAllAssets(offerInfo)
-
-      console.log('Creating trade with:', {
-        participants,
-        assets: assets.map((a) => ({
-          ...a,
-          tokenId: a.tokenId.toString(),
-          amount: a.amount.toString(),
-        })),
+      const assetsArg = prepareAllAssets({
+        creator: users.creator,
+        creator_assets: assets.creator,
+        counterparty: users.counterparty,
+        counterparty_assets: assets.counterparty,
       })
 
       const { request } = await publicClient.simulateContract({
         address: CONTRACT_ADDRESSES[31337] as Address,
         abi: ABI,
         functionName: 'createTrade',
-        args: [participants, assets],
+        args: [participants, assetsArg],
         account: address,
       })
 
@@ -142,7 +143,7 @@ export default function useCreateTrade(offerInfo: OfferInfo) {
       }
       throw err
     }
-  }, [address, offerInfo, publicClient, writeContract, showToast])
+  }, [chainId, users, assets, address, publicClient, writeContract, showToast])
 
   return {
     createTradeOnChain,

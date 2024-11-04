@@ -1,6 +1,11 @@
 import { Address } from 'viem'
 
-export type GridTabOption = 'home' | 'followers' | 'offers' | 'pinned'
+import { ProfileMinimal, SimplifiedNFTAsset } from './supabase'
+
+// Define the main tab types
+export type MainTabOption = 'nft' | 'offer' | 'transactions'
+export type SubTabOption = 'latest' | 'following' | 'pinned' | 'my' | 'favorites'
+
 export type UserTabOption = 'nfts' | 'offers' | 'pinned'
 
 type AssetType = 'ERC20' | 'ERC721' | 'ERC1155' | 'CRYPTOPUNK'
@@ -48,4 +53,51 @@ export interface DepositAsset {
   collection_contract: string
   token_id: string
   token_type: string
+}
+
+export interface OnchainTradeInfoAsset {
+  token: Address
+  tokenId: bigint
+  amount: bigint
+  assetType: number
+  recipient: Address
+  isDeposited: boolean
+}
+
+export interface OnchainTradeInfo {
+  isActive: boolean
+  depositedAssetCount: number
+  totalAssetCount: number
+  assets: OnchainTradeInfoAsset[]
+}
+
+export type OfferModalInfo = {
+  offerId: string | null
+  chainId: number
+  users: {
+    creator: ProfileMinimal
+    counterparty: ProfileMinimal
+  }
+  assets: {
+    creator: SimplifiedNFTAsset[]
+    counterparty: SimplifiedNFTAsset[]
+  }
+}
+
+export type TxModalInfo = {
+  offerId: string | null
+  onchain: {
+    id: string | null
+    hash: string | null
+    done: boolean
+  }
+  chainId: number
+  users: {
+    creator: ProfileMinimal
+    counterparty: ProfileMinimal
+  }
+  assets: {
+    creator: SimplifiedNFTAsset[]
+    counterparty: SimplifiedNFTAsset[]
+  }
 }

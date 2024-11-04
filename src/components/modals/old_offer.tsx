@@ -17,7 +17,7 @@ import {
   Transaction,
   TransactionFeedback,
   TransactionTransition,
-} from '@/components/offer'
+} from '@/components/old_offer'
 import ABI from '@/contracts/abi.json'
 import { useCreateTrade, useIsMobile } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'

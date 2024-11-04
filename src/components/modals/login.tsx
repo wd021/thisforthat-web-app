@@ -37,7 +37,6 @@ const Login: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
       <div className='flex flex-col p-4 items-center text-center h-full justify-center lg:h-auto lg:justify-normal overflow-y-auto hide-scrollbar'>
         <CloseButton onClick={closeModal} />
         <Logo />
-        <Title />
         <Features />
         <LoginButton onClick={handleGoogleSignIn} />
         <TermsNote />
@@ -68,21 +67,13 @@ const CloseButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   </div>
 )
 
-const Logo: React.FC = () => <img src='/logo.png' alt='NFT Swap Logo' className='w-64 h-64' />
-
-const Title: React.FC = () => (
-  <div className='text-3xl mb-8 font-semibold'>
-    NFTs Were Made
-    <br />
-    For Swapping
-  </div>
-)
+const Logo: React.FC = () => <img src='/splash.png' alt='NFT Swap Logo' className='w-64 h-64' />
 
 const Features: React.FC = () => (
-  <div className='gap-y-2 flex flex-col mb-4'>
+  <div className='gap-y-2 flex flex-col my-4'>
+    <div>🎭 Experience the joy of NFT swapping</div>
     <div>🌈 Dive into a world of NFT enthusiasts</div>
     <div>🚀 Elevate your collection to new heights</div>
-    <div>🎭 Experience the joy of NFT swapping</div>
   </div>
 )
 

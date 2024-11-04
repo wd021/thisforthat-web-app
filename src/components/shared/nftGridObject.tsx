@@ -2,29 +2,24 @@ import { FC } from 'react'
 import Link from 'next/link'
 
 import { NFTImage, VerifiedBadge } from '@/components/shared'
-import { NFTFeedItem as NFTFeedItemType } from '@/types/supabase'
+import { NFTGridItem } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
-const NFTFeedItem: FC<{
-  item: NFTFeedItemType
-  makeOffer: (nft: NFTFeedItemType) => void
-  pinItem: (nft: NFTFeedItemType) => void
-}> = ({ item, makeOffer, pinItem }) => {
+const NFTGridObject: FC<{
+  item: NFTGridItem
+  newOffer: (nft: NFTGridItem) => void
+  pinItem: (nft: NFTGridItem) => void
+}> = ({ item, newOffer, pinItem }) => {
   const navigateToUser = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
     window.open(`/${item.nft_user_id_username}`, '_blank')
   }
 
   return (
-    <Link href={`/nft/${item.nft_id}`}>
+    <Link href={`/nfts/${item.nft_id}`}>
       <div className='bg-white rounded-lg shadow-md relative hover:shadow-lg'>
-        <NFTImage
-          src={item.nft_image}
-          alt={item.nft_name}
-          fallback={item.nft_name}
-          hoverOn={false}
-        />
-        <div className='flex justify-between px-3 py-1.5'>
+        <NFTImage src={item.nft_image} alt={item.nft_name} fallback={item.nft_name} />
+        <div className='flex justify-between pl-3 pr-2 py-1.5'>
           <div className='flex items-center w-full'>
             <img
               src={`${process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL}${item?.nft_user_id_profile_pic_url}`}
@@ -57,7 +52,7 @@ const NFTFeedItem: FC<{
             className='mb-1 w-full flex justify-center items-center bg-yellow-50 px-3 py-1 rounded-md hover:bg-yellow-100 transition-colors duration-200 shadow-md'
             onClick={(e) => {
               e.preventDefault()
-              makeOffer(item)
+              newOffer(item)
             }}
           >
             <span className='flex items-center mr-2 text-2xl'>🤝</span>
@@ -78,4 +73,4 @@ const NFTFeedItem: FC<{
   )
 }
 
-export default NFTFeedItem
+export default NFTGridObject

@@ -1,31 +1,34 @@
 import { useEffect, useState } from 'react'
-
 import { useToast } from '@/providers/toastProvider'
-import { NFTOffers } from '@/types/supabase'
+import { OfferData } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
+import { useAuth } from '@/providers/authProvider'
 
 export default function useNFTOffers(nftId: string): {
-  items: NFTOffers[]
+  items: OfferData[]
   hasMore: boolean
   page: number
   loadMore: () => void
+  setItems: React.Dispatch<React.SetStateAction<OfferData[]>>
 } {
-  const [items, setItems] = useState<NFTOffers[]>([])
+  const [items, setItems] = useState<OfferData[]>([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const { user } = useAuth()
   const { showToast } = useToast()
 
   const fetchItems = async (currentPage: number) => {
     try {
-      const { data, error } = await supabase
-        .from('nfts_offers')
-        .select(
-          '*, user_offers!nfts_offers_offer_id_fkey(*, user:user_profile!user_offers_user_id_fkey(*), counter_user:user_profile!user_offers_user_id_counter_fkey(*))',
-        )
-        .eq('nft_id', nftId)
-        .order('updated_at', { ascending: false })
-        .range((currentPage - 1) * GRID_ITEMS_PER_PAGE, currentPage * GRID_ITEMS_PER_PAGE - 1)
+      const rangeStart = (currentPage - 1) * GRID_ITEMS_PER_PAGE
+      const rangeEnd = currentPage * GRID_ITEMS_PER_PAGE - 1
+
+      const { data, error } = await supabase.rpc('get_nft_offers', {
+        p_nft_id: nftId,
+        current_user_id: user?.id || null,
+        range_start: rangeStart,
+        range_end: rangeEnd,
+      })
 
       if (error) throw error
 
@@ -34,8 +37,8 @@ export default function useNFTOffers(nftId: string): {
       } else {
         setItems((prevOffers) => {
           const newOffers = data.filter(
-            (newOffer: NFTOffers) =>
-              !prevOffers.some((prevOffer) => prevOffer.id === newOffer.id),
+            (newOffer: OfferData) =>
+              !prevOffers.some((prevOffer) => prevOffer.offer_id === newOffer.offer_id),
           )
           return [...prevOffers, ...newOffers]
         })
@@ -52,7 +55,7 @@ export default function useNFTOffers(nftId: string): {
     fetchItems(1)
     setPage(1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nftId])
+  }, [nftId, user?.id])
 
   const loadMore = () => {
     const nextPage = page + 1
@@ -65,5 +68,6 @@ export default function useNFTOffers(nftId: string): {
     hasMore,
     page,
     loadMore,
+    setItems,
   }
 }

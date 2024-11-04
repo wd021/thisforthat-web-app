@@ -9,7 +9,7 @@ import { Web3Provider } from '@/providers/web3Provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'TFT - Swap NFTS for NFTs',
+  title: 'This For That - Swap NFTS for NFTs',
   description:
     'Where NFT enthusiasts swap, trade, and connect. Why sell when you can have fun building your collection?',
 }

@@ -1,46 +1,14 @@
 import { useEffect, useState } from 'react'
 
-import { HomeDropdown } from '@/components/dropdowns'
-import { NFTFeedItem, NFTOfferItem } from '@/components/shared'
+import { HomeDropdown, HomeTabBar } from '@/components/dropdowns'
+import { NFTGrid, OfferFeed, TransactionFeed } from '@/components/home'
+import { Offer, Transaction } from '@/components/modals'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import { GridTabOption } from '@/types/main'
-import {
-  NFTFeedItem as NFTFeedItemType,
-  OfferFeedItem as OfferFeedItemType,
-} from '@/types/supabase'
+import { MainTabOption, OfferModalInfo, SubTabOption, TxModalInfo } from '@/types/main'
+import { NFTGridItem, OfferData, TransactionData } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
-
-const OfferGrid: React.FC<{
-  items: OfferFeedItemType[]
-  userId: string
-  viewOffer: (item: OfferFeedItemType) => void
-}> = ({ items, userId, viewOffer }) => (
-  <div className='max-w-[800px] mx-auto flex flex-col gap-y-8 my-6'>
-    {items.map((item) => (
-      <NFTOfferItem
-        key={item.id}
-        item={item}
-        viewOffer={viewOffer}
-        userId={userId}
-        statusDetailed={true}
-      />
-    ))}
-  </div>
-)
-
-const NFTGrid: React.FC<{
-  items: NFTFeedItemType[]
-  makeOffer: (item: NFTFeedItemType) => void
-  pinItem: (item: NFTFeedItemType) => void
-}> = ({ items, makeOffer, pinItem }) => (
-  <div className='p-3 md:p-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-6 mb-16'>
-    {items.map((item) => (
-      <NFTFeedItem key={item.nft_id} item={item} makeOffer={makeOffer} pinItem={pinItem} />
-    ))}
-  </div>
-)
 
 const LoadMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <div className='w-full flex items-center justify-center my-4'>
@@ -53,23 +21,106 @@ const LoadMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   </div>
 )
 
-const Grid: React.FC<{
-  setMakeOfferItem: (item: NFTFeedItemType) => void
-  setViewOfferItem: (item: OfferFeedItemType) => void
-}> = ({ setMakeOfferItem, setViewOfferItem }) => {
-  const { user, loading } = useAuth()
+const LoadingState: React.FC = () => (
+  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
+  </div>
+)
+
+const NoResultsState: React.FC<{ mainTab: MainTabOption; subTab: SubTabOption }> = ({
+  mainTab,
+  subTab,
+}) => {
+  const getMessage = () => {
+    if (mainTab === 'nft') {
+      switch (subTab) {
+        case 'following':
+          return {
+            title: 'No NFTs from following',
+            description: 'No NFTs from those you are following. Go follow some people!',
+          }
+        case 'pinned':
+          return {
+            title: 'No pinned NFTs',
+            description: 'When you pin a NFT, it will show up here',
+          }
+        default:
+          return {
+            title: 'No NFTs found',
+            description: 'Try checking back later',
+          }
+      }
+    }
+
+    if (mainTab === 'offer') {
+      switch (subTab) {
+        case 'my':
+          return {
+            title: 'No offers yet',
+            description: 'Offers you make and receive will appear here',
+          }
+        case 'following':
+          return {
+            title: 'No offers from following',
+            description: 'Offers activity of those you follow will show up here',
+          }
+        case 'favorites':
+          return {
+            title: 'No favorite offers',
+            description: 'When you favorite an offer, it will show up here',
+          }
+        default:
+          return {
+            title: 'No offers available',
+            description: 'Check back later for new updates',
+          }
+      }
+    }
+
+    // Transactions tab
+    return {
+      title: 'No transactions yet',
+      description: 'When you agree on an offer, it will show up here to transact onchain',
+    }
+  }
+
+  const message = getMessage()
+
+  return (
+    <div className='w-full flex flex-col items-center justify-center mt-[150px] px-16 text-center'>
+      <div className='text-gray-400 text-6xl mb-4'>🔍</div>
+      <h3 className='text-xl font-semibold text-gray-700 mb-2'>{message.title}</h3>
+      <p className='text-gray-500'>{message.description}</p>
+    </div>
+  )
+}
+
+const Grid: React.FC = () => {
+  const { user, profile, loading: authLoading } = useAuth()
   const { showToast } = useToast()
 
-  const [items, setItems] = useState<(NFTFeedItemType | OfferFeedItemType)[]>([])
-  const [tabOption, setTabOption] = useState<GridTabOption>('home')
+  const [items, setItems] = useState<(NFTGridItem | OfferData | TransactionData)[]>([])
+  const [mainTab, setMainTab] = useState<MainTabOption>('nft')
+  const [subTab, setSubTab] = useState<SubTabOption>('latest')
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
 
-  const fetchItems = async (tabOption: GridTabOption, page: number) => {
-    if (tabOption !== 'home' && !user) {
+  const [offerModalInfo, setOfferModalInfo] = useState<OfferModalInfo | null>(null)
+  const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
+
+  const fetchItems = async (mainTab: MainTabOption, subTab: SubTabOption, page: number) => {
+    if (page === 1) {
+      setIsLoading(true)
+    }
+
+    // Only allow non-authenticated access to latest NFTs
+    if (!(mainTab === 'nft' && subTab === 'latest') && !user) {
       setItems([])
       setPage(1)
       setHasMore(false)
+      setIsLoading(false)
       return
     }
 
@@ -83,71 +134,93 @@ const Grid: React.FC<{
       range_end: rangeEnd,
     }
 
-    // Build query based on tab option
-    switch (tabOption) {
-      case 'home':
-        query = supabase.rpc('get_home_feed', baseParams)
+    // Build query based on main tab and subtab
+    switch (mainTab) {
+      case 'nft':
+        switch (subTab) {
+          case 'latest':
+            query = supabase.rpc('get_home_feed', baseParams)
+            break
+          case 'following':
+            query = supabase.rpc('get_following_feed', baseParams)
+            break
+          case 'pinned':
+            query = supabase.rpc('get_pinned_feed', baseParams)
+            break
+          default:
+            query = supabase.rpc('get_home_feed', baseParams)
+        }
         break
-      case 'followers':
-        query = supabase.rpc('get_following_feed', baseParams)
+      case 'offer':
+        switch (subTab) {
+          case 'my':
+            query = supabase.rpc('get_user_offers', { ...baseParams })
+            break
+          case 'following':
+            query = supabase.rpc('get_following_offers', baseParams)
+            break
+          case 'favorites':
+            query = supabase.rpc('get_favorited_offers', baseParams)
+            break
+          default:
+            query = supabase.rpc('get_user_offers', { ...baseParams })
+        }
         break
-      case 'pinned':
-        query = supabase.rpc('get_pinned_feed', baseParams)
-        break
-      case 'offers':
-        query = supabase
-          .from('user_offers')
-          .select(
-            '*, user:user_profile!user_offers_user_id_fkey(*), counter_user:user_profile!user_offers_user_id_counter_fkey(*)',
-          )
-          .or(`user_id.eq.${user?.id},user_id_counter.eq.${user?.id}`)
-          .order('updated_at', { ascending: false })
-          .range(rangeStart, rangeEnd)
+      case 'transactions':
+        query = supabase.rpc('get_user_transactions', { ...baseParams })
         break
       default:
         query = supabase.rpc('get_home_feed', baseParams)
     }
 
-    // Execute query
-    const { data, error } = await query
+    try {
+      // Execute query
+      const { data, error } = await query
 
-    if (error) {
+      if (error) {
+        throw error
+      }
+
+      // Update items based on page
+      if (page === 1) {
+        setItems(data || [])
+      } else {
+        setItems((prevItems) => {
+          const isOffer = mainTab !== 'nft'
+          const newItems = data.filter(
+            (newItem: OfferData | NFTGridItem) =>
+              !prevItems.some((prevItem: OfferData | TransactionData | NFTGridItem) =>
+                isOffer
+                  ? (prevItem as OfferData | TransactionData).offer_id ===
+                    (newItem as OfferData | TransactionData).offer_id
+                  : (prevItem as NFTGridItem).nft_id === (newItem as NFTGridItem).nft_id,
+              ),
+          )
+          return [...prevItems, ...newItems]
+        })
+      }
+
+      setHasMore(data?.length === GRID_ITEMS_PER_PAGE)
+    } catch (error) {
       showToast(`⚠️ Error fetching items`, 2500)
       console.error('Error fetching items:', error)
-      return
+    } finally {
+      setIsLoading(false)
+      setIsFirstLoad(false)
     }
-
-    // Update items based on page and tab option
-    if (page === 1) {
-      setItems(data)
-    } else {
-      setItems((prevItems) => {
-        const isOffer = tabOption === 'offers'
-        const newItems = data.filter(
-          (newItem: OfferFeedItemType | NFTFeedItemType) =>
-            !prevItems.some((prevItem: OfferFeedItemType | NFTFeedItemType) =>
-              isOffer
-                ? (prevItem as OfferFeedItemType).id === (newItem as OfferFeedItemType).id
-                : (prevItem as NFTFeedItemType).nft_id === (newItem as NFTFeedItemType).nft_id,
-            ),
-        )
-        return [...prevItems, ...newItems]
-      })
-    }
-
-    setHasMore(data.length === GRID_ITEMS_PER_PAGE)
   }
 
   useEffect(() => {
-    if (tabOption && !loading) {
-      fetchItems(tabOption, 1)
+    if (!authLoading) {
+      setIsLoading(true)
+      fetchItems(mainTab, subTab, 1)
       setPage(1)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabOption, loading])
+  }, [mainTab, subTab, authLoading])
 
-  const makeOffer = async (nft: NFTFeedItemType) => {
-    if (!user) {
+  const newOffer = async (nft: NFTGridItem) => {
+    if (!user || !profile) {
       showToast(`⚠️ You have to login first`, 2500)
       return
     }
@@ -157,14 +230,37 @@ const Grid: React.FC<{
       return
     }
 
-    setMakeOfferItem(nft)
+    const modalInfo = {
+      offerId: null,
+      chainId: nft.nft_chain_id,
+      users: {
+        creator: {
+          id: user.id,
+          username: profile.username,
+          profile_pic_url: profile.profile_pic_url,
+        },
+        counterparty: {
+          id: nft.nft_user_id,
+          username: nft.nft_user_id_username,
+          profile_pic_url: nft.nft_user_id_profile_pic_url,
+        },
+      },
+      assets: {
+        creator: [],
+        counterparty: [
+          {
+            nft_id: nft.nft_id,
+            name: nft.nft_name,
+            image: nft.nft_image,
+          },
+        ],
+      },
+    }
+
+    setOfferModalInfo(modalInfo)
   }
 
-  const viewOffer = async (offer: OfferFeedItemType) => {
-    setViewOfferItem(offer)
-  }
-
-  const pinItem = async (nft: NFTFeedItemType) => {
+  const pinItem = async (nft: NFTGridItem) => {
     if (!user) {
       showToast(`⚠️ You have to login first`, 2500)
       return
@@ -192,38 +288,76 @@ const Grid: React.FC<{
     }
   }
 
-  const handleTabChange = (newTabOption: GridTabOption) => {
-    if (newTabOption !== 'home' && !user) {
+  const handleTabChange = (newMainTab: MainTabOption, newSubTab?: SubTabOption) => {
+    if (!(newMainTab === 'nft' && newSubTab === 'latest') && !user) {
       showToast(`⚠️ You have to login first`, 2500)
       return
     }
 
-    setItems([])
+    setIsFirstLoad(true)
     setPage(1)
     setHasMore(false)
-    setTabOption(newTabOption)
+    setItems([])
+    setMainTab(newMainTab)
+    if (newSubTab) {
+      setSubTab(newSubTab)
+    }
   }
 
   const handleLoadMore = () => {
     const nextPage = page + 1
     setPage(nextPage)
-    fetchItems(tabOption, nextPage)
+    fetchItems(mainTab, subTab, nextPage)
   }
 
+  const renderContent = () => {
+    if (isFirstLoad || authLoading) {
+      return <LoadingState />
+    }
+
+    if (!isLoading && items.length === 0) {
+      return <NoResultsState mainTab={mainTab} subTab={subTab} />
+    }
+
+    return (
+      <>
+        {mainTab === 'offer' ? (
+          <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+            <OfferFeed
+              items={items as OfferData[]}
+              setOfferModalInfo={setOfferModalInfo}
+              setItems={setItems}
+            />
+          </div>
+        ) : mainTab === 'transactions' ? (
+          <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+            <TransactionFeed
+              items={items as TransactionData[]}
+              setTxModalInfo={setTxModalInfo}
+            />
+          </div>
+        ) : (
+          <NFTGrid items={items as NFTGridItem[]} newOffer={newOffer} pinItem={pinItem} />
+        )}
+        {items.length > 0 && hasMore && <LoadMoreButton onClick={handleLoadMore} />}
+      </>
+    )
+  }
+
+  console.log('txModalInfo', txModalInfo)
+
   return (
-    <div className='w-full overflow-y-auto hide-scrollbar'>
-      {user && <HomeDropdown tabOption={tabOption} onNavigationChange={handleTabChange} />}
-      {user && tabOption === 'offers' ? (
-        <OfferGrid
-          items={items as OfferFeedItemType[]}
-          userId={user.id}
-          viewOffer={viewOffer}
-        />
-      ) : (
-        <NFTGrid items={items as NFTFeedItemType[]} makeOffer={makeOffer} pinItem={pinItem} />
+    <>
+      <div className='w-full overflow-y-auto hide-scrollbar'>
+        <HomeDropdown mainTab={mainTab} subTab={subTab} onNavigationChange={handleTabChange} />
+        <div className='max-w-screen-xl mx-auto'>{renderContent()}</div>
+        <HomeTabBar mainTab={mainTab} subTab={subTab} onNavigationChange={handleTabChange} />
+      </div>
+      {offerModalInfo && (
+        <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
-      {items.length > 0 && hasMore && <LoadMoreButton onClick={handleLoadMore} />}
-    </div>
+      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+    </>
   )
 }
 

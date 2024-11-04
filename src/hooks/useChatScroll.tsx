@@ -28,7 +28,7 @@ export default function useChatScroll(dependencies: unknown[] = []) {
     scrollToBottom()
 
     // Add a slight delay to ensure all content is rendered
-    const timeoutId = setTimeout(scrollToBottom, 1000)
+    const timeoutId = setTimeout(scrollToBottom, 500)
 
     return () => clearTimeout(timeoutId)
   }, []) // Empty dependency array ensures this runs only once on mount

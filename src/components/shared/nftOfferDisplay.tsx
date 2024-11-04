@@ -23,7 +23,7 @@ const NFTItem: React.FC<{ nft: NFT; size: 'small' | 'medium' | 'large'; isOpen: 
 
   return (
     <Link
-      href={`/nft/${nft.id}`}
+      href={`/nfts/${nft.id}`}
       target='_blank'
       className={`flex items-center ${isOpen ? 'space-x-2 p-1 w-full' : ''} rounded-md overflow-hidden transition-all duration-200 ${
         isOpen ? 'bg-white bg-opacity-50 hover:bg-opacity-75' : ''
@@ -31,13 +31,7 @@ const NFTItem: React.FC<{ nft: NFT; size: 'small' | 'medium' | 'large'; isOpen: 
       onClick={(e) => e.stopPropagation()}
     >
       <div className={`${sizeClasses[size]} relative rounded-md overflow-hidden flex-shrink-0`}>
-        <NFTImage
-          src={nft.image}
-          alt={nft.name}
-          rounded='all'
-          hoverOn={false}
-          fallback={nft.name}
-        />
+        <NFTImage src={nft.image} alt={nft.name} rounded='all' fallback={nft.name} />
       </div>
       {isOpen && (
         <span className='text-xs font-medium text-gray-800 truncate flex-grow'>{nft.name}</span>

@@ -7,7 +7,7 @@ import { debounce } from 'lodash'
 import {
   AccountDropdown,
   NotificationDropdown,
-  TransactionsDropdown,
+  // TransactionsDropdown,
 } from '@/components/dropdowns'
 import {
   Login as LoginModal,
@@ -24,9 +24,9 @@ const Navbar: FC = () => {
   const isMobile = useIsMobile()
 
   const [notifications, setNotifications] = useState<any[]>([])
-  const [transactions, setTransactions] = useState<any[]>([])
+  // const [transactions, setTransactions] = useState<any[]>([])
   const [newNotificationsCount, setNewNotificationsCount] = useState(0)
-  const [newTransactionsCount, setNewTransactionsCount] = useState(0)
+  // const [newTransactionsCount, setNewTransactionsCount] = useState(0)
 
   const [modal, setModal] = useState<boolean | 'login' | 'onboard' | 'offer'>(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -121,13 +121,13 @@ const Navbar: FC = () => {
               >
                 My NFTs
               </Link>
-              <Link
+              {/* <Link
                 className='flex items-center text-xl mb-4'
                 href='/transactions'
                 onClick={toggleMenu}
               >
                 Transactions
-              </Link>
+              </Link> */}
               <Link
                 className='flex items-center text-xl mb-4'
                 href='/notifications'
@@ -161,20 +161,6 @@ const Navbar: FC = () => {
             </>
           ) : (
             <>
-              <TransactionsDropdown
-                transactions={transactions}
-                userId={user?.id}
-                newCount={newTransactionsCount}
-                onOpen={() => {
-                  if (newTransactionsCount > 0) {
-                    updateLastSeen('tx')
-                  }
-                }}
-                selectOffer={(offerId) => {
-                  setOfferModalInfo({ type: 'transaction', id: offerId })
-                  setModal('offer')
-                }}
-              />
               <NotificationDropdown
                 notifications={notifications}
                 newCount={newNotificationsCount}
@@ -182,10 +168,6 @@ const Navbar: FC = () => {
                   if (newNotificationsCount > 0) {
                     updateLastSeen('notif')
                   }
-                }}
-                selectOffer={(offerId) => {
-                  setOfferModalInfo({ type: 'view_offer', id: offerId })
-                  setModal('offer')
                 }}
               />
               <AccountDropdown username={profile?.username || ''} />
@@ -233,34 +215,34 @@ const Navbar: FC = () => {
     setNewNotificationsCount(newCount)
   }
 
-  const getLatestTransactions = async () => {
-    const { data, error } = await supabase
-      .from('user_offers')
-      .select(
-        '*, user:user_profile!user_offers_user_id_fkey(*), counter_user:user_profile!user_offers_user_id_counter_fkey(*)',
-      )
-      .or(`user_id.eq.${user?.id},user_id_counter.eq.${user?.id}`)
-      .neq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(10)
+  // const getLatestTransactions = async () => {
+  //   const { data, error } = await supabase
+  //     .from('user_offers')
+  //     .select(
+  //       '*, user:user_profile!user_offers_user_id_fkey(*), counter_user:user_profile!user_offers_user_id_counter_fkey(*)',
+  //     )
+  //     .or(`user_id.eq.${user?.id},user_id_counter.eq.${user?.id}`)
+  //     .neq('status', 'pending')
+  //     .order('created_at', { ascending: false })
+  //     .limit(10)
 
-    if (error) {
-      console.error('Error fetching transactions:', error)
-      return
-    }
+  //   if (error) {
+  //     console.error('Error fetching transactions:', error)
+  //     return
+  //   }
 
-    setTransactions(data)
+  //   setTransactions(data)
 
-    const newCount = data.filter(
-      (tx) => new Date(tx.created_at) > new Date(profile?.tx_last_seen || 0),
-    ).length
-    setNewTransactionsCount(newCount)
-  }
+  //   const newCount = data.filter(
+  //     (tx) => new Date(tx.created_at) > new Date(profile?.tx_last_seen || 0),
+  //   ).length
+  //   setNewTransactionsCount(newCount)
+  // }
 
   useEffect(() => {
     if (profile) {
       getLatestNotifications()
-      getLatestTransactions()
+      // getLatestTransactions()
     }
   }, [profile])
 
@@ -268,13 +250,13 @@ const Navbar: FC = () => {
     <>
       <nav className='z-[55] top-0 fixed w-full bg-white flex justify-between items-center px-2 h-[75px] border-b border-gray-200'>
         <Link href='/'>
-          <img src='/logo.png' className='w-[70px] h-[70px] p-2' alt='Logo' />
+          <img src='/logo_header.png' className='h-[60px] p-1.5 fill' alt='Logo' />
         </Link>
         <div className='flex-1 max-w-xl mx-4'>
           <div className='relative' ref={searchRef}>
             <input
               type='text'
-              placeholder='Search NFT or User'
+              placeholder='Find User or NFT'
               className='w-full px-4 h-[44px] pl-10 pr-4 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
               value={searchTerm}
               onChange={handleSearchInputChange}
@@ -297,7 +279,7 @@ const Navbar: FC = () => {
                         {searchResults.nfts.map((nft) => (
                           <Link
                             key={nft.id}
-                            href={`/nft/${nft.id}`}
+                            href={`/nfts/${nft.id}`}
                             className='flex items-center hover:bg-gray-100 p-2 rounded'
                           >
                             <img src={nft.image} className='w-8 h-8 rounded-full' />

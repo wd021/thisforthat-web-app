@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
+import { OfferFeed } from '@/components/home'
 import { Duplicates, Offer } from '@/components/modals'
 import { NFTImage, NFTOfferItem, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
@@ -11,7 +12,7 @@ import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import {
   NFT,
-  NFTFeedItem as NFTFeedItemType,
+  NFTGridItem,
   NFTOffers,
   OfferFeedItem as OfferFeedItemType,
 } from '@/types/supabase'
@@ -29,7 +30,7 @@ const NFTSidebar: React.FC<{
   const multipleHolders = nftUsers.length > 1
 
   return (
-    <div className='w-full lg:w-[360px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
+    <div className='w-full lg:w-[320px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
       <div className='bg-white rounded-lg shadow-md mb-4 mx-4 lg:mx-0 max-w-[260px] self-center lg:self-auto lg:max-w-none'>
         <NFTImage src={nft?.image} alt={nft?.name} fallback={nft?.name} />
         <div className='p-4 space-y-3'>
@@ -109,7 +110,7 @@ const NFTTitle: React.FC<{ nft: NFT }> = ({ nft }) => {
     nft.token_id,
   )
   return (
-    <div className='w-full bg-white p-3 md:p-6 mb-4 rounded-lg shadow-md'>
+    <div className='w-full bg-white p-3 md:p-4 mb-4 rounded-lg shadow-sm'>
       <div className='flex items-center justify-between px-1'>
         <div className='flex items-center'>
           <ChainLogo chainId={nft.chain_id} className='w-6 h-6 mr-2 md:w-8 md:h-8' />
@@ -176,14 +177,14 @@ const ActionButtons: React.FC<{
   <div className={`flex gap-x-2 p-0.5 ${className} lg:mb-2`}>
     <button
       onClick={makeOffer}
-      className={`flex-1 py-3 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-50 hover:bg-yellow-100`}
+      className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-50 hover:bg-yellow-100`}
     >
-      <span className='text-2xl mr-2'>🤝</span>
-      <span className='text-gray-800 text-lg font-semibold'>Offer</span>
+      <span className='text-3xl mr-2'>🤝</span>
+      <span className='text-gray-800 text-xl font-semibold'>Offer</span>
     </button>
     <button
       onClick={pinItem}
-      className={`py-3 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-red-50 hover:bg-red-100`}
+      className={`py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-red-50 hover:bg-red-100`}
     >
       <span className='text-2xl'>📌</span>
     </button>
@@ -217,8 +218,8 @@ const NFTPage: React.FC<{
 }> = ({ nft, nftUsers }) => {
   const { user } = useAuth()
   const { showToast } = useToast()
-  const { items, hasMore, loadMore } = useNFTOffers(nft.id)
-  const [makeOfferItem, setMakeOfferItem] = useState<NFTFeedItemType | null>(null)
+  const { items, hasMore, loadMore, setItems } = useNFTOffers(nft.id)
+  const [makeOfferItem, setMakeOfferItem] = useState<NFTGridItem | null>(null)
   const [viewOfferItem, setViewOfferItem] = useState<OfferFeedItemType | null>(null)
   const [multiUserModal, setShowMultiUserModal] = useState(false)
 
@@ -233,7 +234,7 @@ const NFTPage: React.FC<{
       return
     }
 
-    const initialNFTOfferItem: NFTFeedItemType = {
+    const initialNFTOfferItem: NFTGridItem = {
       nft_id: nft.id,
       nft_name: nft.name,
       nft_image: nft.image,
@@ -297,15 +298,13 @@ const NFTPage: React.FC<{
             makeOffer={() => makeOffer(nft)}
             pinItem={() => pinItem(nft)}
           />
-          <div className='flex flex-col flex-grow w-full lg:max-w-3xl px-4 lg:px-0'>
+          <div className='flex flex-col flex-grow w-full lg:max-w-2xl px-4 lg:px-0'>
             <NFTTitle nft={nft} />
             <div className='flex-grow overflow-hidden'>
               <div className='h-full overflow-y-auto hide-scrollbar'>
-                <OffersGrid
-                  items={items}
-                  viewOffer={viewOffer}
-                  userId={user ? user.id : null}
-                />
+                <div className='flex flex-col gap-y-4'>
+                  <OfferFeed items={items} setItems={setItems} />
+                </div>
                 {items.length > 0 && hasMore && (
                   <button
                     className='bg-gray-100 py-2 px-6 text-gray-600 hover:bg-gray-200 transition-colors duration-300 text-sm font-medium my-4 mx-auto rounded-full shadow-sm flex items-center'

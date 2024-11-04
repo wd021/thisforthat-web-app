@@ -12,7 +12,8 @@ const AboutPage: React.FC = () => {
         className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'} items-center justify-center`}
       >
         <div>- mention what TFT is</div>
-        <div>- mention chains its on</div>
+        <div>- chains supported</div>
+        <div>- contracts and how trades work</div>
         <div>- mention whats coming</div>
       </div>
       {!isMobile && <Footer />}

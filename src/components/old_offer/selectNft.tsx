@@ -146,7 +146,7 @@ const SelectNFT: FC<Props> = ({ chainId, user, selectedNFTs, onSelect, onClose }
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className='w-full mt-auto bg-yellow-400 text-gray-800 py-3 px-6 rounded-full shadow-md cursor-pointer font-semibold text-lg transition-all duration-200 flex items-center justify-center'
+          className='w-full mt-auto bg-yellow-400 text-gray-800 py-3 px-6 rounded-lg shadow-md cursor-pointer font-semibold text-lg transition-all duration-200 flex items-center justify-center'
           onClick={onClose}
         >
           <span className='text-xl font-semibold'>Done</span>

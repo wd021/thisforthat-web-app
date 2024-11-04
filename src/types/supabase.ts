@@ -3,7 +3,6 @@ export interface Profile {
   username: string
   bio: string
   profile_pic_url: string
-  profile_nft_id: string
   social_links: JSON
   created_at: string
   updated_at: string
@@ -13,11 +12,7 @@ export interface Profile {
   tx_last_seen: string | null
 }
 
-export interface ProfileMinimal {
-  id: string
-  username: string
-  profile_pic_url: string
-}
+export type ProfileMinimal = Pick<Profile, 'id' | 'username' | 'profile_pic_url' | 'wallet'>
 
 export interface UserNFT {
   id: string
@@ -40,7 +35,7 @@ export interface NFT {
   created_at: string
   updated_at: string
   wallet_address: string
-  offers: number
+  offers: number // not being used
   is_verified: boolean
   verified_at: string
   user_id: string
@@ -61,7 +56,7 @@ export type NFTUpload = Omit<
   | 'user_profile'
 >
 
-export interface NFTFeedItem {
+export interface NFTGridItem {
   nft_chain_id: number
   nft_collection_contract: string
   nft_collection_name: string
@@ -116,6 +111,8 @@ export interface OfferFeedItem {
   onchain_tx: string | null
 }
 
+export type SimplifiedOfferItem = Pick<OfferFeedItem, 'id' | 'status'>
+
 export interface Activity {
   id: string
   user_id: string
@@ -127,4 +124,77 @@ export interface Activity {
   created_at: string
 }
 
-export type SimplifiedOfferItem = Pick<OfferFeedItem, 'id' | 'status'>
+export interface NFTAsset {
+  offer_nft_id: string
+  nft_id: string
+  name: string
+  image: string
+  chain_id: number
+  collection_name: string
+  collection_contract: string
+  token_id: string
+  token_type: string
+  like_count: number
+  is_liked_by_user?: boolean
+}
+
+export type SimplifiedNFTAsset = Omit<
+  NFTAsset,
+  'offer_nft_id' | 'chain_id' | 'collection_name' | 'like_count' | 'is_liked_by_user'
+>
+
+export interface OfferData {
+  offer_id: string
+  child_offer_id: string | null
+  creator_id: string
+  creator_username: string
+  creator_profile_pic_url: string
+  creator_wallet: string
+  counterparty_id: string
+  counterparty_username: string
+  counterparty_profile_pic_url: string
+  counterparty_wallet: string
+  status: string
+  chain_id: number
+  created_at: string
+  updated_at: string
+  favorite_count: number
+  comment_count: number
+  favorited_by_user: boolean
+  creator_assets: NFTAsset[]
+  counterparty_assets: NFTAsset[]
+}
+
+export interface TransactionData {
+  offer_id: string
+  child_offer_id: string | null
+  creator_id: string
+  creator_username: string
+  creator_profile_pic_url: string
+  creator_wallet: string
+  counterparty_id: string
+  counterparty_username: string
+  counterparty_profile_pic_url: string
+  counterparty_wallet: string
+  status: string
+  chain_id: number
+  created_at: string
+  updated_at: string
+  onchain_trade_id: string | null
+  onchain_tx: string | null
+  onchain_done: boolean
+  creator_assets: NFTAsset[]
+  counterparty_assets: NFTAsset[]
+}
+
+export interface OfferMessage {
+  id: string
+  type: 'user' | 'alert'
+  offer_id: string
+  user_id: string
+  username: string
+  profile_pic_url: string
+  message: string
+  created_at: string
+  updated_at: string
+}

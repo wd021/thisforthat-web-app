@@ -34,7 +34,7 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
 
 const NFTAccountItem: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, profile }) => {
   return (
-    <Link href={`/nft/${item.nfts.id}`}>
+    <Link href={`/nfts/${item.nfts.id}`}>
       <NFTImageWrapper item={item} profile={profile} />
     </Link>
   )

@@ -5,17 +5,13 @@ import { useState } from 'react'
 import { Footer } from '@/components'
 import { UserDropdown } from '@/components/dropdowns'
 import { Offer } from '@/components/modals'
-import { NFTFeedItem, NFTOfferItem } from '@/components/shared'
+import { NFTGridObject, NFTOfferItem } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useFollow, useProfile, useUserItems } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { UserTabOption } from '@/types/main'
-import {
-  NFTFeedItem as NFTFeedItemType,
-  OfferFeedItem as OfferFeedItemType,
-  Profile,
-} from '@/types/supabase'
+import { NFTGridItem, OfferFeedItem as OfferFeedItemType, Profile } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
 const ProfilePicture: React.FC<{ url: string | null }> = ({ url }) => (
@@ -58,11 +54,11 @@ const ProfileHeader: React.FC<{
 )
 
 const ContentGrid: React.FC<{
-  items: (NFTFeedItemType | OfferFeedItemType)[]
+  items: (NFTGridItem | OfferFeedItemType)[]
   tabOption: UserTabOption
-  onMakeOffer: (item: NFTFeedItemType) => void
+  onMakeOffer: (item: NFTGridItem) => void
   onViewOffer: (item: OfferFeedItemType) => void
-  onPinItem: (item: NFTFeedItemType) => void
+  onPinItem: (item: NFTGridItem) => void
   userId: string | null
 }> = ({ items, tabOption, onMakeOffer, onViewOffer, onPinItem, userId }) => {
   if (tabOption === 'offers') {
@@ -77,8 +73,8 @@ const ContentGrid: React.FC<{
 
   return (
     <div className='p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-6 mb-16'>
-      {(items as NFTFeedItemType[]).map((item) => (
-        <NFTFeedItem
+      {(items as NFTGridItem[]).map((item) => (
+        <NFTGridObject
           key={item.nft_id}
           item={item}
           makeOffer={onMakeOffer}
@@ -102,10 +98,10 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     showToast,
   )
 
-  const [makeOfferItem, setMakeOfferItem] = useState<NFTFeedItemType | null>(null)
+  const [makeOfferItem, setMakeOfferItem] = useState<NFTGridItem | null>(null)
   const [viewOfferItem, setViewOfferItem] = useState<OfferFeedItemType | null>(null)
 
-  const handleMakeOffer = async (nft: NFTFeedItemType) => {
+  const handleMakeOffer = async (nft: NFTGridItem) => {
     if (!user) {
       showToast(`⚠️ You have to login first`, 2500)
       return
@@ -119,7 +115,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     setMakeOfferItem(nft)
   }
 
-  const handlePinItem = async (nft: NFTFeedItemType) => {
+  const handlePinItem = async (nft: NFTGridItem) => {
     if (!user) {
       showToast(`⚠️ You have to login first`, 2500)
       return

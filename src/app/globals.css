@@ -12,6 +12,41 @@ body {
   overflow: hidden;
 }
 
+.custom-scrollbar {
+  /* Show scrollbar only on hover for supported browsers */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(203, 213, 225, 0.6) transparent; /* Firefox */
+
+  /* Hide default scrollbar for Chrome/Safari/Edge */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 8px;
+    margin: 4px;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: rgba(203, 213, 225, 0.6);
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(148, 163, 184, 0.8);
+    }
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.8);
+  }
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* for Chrome, Safari, and Opera */
 }
@@ -19,6 +54,11 @@ body {
 .hide-scrollbar {
   -ms-overflow-style: none; /* for Internet Explorer and Edge */
   scrollbar-width: none; /* for Firefox */
+}
+
+.offer-message a {
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 .line-clamp-2 {

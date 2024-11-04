@@ -8,11 +8,11 @@ const ChainLogo: React.FC<ChainLogoProps> = ({ chainId, ...props }) => {
   const logos: { [key: number]: React.ReactElement } = {
     // Ethereum
     1: (
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' {...props}>
-        <path fill='#8A92B2' d='M16 0L6 16L16 21.5L26 16L16 0Z' />
-        <path fill='#62688F' d='M16 0L6 16L16 21.5V0Z' />
-        <path fill='#8A92B2' d='M16 23.4L6 17.9L16 32L26 17.9L16 23.4Z' />
-        <path fill='#62688F' d='M16 32V23.4L6 17.9L16 32Z' />
+      <svg role='img' viewBox='0 0 24 24' {...props}>
+        <path
+          d='M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z'
+          fill='currentColor'
+        />
       </svg>
     ),
     // Base
@@ -139,7 +139,7 @@ const ChainLogo: React.FC<ChainLogoProps> = ({ chainId, ...props }) => {
   }
 
   const DefaultLogo = (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
+    <svg viewBox='0 0 32 32'>
       <circle cx='16' cy='16' r='16' fill='#CCCCCC' />
       <text x='16' y='22' fontSize='20' fill='#666666' textAnchor='middle'>
         ?

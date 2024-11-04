@@ -34,7 +34,7 @@ const PWA = () => {
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg border-t border-gray-200'>
+    <div className='fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg border-t border-gray-200 z-[1000]'>
       <div className='relative max-w-lg mx-auto'>
         <button
           onClick={() => setShowPrompt(false)}
@@ -50,11 +50,11 @@ const PWA = () => {
         </button>
 
         <div className='pr-8'>
-          <h3 className='font-semibold text-lg mb-2'>Get the TFT App Experience</h3>
+          <h3 className='font-semibold text-lg mb-2'>Get the This For That App</h3>
 
           <p className='text-gray-600 text-sm mb-3'>
-            We're working on a mobile app. Meanwhile, you can add TFT to your home screen for
-            the best experience!
+            We're working on a mobile app. Meanwhile, you can add TFT to your homescreen by
+            following the instructions below.
           </p>
 
           {platform !== 'other' && (
