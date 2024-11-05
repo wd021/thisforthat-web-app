@@ -1,86 +1,144 @@
 'use client'
 
 import { useState } from 'react'
-
 import { Footer } from '@/components'
 import { UserDropdown } from '@/components/dropdowns'
-import { Offer } from '@/components/modals'
-import { NFTGridObject, NFTOfferItem } from '@/components/shared'
+import { Offer, Transaction, Following } from '@/components/modals'
+import { NFTGridObject } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useFollow, useProfile, useUserItems } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import { UserTabOption } from '@/types/main'
-import { NFTGridItem, OfferFeedItem as OfferFeedItemType, Profile } from '@/types/supabase'
+import { OfferModalInfo, TxModalInfo, UserTabOption } from '@/types/main'
+import { NFTGridItem, OfferData, Profile } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
-
-const ProfilePicture: React.FC<{ url: string | null }> = ({ url }) => (
-  <div className='relative w-[175px] h-[175px] bg-gray-100 rounded-full'>
-    {url && (
-      <img
-        src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL! + url}
-        alt='Profile Picture'
-        className='w-full h-full rounded-full'
-      />
-    )}
-  </div>
-)
+import { OfferFeed } from '@/components/home'
 
 const ProfileHeader: React.FC<{
   profile: Profile | null
-  isFollowing: boolean
-  onFollow: () => void
   isOwnProfile: boolean
-}> = ({ profile, isFollowing, onFollow, isOwnProfile }) => (
-  <div className='mt-12 mb-4 flex justify-center'>
-    <div className='flex flex-col items-center'>
-      <ProfilePicture url={profile?.profile_pic_url || null} />
-      {!isOwnProfile && (
-        <div
-          className={`flex items-center border px-3 py-1 rounded-full mt-[-14px] z-10 cursor-pointer ${
-            isFollowing ? 'bg-gray-800 text-white' : 'bg-gray-100 border-gray-200'
-          }`}
-          onClick={onFollow}
-        >
-          {isFollowing ? 'Unfollow' : 'Follow'}
-        </div>
+  onFollow: () => void
+  isFollowing: boolean
+  onClick: (tab: 'following' | 'followers' | 'nfts' | 'offers') => void
+}> = ({ profile, isOwnProfile, onFollow, isFollowing, onClick }) => {
+  const renderProfileImage = () => (
+    <div className='relative w-[175px] h-[175px] rounded-full overflow-hidden'>
+      {profile ? (
+        <img
+          src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL! + profile.profile_pic_url}
+          alt='Profile Picture'
+          className='w-full h-full rounded-xl object-cover'
+        />
+      ) : (
+        <div className='w-full h-full rounded-xl bg-gradient-to-br from-blue-50 to-purple-50' />
       )}
-      <div className='flex items-center mt-4'>
-        <div className='text-3xl font-bold'>{profile?.username}</div>
-      </div>
-      <p className='text-gray-600 mt-2'>{profile?.bio}</p>
     </div>
+  )
+
+  const renderFollowButton = () =>
+    !isOwnProfile && (
+      <button
+        onClick={onFollow}
+        className={`
+          inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium
+          transition-all duration-200 ease-in-out
+          ${
+            isFollowing
+              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }
+        `}
+      >
+        {isFollowing && <span className='mr-1.5 text-xs'>✓</span>}
+        {isFollowing ? 'Following' : 'Follow'}
+      </button>
+    )
+
+  const StatItem: React.FC<{
+    value: number
+    label: string
+    onClick: () => void
+  }> = ({ value, label, onClick }) => (
+    <div
+      onClick={onClick}
+      className='group cursor-pointer transition-all duration-300 hover:transform hover:-translate-y-0.5'
+    >
+      <div className='px-1 py-1.5'>
+        <span className='font-semibold text-gray-900 transition-colors'>
+          {value.toLocaleString()}
+        </span>
+        <span className='ml-1.5 text-sm text-gray-500'>{label}</span>
+      </div>
+    </div>
+  )
+
+  const renderStats = () => (
+    <div className='flex items-center gap-4'>
+      <StatItem
+        value={profile?.following_count || 0}
+        label='Following'
+        onClick={() => onClick('following')}
+      />
+      <StatItem
+        value={profile?.followers_count || 0}
+        label='Followers'
+        onClick={() => onClick('followers')}
+      />
+      <StatItem value={profile?.nfts_count || 0} label='NFTs' onClick={() => onClick('nfts')} />
+      <StatItem
+        value={profile?.offers_count || 0}
+        label='Offers'
+        onClick={() => onClick('offers')}
+      />
+    </div>
+  )
+
+  return (
+    <div className='max-w-3xl mx-auto bg-white rounded-xl shadow-sm border p-6 mb-4'>
+      <div className='md:items-center flex-col flex md:flex-row gap-6'>
+        {renderProfileImage()}
+        <div className='flex-1 min-w-0'>
+          <div className='flex items-center gap-4 mb-2'>
+            <h1 className='text-xl font-bold text-gray-900 truncate'>{profile?.username}</h1>
+            {renderFollowButton()}
+          </div>
+          {profile?.bio && <p className='text-gray-600 leading-relaxed mb-2'>{profile.bio}</p>}
+          <div className='space-y-2'>{renderStats()}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const LoadingState: React.FC = () => (
+  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
   </div>
 )
 
-const ContentGrid: React.FC<{
-  items: (NFTGridItem | OfferFeedItemType)[]
-  tabOption: UserTabOption
-  onMakeOffer: (item: NFTGridItem) => void
-  onViewOffer: (item: OfferFeedItemType) => void
-  onPinItem: (item: NFTGridItem) => void
-  userId: string | null
-}> = ({ items, tabOption, onMakeOffer, onViewOffer, onPinItem, userId }) => {
-  if (tabOption === 'offers') {
-    return (
-      <div className='p-3 md:p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-6 mb-12'>
-        {(items as OfferFeedItemType[]).map((item) => (
-          <NFTOfferItem key={item.id} item={item} viewOffer={onViewOffer} userId={userId} />
-        ))}
-      </div>
-    )
+const NoResultsState: React.FC<{ tab: UserTabOption }> = ({ tab }) => {
+  const messages = {
+    nfts: {
+      title: 'No NFTs',
+      description: 'User has not uploaded any NFTs yet.',
+    },
+    pinned: {
+      title: 'No Pinned NFTs',
+      description: 'User has not pinned any NFTs yet.',
+    },
+    offers: {
+      title: 'No offers',
+      description: 'User has no offers yet.',
+    },
   }
 
+  const { title, description } = messages[tab]
+
   return (
-    <div className='p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-6 mb-16'>
-      {(items as NFTGridItem[]).map((item) => (
-        <NFTGridObject
-          key={item.nft_id}
-          item={item}
-          makeOffer={onMakeOffer}
-          pinItem={onPinItem}
-        />
-      ))}
+    <div className='w-full flex flex-col items-center justify-center mt-[150px] px-16 text-center'>
+      <div className='text-gray-400 text-6xl mb-4'>🔍</div>
+      <h3 className='text-xl font-semibold text-gray-700 mb-2'>{title}</h3>
+      <p className='text-gray-500'>{description}</p>
     </div>
   )
 }
@@ -92,17 +150,17 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const userPageProfile = useProfile(params.id, profile)
   const { isFollowing, handleFollow } = useFollow(userPageProfile, user)
   const [tabOption, setTabOption] = useState<UserTabOption>('nfts')
-  const { items, hasMore, loadMore, refreshItems } = useUserItems(
-    tabOption,
-    userPageProfile,
-    showToast,
-  )
+  const [offerModalInfo, setOfferModalInfo] = useState<OfferModalInfo | null>(null)
+  const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
+  const [followingModalInfo, setFollowingModalInfo] = useState<
+    null | 'following' | 'followers'
+  >(null)
 
-  const [makeOfferItem, setMakeOfferItem] = useState<NFTGridItem | null>(null)
-  const [viewOfferItem, setViewOfferItem] = useState<OfferFeedItemType | null>(null)
+  const { items, setItems, hasMore, loadMore, refreshItems, isFirstLoad, isLoading } =
+    useUserItems(tabOption, userPageProfile, showToast)
 
-  const handleMakeOffer = async (nft: NFTGridItem) => {
-    if (!user) {
+  const handleNewOffer = async (nft: NFTGridItem) => {
+    if (!user || !profile) {
       showToast(`⚠️ You have to login first`, 2500)
       return
     }
@@ -112,7 +170,37 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
       return
     }
 
-    setMakeOfferItem(nft)
+    setOfferModalInfo({
+      offerId: null,
+      chainId: nft.nft_chain_id,
+      users: {
+        creator: {
+          id: user.id,
+          username: profile.username,
+          profile_pic_url: profile.profile_pic_url,
+          wallet: profile.wallet,
+        },
+        counterparty: {
+          id: nft.nft_user_id,
+          username: nft.nft_user_id_username,
+          profile_pic_url: nft.nft_user_id_profile_pic_url,
+          wallet: nft.nft_user_id_wallet,
+        },
+      },
+      assets: {
+        creator: [],
+        counterparty: [
+          {
+            nft_id: nft.nft_id,
+            name: nft.nft_name,
+            image: nft.nft_image,
+            collection_contract: nft.nft_collection_contract,
+            token_id: nft.nft_token_id,
+            token_type: nft.nft_token_type,
+          },
+        ],
+      },
+    })
   }
 
   const handlePinItem = async (nft: NFTGridItem) => {
@@ -122,18 +210,10 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     }
 
     try {
-      await supabase.from('user_pins').upsert(
-        [
-          {
-            user_id: user.id,
-            nft_id: nft.nft_id,
-          },
-        ],
-        {
-          onConflict: 'user_id,nft_id',
-          ignoreDuplicates: true,
-        },
-      )
+      await supabase.from('user_pins').upsert([{ user_id: user.id, nft_id: nft.nft_id }], {
+        onConflict: 'user_id,nft_id',
+        ignoreDuplicates: true,
+      })
       showToast(`✅ NFT pinned`, 1500)
     } catch (error) {
       showToast(`⚠️ Error pinning NFT`, 2500)
@@ -142,62 +222,86 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   }
 
   const handleTabChange = (newTabOption: UserTabOption) => {
+    if (newTabOption === tabOption) return
+
     refreshItems()
     setTabOption(newTabOption)
   }
+
+  const renderContent = () => {
+    if (isFirstLoad) return <LoadingState />
+    if (!isLoading && !isFirstLoad && items.length === 0)
+      return <NoResultsState tab={tabOption} />
+
+    return tabOption !== 'offers' ? (
+      <div className='p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-6 mb-24'>
+        {(items as NFTGridItem[]).map((item) => (
+          <NFTGridObject
+            key={item.nft_id}
+            item={item}
+            newOffer={handleNewOffer}
+            pinItem={handlePinItem}
+          />
+        ))}
+      </div>
+    ) : (
+      <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+        <OfferFeed
+          items={items as OfferData[]}
+          setOfferModalInfo={setOfferModalInfo}
+          setItems={setItems}
+        />
+      </div>
+    )
+  }
+
+  const renderLoadMoreButton = () =>
+    items.length > 0 &&
+    hasMore && (
+      <div className='w-full flex items-center justify-center my-4'>
+        <button
+          onClick={loadMore}
+          className='px-10 py-3 text-lg rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors duration-300'
+        >
+          Load More
+        </button>
+      </div>
+    )
 
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>
       <div
         className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'}`}
       >
-        <div className='px-3 md:px-6 md:container md:mx-auto'>
+        <div className='my-8 px-3 md:px-6 md:container md:mx-auto'>
           <ProfileHeader
             profile={userPageProfile}
             isFollowing={isFollowing}
             onFollow={handleFollow}
+            onClick={(option: string) => {
+              if (option === 'following' || option === 'followers') {
+                setFollowingModalInfo(option as 'following' | 'followers')
+              } else {
+                handleTabChange(option as UserTabOption)
+              }
+            }}
             isOwnProfile={userPageProfile?.id === user?.id}
           />
           <UserDropdown tabOption={tabOption} onNavigationChange={handleTabChange} />
-          <ContentGrid
-            items={items}
-            tabOption={tabOption}
-            onMakeOffer={handleMakeOffer}
-            onViewOffer={setViewOfferItem}
-            onPinItem={handlePinItem}
-            userId={user?.id || null}
-          />
-          {items.length > 0 && hasMore && (
-            <div className='w-full flex items-center justify-center my-4'>
-              <button
-                onClick={loadMore}
-                className='px-10 py-3 text-lg rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors duration-300'
-              >
-                Load More
-              </button>
-            </div>
-          )}
+          {renderContent()}
+          {renderLoadMoreButton()}
         </div>
       </div>
       {!isMobile && <Footer />}
-      {makeOfferItem && (
-        <Offer
-          type='make_offer'
-          offerId={null}
-          initialNFT={makeOfferItem}
-          closeModal={() => setMakeOfferItem(null)}
-        />
+      {offerModalInfo && (
+        <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
-      {viewOfferItem && (
-        <Offer
-          type={
-            viewOfferItem.status === 'accepted' || viewOfferItem.status === 'completed'
-              ? 'transaction'
-              : 'view_offer'
-          }
-          offerId={viewOfferItem.id}
-          initialNFT={null}
-          closeModal={() => setViewOfferItem(null)}
+      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+      {followingModalInfo && (
+        <Following
+          userId={userPageProfile?.id!}
+          initialTab={followingModalInfo}
+          closeModal={() => setFollowingModalInfo(null)}
         />
       )}
     </div>

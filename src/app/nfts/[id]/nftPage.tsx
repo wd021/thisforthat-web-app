@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 
 import { OfferFeed } from '@/components/home'
-import { Duplicates, Offer } from '@/components/modals'
+import { Duplicates, Offer, Transaction } from '@/components/modals'
 import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
 import { ChainLogo, Etherscan, Opensea } from '@/icons'
@@ -14,7 +14,7 @@ import { NFT, NFTGridItem } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
-import { OfferModalInfo } from '@/types/main'
+import { OfferModalInfo, TxModalInfo } from '@/types/main'
 
 const LoadingState: React.FC = () => (
   <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
@@ -198,6 +198,7 @@ const NFTPage: React.FC<{
   const { items, hasMore, loadMore, setItems, isFirstLoad, isLoading } = useNFTOffers(nft.id)
 
   const [offerModalInfo, setOfferModalInfo] = useState<OfferModalInfo | null>(null)
+  const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
   const [multiUserModal, setShowMultiUserModal] = useState(false)
 
   const newOffer = async (nft: NFT) => {
@@ -327,6 +328,7 @@ const NFTPage: React.FC<{
       {offerModalInfo && (
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
+      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
       {multiUserModal && (
         <Duplicates users={nftUsers} closeModal={() => setShowMultiUserModal(false)} />
       )}

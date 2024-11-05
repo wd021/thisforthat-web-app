@@ -7,8 +7,8 @@ interface UserNavItem {
 }
 
 const navItems: UserNavItem[] = [
-  { id: 'nfts', label: 'My NFTS', emoji: '🖼️' },
-  { id: 'pinned', label: 'My Pins', emoji: '📌' },
+  { id: 'nfts', label: 'NFTS', emoji: '🖼️' },
+  { id: 'pinned', label: 'Pins', emoji: '📌' },
   { id: 'offers', label: 'Offers', emoji: '🤝' },
 ]
 

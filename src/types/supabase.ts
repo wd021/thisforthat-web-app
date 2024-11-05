@@ -1,3 +1,10 @@
+export interface FollowingProfile {
+  followed_id: string
+  follower_id: string
+  id: string
+  user_profile: Profile
+}
+
 export interface Profile {
   id: string
   username: string
@@ -9,7 +16,10 @@ export interface Profile {
   wallet: string
   banned: boolean
   notif_last_seen: string | null
-  tx_last_seen: string | null
+  following_count: number
+  followers_count: number
+  offers_count: number
+  nfts_count: number
 }
 
 export type ProfileMinimal = Pick<Profile, 'id' | 'username' | 'profile_pic_url' | 'wallet'>
@@ -63,7 +73,6 @@ export interface NFTGridItem {
   nft_created_at: string
   nft_id: string
   nft_name: string
-  nft_pins: number // not being used
   nft_image: string
   nft_thumbnail: string
   nft_token_id: string

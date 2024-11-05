@@ -9,7 +9,13 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
   <div className='flex flex-col bg-white shadow-md rounded-lg relative'>
     <NFTImage src={item.nfts.image} alt={item.nfts.name} fallback={item.nfts.name} />
     <div className='flex justify-between px-3 py-1.5'>
-      <div className='flex items-center w-full'>
+      <div
+        className='flex items-center w-full'
+        onClick={(e) => {
+          e.preventDefault()
+          window.open(`/${profile.username}`, '_blank')
+        }}
+      >
         <img
           src={`${process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL}${profile?.profile_pic_url}`}
           alt={profile?.username}

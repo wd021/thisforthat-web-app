@@ -111,9 +111,7 @@ const Grid: React.FC = () => {
   const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
 
   const fetchItems = async (mainTab: MainTabOption, subTab: SubTabOption, page: number) => {
-    if (page === 1) {
-      setIsLoading(true)
-    }
+    setIsLoading(true)
 
     // Only allow non-authenticated access to latest NFTs
     if (!(mainTab === 'nft' && subTab === 'latest') && !user) {
@@ -154,7 +152,7 @@ const Grid: React.FC = () => {
       case 'offer':
         switch (subTab) {
           case 'my':
-            query = supabase.rpc('get_user_offers', { ...baseParams })
+            query = supabase.rpc('get_user_offers', baseParams)
             break
           case 'following':
             query = supabase.rpc('get_following_offers', baseParams)
@@ -163,11 +161,11 @@ const Grid: React.FC = () => {
             query = supabase.rpc('get_favorited_offers', baseParams)
             break
           default:
-            query = supabase.rpc('get_user_offers', { ...baseParams })
+            query = supabase.rpc('get_user_offers', baseParams)
         }
         break
       case 'transactions':
-        query = supabase.rpc('get_user_transactions', { ...baseParams })
+        query = supabase.rpc('get_user_transactions', baseParams)
         break
       default:
         query = supabase.rpc('get_home_feed', baseParams)
