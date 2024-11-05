@@ -10,6 +10,12 @@ import { useToast } from '@/providers/toastProvider'
 import { OfferData } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
+const LoadingState: React.FC = () => (
+  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
+  </div>
+)
+
 interface NFTPageProps {
   params: {
     id: string
@@ -51,6 +57,10 @@ const Offer: React.FC<NFTPageProps> = ({ params }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, loading])
+
+  if (!offerInfo) {
+    return <LoadingState />
+  }
 
   return (
     <div

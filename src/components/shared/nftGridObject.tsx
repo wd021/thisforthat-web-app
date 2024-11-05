@@ -20,7 +20,7 @@ const NFTGridObject: FC<{
       <div className='bg-white rounded-lg shadow-md relative hover:shadow-lg'>
         <NFTImage src={item.nft_image} alt={item.nft_name} fallback={item.nft_name} />
         <div className='flex justify-between pl-3 pr-2 py-1.5'>
-          <div className='flex items-center w-full'>
+          <div className='flex items-center w-full mr-2 truncate'>
             <img
               src={`${process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL}${item?.nft_user_id_profile_pic_url}`}
               alt={item?.nft_user_id_username}

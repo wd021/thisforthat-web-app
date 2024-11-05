@@ -11,14 +11,19 @@ export default function useNFTOffers(nftId: string): {
   page: number
   loadMore: () => void
   setItems: React.Dispatch<React.SetStateAction<OfferData[]>>
+  isFirstLoad: boolean
+  isLoading: boolean
 } {
   const [items, setItems] = useState<OfferData[]>([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const { user } = useAuth()
   const { showToast } = useToast()
 
   const fetchItems = async (currentPage: number) => {
+    setIsLoading(true)
     try {
       const rangeStart = (currentPage - 1) * GRID_ITEMS_PER_PAGE
       const rangeEnd = currentPage * GRID_ITEMS_PER_PAGE - 1
@@ -45,9 +50,12 @@ export default function useNFTOffers(nftId: string): {
       }
 
       setHasMore(data.length === GRID_ITEMS_PER_PAGE)
+      if (isFirstLoad) setIsFirstLoad(false)
     } catch (error) {
       console.error('Error fetching items:', error)
       showToast(`⚠️ Error fetching offers`, 2500)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -69,5 +77,7 @@ export default function useNFTOffers(nftId: string): {
     page,
     loadMore,
     setItems,
+    isFirstLoad,
+    isLoading,
   }
 }

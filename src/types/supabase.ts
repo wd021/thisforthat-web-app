@@ -71,6 +71,7 @@ export interface NFTGridItem {
   nft_user_id: string
   nft_user_id_profile_pic_url: string
   nft_user_id_username: string
+  nft_user_id_wallet: string
   nft_is_verified: boolean
   nft_verified_at: string | null
 }

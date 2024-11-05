@@ -238,11 +238,13 @@ const Grid: React.FC = () => {
           id: user.id,
           username: profile.username,
           profile_pic_url: profile.profile_pic_url,
+          wallet: profile.wallet,
         },
         counterparty: {
           id: nft.nft_user_id,
           username: nft.nft_user_id_username,
           profile_pic_url: nft.nft_user_id_profile_pic_url,
+          wallet: nft.nft_user_id_wallet,
         },
       },
       assets: {
@@ -252,6 +254,9 @@ const Grid: React.FC = () => {
             nft_id: nft.nft_id,
             name: nft.nft_name,
             image: nft.nft_image,
+            collection_contract: nft.nft_collection_contract,
+            token_id: nft.nft_token_id,
+            token_type: nft.nft_token_type,
           },
         ],
       },
@@ -268,18 +273,12 @@ const Grid: React.FC = () => {
 
     showToast(`✅ NFT pinned`, 1500)
 
-    const { error } = await supabase.from('user_pins').upsert(
-      [
-        {
-          user_id: user?.id,
-          nft_id: nft.nft_id,
-        },
-      ],
-      {
+    const { error } = await supabase
+      .from('user_pins')
+      .upsert([{ user_id: user?.id, nft_id: nft.nft_id }], {
         onConflict: 'user_id,nft_id',
         ignoreDuplicates: true,
-      },
-    )
+      })
 
     if (error) {
       showToast(`⚠️ Error pinning NFT`, 2500)

@@ -5,20 +5,22 @@ import Link from 'next/link'
 
 import { OfferFeed } from '@/components/home'
 import { Duplicates, Offer } from '@/components/modals'
-import { NFTImage, NFTOfferItem, VerifiedBadge } from '@/components/shared'
+import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
 import { ChainLogo, Etherscan, Opensea } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import {
-  NFT,
-  NFTGridItem,
-  NFTOffers,
-  OfferFeedItem as OfferFeedItemType,
-} from '@/types/supabase'
+import { NFT, NFTGridItem } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
+import { OfferModalInfo } from '@/types/main'
+
+const LoadingState: React.FC = () => (
+  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
+  </div>
+)
 
 const NFTSidebar: React.FC<{
   nft: NFT
@@ -31,7 +33,7 @@ const NFTSidebar: React.FC<{
 
   return (
     <div className='w-full lg:w-[320px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
-      <div className='bg-white rounded-lg shadow-md mb-4 mx-4 lg:mx-0 max-w-[260px] self-center lg:self-auto lg:max-w-none'>
+      <div className='bg-white rounded-lg shadow-md mb-4 mx-4 lg:mx-0 max-w-[320px] self-center lg:self-auto lg:max-w-none'>
         <NFTImage src={nft?.image} alt={nft?.name} fallback={nft?.name} />
         <div className='p-4 space-y-3'>
           <div className='flex items-center justify-between'>
@@ -144,31 +146,6 @@ const NFTTitle: React.FC<{ nft: NFT }> = ({ nft }) => {
   )
 }
 
-const OffersGrid: React.FC<{
-  items: NFTOffers[]
-  viewOffer: (offer: OfferFeedItemType) => void
-  userId: string | null
-}> = ({ items, viewOffer, userId }) => (
-  <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2'>
-    {items.map((item) => (
-      <NFTOfferItem
-        key={item.id}
-        item={item.user_offers}
-        viewOffer={viewOffer}
-        userId={userId}
-      />
-    ))}
-    {items.length === 0 && (
-      <div className='col-span-1 sm:col-span-2 flex flex-col items-center justify-center py-16 px-4'>
-        <h3 className='text-lg font-semibold text-gray-700 mb-1'>No Offers Yet</h3>
-        <p className='text-gray-500 text-center text-sm max-w-sm'>
-          Be the first to make an offer on this NFT. Click the offer button to get started!
-        </p>
-      </div>
-    )}
-  </div>
-)
-
 const ActionButtons: React.FC<{
   className?: string
   makeOffer: () => void
@@ -216,15 +193,15 @@ const NFTPage: React.FC<{
   nft: NFT
   nftUsers: any[]
 }> = ({ nft, nftUsers }) => {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { showToast } = useToast()
-  const { items, hasMore, loadMore, setItems } = useNFTOffers(nft.id)
-  const [makeOfferItem, setMakeOfferItem] = useState<NFTGridItem | null>(null)
-  const [viewOfferItem, setViewOfferItem] = useState<OfferFeedItemType | null>(null)
+  const { items, hasMore, loadMore, setItems, isFirstLoad, isLoading } = useNFTOffers(nft.id)
+
+  const [offerModalInfo, setOfferModalInfo] = useState<OfferModalInfo | null>(null)
   const [multiUserModal, setShowMultiUserModal] = useState(false)
 
-  const makeOffer = async (nft: NFT) => {
-    if (!user) {
+  const newOffer = async (nft: NFT) => {
+    if (!user || !profile) {
       showToast(`⚠️ You have to login first`, 2500)
       return
     }
@@ -234,30 +211,39 @@ const NFTPage: React.FC<{
       return
     }
 
-    const initialNFTOfferItem: NFTGridItem = {
-      nft_id: nft.id,
-      nft_name: nft.name,
-      nft_image: nft.image,
-      nft_chain_id: nft.chain_id,
-      nft_collection_contract: nft.collection_contract,
-      nft_token_id: nft.token_id,
-      nft_token_type: nft.token_type,
-      nft_collection_name: nft.collection_name,
-      nft_created_at: nft.created_at,
-      nft_thumbnail: nft.thumbnail,
-      nft_is_verified: nft.is_verified,
-      nft_verified_at: nft.verified_at,
-      nft_pins: nft.pins,
-      nft_user_id: nft.user_id,
-      nft_user_id_username: nft.user_profile.username,
-      nft_user_id_profile_pic_url: nft.user_profile.profile_pic_url,
+    const modalInfo = {
+      offerId: null,
+      chainId: nft.chain_id,
+      users: {
+        creator: {
+          id: user.id,
+          username: profile.username,
+          profile_pic_url: profile.profile_pic_url,
+          wallet: profile.wallet,
+        },
+        counterparty: {
+          id: nft.user_profile.id,
+          username: nft.user_profile.username,
+          profile_pic_url: nft.user_profile.profile_pic_url,
+          wallet: nft.user_profile.wallet,
+        },
+      },
+      assets: {
+        creator: [],
+        counterparty: [
+          {
+            nft_id: nft.id,
+            name: nft.name,
+            image: nft.image,
+            collection_contract: nft.collection_contract,
+            token_id: nft.token_id,
+            token_type: nft.token_type,
+          },
+        ],
+      },
     }
 
-    setMakeOfferItem(initialNFTOfferItem)
-  }
-
-  const viewOffer = async (offer: OfferFeedItemType) => {
-    setViewOfferItem(offer)
+    setOfferModalInfo(modalInfo)
   }
 
   const pinItem = async (nft: NFT) => {
@@ -268,18 +254,12 @@ const NFTPage: React.FC<{
 
     showToast(`✅ NFT pinned`, 1500)
 
-    const { error } = await supabase.from('user_pins').upsert(
-      [
-        {
-          user_id: user?.id,
-          nft_id: nft.id,
-        },
-      ],
-      {
+    const { error } = await supabase
+      .from('user_pins')
+      .upsert([{ user_id: user?.id, nft_id: nft.id }], {
         onConflict: 'user_id,nft_id',
         ignoreDuplicates: true,
-      },
-    )
+      })
     if (error) {
       showToast(`⚠️ Error pinning NFT`, 2500)
       console.error('Error pinning NFT:', error)
@@ -295,50 +275,57 @@ const NFTPage: React.FC<{
             nft={nft}
             nftUsers={nftUsers}
             showMultiUserModal={() => setShowMultiUserModal(true)}
-            makeOffer={() => makeOffer(nft)}
+            makeOffer={() => newOffer(nft)}
             pinItem={() => pinItem(nft)}
           />
           <div className='flex flex-col flex-grow w-full lg:max-w-2xl px-4 lg:px-0'>
             <NFTTitle nft={nft} />
             <div className='flex-grow overflow-hidden'>
-              <div className='h-full overflow-y-auto hide-scrollbar'>
-                <div className='flex flex-col gap-y-4'>
-                  <OfferFeed items={items} setItems={setItems} />
-                </div>
-                {items.length > 0 && hasMore && (
-                  <button
-                    className='bg-gray-100 py-2 px-6 text-gray-600 hover:bg-gray-200 transition-colors duration-300 text-sm font-medium my-4 mx-auto rounded-full shadow-sm flex items-center'
-                    onClick={loadMore}
-                  >
-                    Load more
-                  </button>
-                )}
-              </div>
+              {isFirstLoad ? (
+                <LoadingState />
+              ) : (
+                <>
+                  {!isLoading && items.length === 0 ? (
+                    <>
+                      <div className='w-full flex flex-col items-center justify-center my-[150px] px-16 text-center'>
+                        <div className='text-gray-400 text-6xl mb-4'>🔍</div>
+                        <h3 className='text-xl font-semibold text-gray-700 mb-2'>
+                          No offers yet
+                        </h3>
+                        <p className='text-gray-500'>
+                          Be the first to make an offer for this NFT!
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className='h-full overflow-y-auto hide-scrollbar'>
+                      <div className='flex flex-col gap-y-4'>
+                        <OfferFeed
+                          items={items}
+                          setItems={setItems}
+                          setOfferModalInfo={() => {}}
+                        />
+                      </div>
+                      {items.length > 0 && hasMore && (
+                        <button
+                          className='bg-gray-100 py-2 px-6 text-gray-600 hover:bg-gray-200 transition-colors duration-300 text-sm font-medium my-4 mx-auto rounded-full shadow-sm flex items-center'
+                          onClick={loadMore}
+                        >
+                          Load more
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
             <div className='h-[100px] lg:hidden' />
           </div>
         </div>
-        <MobileActionButtons makeOffer={() => makeOffer(nft)} pinItem={() => pinItem(nft)} />
+        <MobileActionButtons makeOffer={() => newOffer(nft)} pinItem={() => pinItem(nft)} />
       </div>
-      {makeOfferItem && (
-        <Offer
-          type='make_offer'
-          offerId={null}
-          initialNFT={makeOfferItem}
-          closeModal={() => setMakeOfferItem(null)}
-        />
-      )}
-      {viewOfferItem && (
-        <Offer
-          type={
-            viewOfferItem.status === 'accepted' || viewOfferItem.status === 'completed'
-              ? 'transaction'
-              : 'view_offer'
-          }
-          offerId={viewOfferItem.id}
-          initialNFT={null}
-          closeModal={() => setViewOfferItem(null)}
-        />
+      {offerModalInfo && (
+        <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
       {multiUserModal && (
         <Duplicates users={nftUsers} closeModal={() => setShowMultiUserModal(false)} />
