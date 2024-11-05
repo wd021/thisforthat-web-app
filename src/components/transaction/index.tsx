@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
-import Header from './header'
 import { TransactionData } from '@/types/supabase'
 import { OnchainTradeInfo } from '@/types/main'
+import { Expand } from '@/icons'
+import Link from 'next/link'
+
+import Header from './header'
+import Footer from './footer'
 
 // Icon Components
 const Icons = {
@@ -119,7 +123,7 @@ const TradeSection = ({ username, assets, onchainInfo }) => {
           const onchainAsset = onchainInfo.assets.find(
             (a) => a.tokenId.toString() === asset.token_id,
           )
-          return (
+          return onchainAsset ? (
             <NFTCard
               key={asset.nft_id}
               asset={asset}
@@ -127,7 +131,7 @@ const TradeSection = ({ username, assets, onchainInfo }) => {
               recipient={onchainAsset?.recipient}
               onCopy={(text) => navigator.clipboard.writeText(text)}
             />
-          )
+          ) : null
         })}
       </div>
     </div>
@@ -137,9 +141,10 @@ const TradeSection = ({ username, assets, onchainInfo }) => {
 const Transaction: React.FC<{
   fullPage?: boolean
   transaction: TransactionData
+  onchainStatusLoading: boolean
   onchainInfo: OnchainTradeInfo
   showTxModal: () => void
-}> = ({ fullPage = false, transaction, onchainInfo, showTxModal }) => {
+}> = ({ fullPage = false, transaction, onchainStatusLoading, onchainInfo, showTxModal }) => {
   const [isExpanded, setIsExpanded] = useState(fullPage)
 
   const handleClick = () => {
@@ -147,6 +152,11 @@ const Transaction: React.FC<{
       setIsExpanded(!isExpanded)
     }
   }
+
+  const tradeNeedsConfirming =
+    onchainInfo.isActive === false &&
+    onchainInfo?.depositedAssetCount === onchainInfo?.totalAssetCount &&
+    !transaction.onchain_done
 
   return (
     <div
@@ -200,6 +210,27 @@ const Transaction: React.FC<{
         </div>
       )}
 
+      {isExpanded && (
+        <div className='flex flex-col text-sm gap-y-2 ml-2'>
+          <Link
+            href={`/transactions/${transaction.offer_id}`}
+            target='_blank'
+            className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+          >
+            <span>Link to Offer</span>
+            <Expand />
+          </Link>
+          <Link
+            href='https://www.etherscan.io'
+            target='_blank'
+            className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+          >
+            <span>Onchain Contract</span>
+            <Expand />
+          </Link>
+        </div>
+      )}
+
       {/* Expanded View */}
       {isExpanded && (
         <div className='space-y-4'>
@@ -217,13 +248,14 @@ const Transaction: React.FC<{
       )}
 
       {/* Progress Bar and Action Button */}
-      <div className='flex items-center justify-between'>
+      <Footer transaction={transaction} onchainInfo={onchainInfo} showTxModal={showTxModal} />
+      {/* <div className='flex items-center justify-between'>
         <div className='flex-1 mr-8 max-w-[300px]'>
           {onchainInfo ? (
             <>
               <div className='w-full h-2 bg-gray-100 rounded-full overflow-hidden'>
                 <div
-                  className='h-full bg-green-500 transition-all duration-500'
+                  className='h-full bg-blue-500 transition-all duration-500'
                   style={{
                     width: `${(onchainInfo.depositedAssetCount / onchainInfo.totalAssetCount) * 100}%`,
                   }}
@@ -247,12 +279,11 @@ const Transaction: React.FC<{
             e.stopPropagation()
             showTxModal()
           }}
-          className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors'
+          className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors'
         >
-          <Icons.Wallet />
           Create Trade
         </button>
-      </div>
+      </div> */}
     </div>
   )
 }

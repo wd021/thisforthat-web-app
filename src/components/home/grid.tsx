@@ -319,7 +319,7 @@ const Grid: React.FC = () => {
     return (
       <>
         {mainTab === 'offer' ? (
-          <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+          <div className='px-4 max-w-[740px] mx-auto flex flex-col gap-y-4 my-6'>
             <OfferFeed
               items={items as OfferData[]}
               setOfferModalInfo={setOfferModalInfo}
@@ -327,7 +327,7 @@ const Grid: React.FC = () => {
             />
           </div>
         ) : mainTab === 'transactions' ? (
-          <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+          <div className='px-4 max-w-[740px] mx-auto flex flex-col gap-y-4 my-6'>
             <TransactionFeed
               items={items as TransactionData[]}
               setTxModalInfo={setTxModalInfo}

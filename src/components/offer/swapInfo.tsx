@@ -143,13 +143,16 @@ const TradeOffer: FC<TradeOfferProps> = ({
   optimisticCounts,
   onLike,
 }) => {
-  if (isOpenOffer && offer.counterparty_assets[0]) {
+  if (isOpenOffer) {
     return (
-      <div className='mb-2' onClick={(e) => e.stopPropagation()}>
+      <div
+        className='mb-2 flex justify-between p-3 w-full rounded-lg bg-gray-50'
+        onClick={(e) => e.stopPropagation()}
+      >
         <Link
           href={`/nfts/${offer.counterparty_assets[0].nft_id}`}
           target='_blank'
-          className='flex items-start space-x-2.5 rounded-lg bg-gray-50 p-2.5 transition-colors hover:bg-gray-50'
+          className='flex items-center space-x-2.5 transition-colors hover:bg-gray-50'
         >
           <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-12 w-12'}`}>
             <NFTImage
@@ -159,22 +162,43 @@ const TradeOffer: FC<TradeOfferProps> = ({
               rounded='all'
             />
           </div>
-          <div className='flex min-w-0 flex-col py-0.5'>
-            <span className='truncate text-sm font-medium text-gray-900'>
-              {offer.counterparty_assets[0].name}
-            </span>
-            <span className='mt-0.5 flex items-center'>
-              <ChainLogo chainId={offer.counterparty_assets[0].chain_id} className='h-3 w-3' />
-              <span className='ml-1 text-sm text-gray-600'>
-                {
-                  CHAIN_IDS_TO_CHAINS[
-                    offer.counterparty_assets[0].chain_id as keyof typeof CHAIN_IDS_TO_CHAINS
-                  ]
-                }
+          {isExpanded && (
+            <div className='flex min-w-0 flex-col py-0.5'>
+              <span className='truncate text-sm font-medium text-gray-900'>
+                {offer.counterparty_assets[0].name}
               </span>
-            </span>
-          </div>
+              <span className='mt-0.5 flex items-center'>
+                <ChainLogo
+                  chainId={offer.counterparty_assets[0].chain_id}
+                  className='h-3 w-3'
+                />
+                <span className='ml-1 text-sm text-gray-600'>
+                  {
+                    CHAIN_IDS_TO_CHAINS[
+                      offer.counterparty_assets[0].chain_id as keyof typeof CHAIN_IDS_TO_CHAINS
+                    ]
+                  }
+                </span>
+              </span>
+            </div>
+          )}
         </Link>
+        {isExpanded && (
+          <LikeButton
+            isLiked={!!userLikes[offer.counterparty_assets[0].offer_nft_id]}
+            likesCount={
+              optimisticCounts[offer.counterparty_assets[0].offer_nft_id] ??
+              offer.counterparty_assets[0].like_count ??
+              0
+            }
+            onLike={() =>
+              onLike(
+                offer.counterparty_assets[0].offer_nft_id,
+                !!userLikes[offer.counterparty_assets[0].offer_nft_id],
+              )
+            }
+          />
+        )}
       </div>
     )
   }
@@ -188,34 +212,71 @@ const TradeOffer: FC<TradeOfferProps> = ({
           bg-gray-50 
           overflow-x-auto 
           custom-scrollbar
-          ${!isExpanded ? 'items-center p-3 custom-scrollbar' : ''}
+          ${!isExpanded ? 'custom-scrollbar' : ''}
         `}
       >
-        <OfferSide
-          assets={offer.creator_assets}
-          isExpanded={isExpanded}
-          side='creator'
-          userLikes={userLikes}
-          optimisticCounts={optimisticCounts}
-          onLike={onLike}
-        />
-
+        {/* Compact View */}
         {!isExpanded && (
-          <div className='flex items-center px-4'>
-            <div className='rounded-full border border-gray-100 bg-white/80 p-1.5 shadow-sm'>
-              <SwapArrows />
+          <div className='bg-gray-50 rounded-lg p-4'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center space-x-4'>
+                <div className='flex -space-x-2'>
+                  {offer.creator_assets.map((asset) => (
+                    <div
+                      key={asset.nft_id}
+                      className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
+                    >
+                      <img
+                        src={asset.image}
+                        alt={asset.name}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className='p-2 bg-white rounded-full shadow-sm'>
+                  <SwapArrows />
+                </div>
+                <div className='flex -space-x-2'>
+                  {offer.counterparty_assets.map((asset) => (
+                    <div
+                      key={asset.nft_id}
+                      className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
+                    >
+                      <img
+                        src={asset.image}
+                        alt={asset.name}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        <OfferSide
-          assets={offer.counterparty_assets}
-          isExpanded={isExpanded}
-          side='counterparty'
-          userLikes={userLikes}
-          optimisticCounts={optimisticCounts}
-          onLike={onLike}
-        />
+        {/* Expanded View */}
+        {isExpanded && (
+          <>
+            <OfferSide
+              assets={offer.creator_assets}
+              isExpanded={isExpanded}
+              side='creator'
+              userLikes={userLikes}
+              optimisticCounts={optimisticCounts}
+              onLike={onLike}
+            />
+            <OfferSide
+              assets={offer.counterparty_assets}
+              isExpanded={isExpanded}
+              side='counterparty'
+              userLikes={userLikes}
+              optimisticCounts={optimisticCounts}
+              onLike={onLike}
+            />
+          </>
+        )}
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
-import { Notifications } from '@/icons'
+import { Expand, Notifications } from '@/icons'
 import { timeAgoShort } from '@/utils/helpers'
 
 interface Notification {
@@ -48,20 +48,7 @@ const FeedItem = ({ notification }: { notification: Notification }) => {
             </span>
           </div>
 
-          <svg
-            className='text-gray-500 ml-2'
-            fill='none'
-            height='14'
-            width='14'
-            stroke='currentColor'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth='2'
-            viewBox='0 0 24 24'
-          >
-            <line x1='7' x2='17' y1='17' y2='7' />
-            <polyline points='7 7 17 7 17 17' />
-          </svg>
+          <Expand className='text-gray-500 ml-2' />
         </div>
       </div>
 

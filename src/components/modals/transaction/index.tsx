@@ -73,7 +73,7 @@ const TradeCreationModal: React.FC<{
   const { tradeInfo, isLoading, refetch } = useTradeInfo(onchain.id)
 
   const assetsToDeposit =
-    !isLoading && tradeInfo ? getAssetsToDeposit(user!, users, assets, tradeInfo) : []
+    !isLoading && tradeInfo && user ? getAssetsToDeposit(user, users, assets, tradeInfo) : []
 
   const showCancelComponent = onchain.id !== null && cancelTrade
   const showCreateComponent = onchain.id === null
@@ -101,12 +101,7 @@ const TradeCreationModal: React.FC<{
           onFinish={() => {}}
         />
       ) : showDepositComponent ? (
-        <DepositTx
-          assets={assetsToDeposit}
-          currentUser={users.creator}
-          counterpartyUser={users.counterparty}
-          tradeId={onchain.id}
-        />
+        <DepositTx assets={assetsToDeposit} tradeId={BigInt(onchain.id!)} onFinish={() => {}} />
       ) : showCompletedComponent ? (
         <CompletedTx />
       ) : null}

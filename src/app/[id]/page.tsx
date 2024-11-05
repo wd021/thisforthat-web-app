@@ -14,23 +14,29 @@ import { NFTGridItem, OfferData, Profile } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 import { OfferFeed } from '@/components/home'
 
-const ProfileHeader: React.FC<{
+const ProfileHeader = ({
+  profile,
+  isOwnProfile,
+  onFollow,
+  isFollowing,
+  onClick,
+}: {
   profile: Profile | null
   isOwnProfile: boolean
   onFollow: () => void
   isFollowing: boolean
-  onClick: (tab: 'following' | 'followers' | 'nfts' | 'offers') => void
-}> = ({ profile, isOwnProfile, onFollow, isFollowing, onClick }) => {
+  onClick: (option: string) => void
+}) => {
   const renderProfileImage = () => (
     <div className='relative w-[175px] h-[175px] rounded-full overflow-hidden'>
       {profile ? (
         <img
           src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL! + profile.profile_pic_url}
           alt='Profile Picture'
-          className='w-full h-full rounded-xl object-cover'
+          className='w-full h-full object-cover'
         />
       ) : (
-        <div className='w-full h-full rounded-xl bg-gradient-to-br from-blue-50 to-purple-50' />
+        <div className='w-full h-full bg-gradient-to-br from-blue-50 to-purple-50' />
       )}
     </div>
   )
@@ -41,10 +47,10 @@ const ProfileHeader: React.FC<{
         onClick={onFollow}
         className={`
           inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium
-          transition-all duration-200 ease-in-out
+          transition-all duration-200 ease-in-out shadow-sm
           ${
             isFollowing
-              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              ? 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
               : 'bg-blue-500 hover:bg-blue-600 text-white'
           }
         `}
@@ -54,26 +60,20 @@ const ProfileHeader: React.FC<{
       </button>
     )
 
-  const StatItem: React.FC<{
-    value: number
-    label: string
-    onClick: () => void
-  }> = ({ value, label, onClick }) => (
-    <div
+  const StatItem = ({ value, label, onClick }) => (
+    <button
       onClick={onClick}
-      className='group cursor-pointer transition-all duration-300 hover:transform hover:-translate-y-0.5'
+      className='w-[100px] group flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-all duration-200'
     >
-      <div className='px-1 py-1.5'>
-        <span className='font-semibold text-gray-900 transition-colors'>
-          {value.toLocaleString()}
-        </span>
-        <span className='ml-1.5 text-sm text-gray-500'>{label}</span>
-      </div>
-    </div>
+      <span className='text-lg font-bold text-gray-900 group-hover:text-blue-500 transition-colors'>
+        {value.toLocaleString()}
+      </span>
+      <span className='text-xs text-gray-500 mt-0.5'>{label}</span>
+    </button>
   )
 
   const renderStats = () => (
-    <div className='flex items-center gap-4'>
+    <div className='inline-flex items-center divide-x divide-gray-100'>
       <StatItem
         value={profile?.following_count || 0}
         label='Following'
@@ -94,16 +94,16 @@ const ProfileHeader: React.FC<{
   )
 
   return (
-    <div className='max-w-3xl mx-auto bg-white rounded-xl shadow-sm border p-6 mb-4'>
-      <div className='md:items-center flex-col flex md:flex-row gap-6'>
+    <div className='max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-8 mb-6'>
+      <div className='flex flex-col md:flex-row gap-8 items-center'>
         {renderProfileImage()}
-        <div className='flex-1 min-w-0'>
-          <div className='flex items-center gap-4 mb-2'>
-            <h1 className='text-xl font-bold text-gray-900 truncate'>{profile?.username}</h1>
+        <div className='flex-1 min-w-0 space-y-4'>
+          <div className='flex items-center gap-4'>
+            <h1 className='text-2xl font-bold text-gray-900 truncate'>{profile?.username}</h1>
             {renderFollowButton()}
           </div>
-          {profile?.bio && <p className='text-gray-600 leading-relaxed mb-2'>{profile.bio}</p>}
-          <div className='space-y-2'>{renderStats()}</div>
+          {profile?.bio && <p className='text-gray-600 leading-relaxed'>{profile.bio}</p>}
+          <div className='bg-gray-50 rounded-xl overflow-hidden'>{renderStats()}</div>
         </div>
       </div>
     </div>
@@ -245,7 +245,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
         ))}
       </div>
     ) : (
-      <div className='px-4 max-w-[800px] mx-auto flex flex-col gap-y-4 my-6'>
+      <div className='px-4 max-w-[740px] mx-auto flex flex-col gap-y-4 my-6'>
         <OfferFeed
           items={items as OfferData[]}
           setOfferModalInfo={setOfferModalInfo}

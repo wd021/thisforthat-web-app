@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-import { ChainLogo } from '@/icons'
+import { ChainLogo, Expand } from '@/icons'
 import { TransactionData } from '@/types/supabase'
 
 const Icons = {
@@ -72,10 +72,10 @@ const Header: React.FC<{
   setIsExpanded: (isExpanded: boolean) => void
 }> = ({ fullPage, transaction, isExpanded, setIsExpanded }) => {
   return (
-    <div className='flex items-center justify-between p-2 pt-0'>
-      <div className='flex items-center space-x-3'>
-        <ChainLogo chainId={transaction.chain_id} className='w-10 h-10' />
-        <div className='flex flex-col gap-2'>
+    <div className='flex items-center justify-between p-2 py-0'>
+      <div className='flex items-center space-x-2'>
+        <ChainLogo chainId={transaction.chain_id} className='w-5 h-5' />
+        <div className='flex gap-x-5'>
           <div className='flex items-center gap-x-1'>
             <UserInfo
               username={transaction.creator_username}
@@ -88,24 +88,6 @@ const Header: React.FC<{
               username={transaction.counterparty_username}
               profilePic={transaction.counterparty_profile_pic_url}
             />
-          </div>
-          <div className='flex items-center text-sm -ml-0.5'>
-            <Link
-              href={`/transactions/${transaction.offer_id}`}
-              target='_blank'
-              className='text-gray-600 hover:text-gray-900 border-r border-gray-200 pr-2 mr-2 flex items-center gap-1.5'
-            >
-              <span>🤝 Offer</span>
-              <Icons.ExternalLink />
-            </Link>
-            <Link
-              href='https://www.etherscan.io'
-              target='_blank'
-              className='text-gray-600 hover:text-gray-900 flex items-center gap-1.5'
-            >
-              <span>📝 Contract</span>
-              <Icons.ExternalLink />
-            </Link>
           </div>
         </div>
       </div>
