@@ -19,7 +19,7 @@ const formatTradeInfo = (
   }
 }
 
-export default function useTradeInfo(tradeId: string | number | null) {
+export default function useTradeInfo(tradeId: string | number | null, done: boolean) {
   const {
     data: tradeData,
     isError,
@@ -31,7 +31,7 @@ export default function useTradeInfo(tradeId: string | number | null) {
     functionName: 'getTradeInfo',
     args: tradeId ? [BigInt(tradeId)] : undefined,
     query: {
-      enabled: Boolean(tradeId),
+      enabled: Boolean(tradeId) && !done,
     },
   }) as {
     data: [boolean, bigint, bigint, TradeInfoAsset[]] | undefined

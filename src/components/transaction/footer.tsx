@@ -1,6 +1,58 @@
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
 
+const StatusMessage: React.FC<{
+  status: string
+  showTxModal: () => void
+}> = ({ status, showTxModal }) => {
+  const getStatusConfig = () => {
+    switch (status) {
+      case 'onchain_completed':
+        return {
+          message: `completed`,
+          className: 'text-green-700 bg-green-50',
+        }
+      case 'onchain_cancelled':
+        return {
+          message: `cancelled`,
+          className: 'text-red-700 bg-red-50',
+        }
+      default:
+        return {
+          message: '',
+          className: 'text-gray-700 bg-gray-50',
+        }
+    }
+  }
+
+  const config = getStatusConfig()
+
+  return (
+    <div
+      className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${config.className}`}
+      onClick={showTxModal}
+    >
+      <span className='text-sm font-semibold'>{config.message}</span>
+      {(status === 'countered' || status === 'countered-open') && (
+        <svg
+          className='text-blue-700'
+          fill='none'
+          height='14'
+          width='14'
+          stroke='currentColor'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          strokeWidth='2'
+          viewBox='0 0 24 24'
+        >
+          <line x1='7' x2='17' y1='17' y2='7' />
+          <polyline points='7 7 17 7 17 17' />
+        </svg>
+      )}
+    </div>
+  )
+}
+
 const Footer = ({
   transaction,
   onchainInfo,
@@ -51,7 +103,7 @@ const Footer = ({
       </div>
 
       {tradeEnded || onchainCancelled ? (
-        <div>trade completed</div>
+        <StatusMessage status={transaction.status} showTxModal={showTxModal} />
       ) : !tradeStarted ? (
         <button
           onClick={(e) => {

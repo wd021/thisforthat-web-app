@@ -12,6 +12,7 @@ import CancelTx from './cancel'
 import CompletedTx from './completed'
 import CreateTx from './create'
 import DepositTx from './deposit'
+import WaitingTx from './waiting'
 
 const getAssetsToDeposit = (
   user: { id: string },
@@ -46,6 +47,54 @@ const getAssetsToDeposit = (
   })
 }
 
+const getOtherUserPendingDeposits = (
+  user: { id: string },
+  users: {
+    creator: ProfileMinimal
+    counterparty: ProfileMinimal
+  },
+  assets: {
+    creator: SimplifiedNFTAsset[]
+    counterparty: SimplifiedNFTAsset[]
+  },
+  tradeInfo: TradeInfo,
+): {
+  hasPendingDeposits: boolean
+  pendingAssets: SimplifiedNFTAsset[]
+} => {
+  // Determine if the current user is the creator or counterparty
+  const isCreator = user.id === users.creator.id
+
+  // Get the other user's assets
+  const otherUserAssets = isCreator ? assets.counterparty : assets.creator
+
+  // If there's no tradeInfo or assets, return empty result
+  if (!tradeInfo?.assets || !otherUserAssets) {
+    return {
+      hasPendingDeposits: false,
+      pendingAssets: [],
+    }
+  }
+
+  // Filter assets that haven't been deposited yet by the other user
+  const pendingAssets = otherUserAssets.filter((otherAsset) => {
+    // Find corresponding asset in tradeInfo
+    const tradeInfoAsset = tradeInfo.assets.find(
+      (tAsset) =>
+        tAsset.token.toLowerCase() === otherAsset.collection_contract.toLowerCase() &&
+        tAsset.tokenId.toString() === otherAsset.token_id,
+    )
+
+    // Include asset if it's found in tradeInfo and not yet deposited
+    return tradeInfoAsset && !tradeInfoAsset.isDeposited
+  })
+
+  return {
+    hasPendingDeposits: pendingAssets.length > 0,
+    pendingAssets,
+  }
+}
+
 const TradeCreationModal: React.FC<{
   offerId: string
   cancelTrade: boolean
@@ -70,10 +119,15 @@ const TradeCreationModal: React.FC<{
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
 
-  const { tradeInfo, isLoading, refetch } = useTradeInfo(onchain.id)
+  const { tradeInfo, isLoading, refetch } = useTradeInfo(onchain.id, onchain.done)
 
   const assetsToDeposit =
     !isLoading && tradeInfo && user ? getAssetsToDeposit(user, users, assets, tradeInfo) : []
+
+  const { hasPendingDeposits, pendingAssets } =
+    !isLoading && tradeInfo && user
+      ? getOtherUserPendingDeposits(user, users, assets, tradeInfo)
+      : { hasPendingDeposits: false, pendingAssets: [] }
 
   const showCancelComponent = onchain.id !== null && cancelTrade
   const showCreateComponent = onchain.id === null
@@ -90,7 +144,9 @@ const TradeCreationModal: React.FC<{
       onRequestClose={closeModal}
       style={customStyles}
     >
-      {showCancelComponent ? (
+      <WaitingTx onClose={() => {}} />
+
+      {/* {showCancelComponent ? (
         <CancelTx />
       ) : showCreateComponent ? (
         <CreateTx
@@ -101,10 +157,17 @@ const TradeCreationModal: React.FC<{
           onFinish={() => {}}
         />
       ) : showDepositComponent ? (
-        <DepositTx assets={assetsToDeposit} tradeId={BigInt(onchain.id!)} onFinish={() => {}} />
+        <DepositTx
+          assets={assetsToDeposit}
+          tradeId={BigInt(onchain.id!)}
+          onFinish={() => {
+            // completed or waiting
+            // if completed, call completeTrade
+          }}
+        />
       ) : showCompletedComponent ? (
-        <CompletedTx />
-      ) : null}
+        <CompletedTx onClose={() => {}} />
+      ) : null} */}
     </Modal>
   )
 }

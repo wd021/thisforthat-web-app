@@ -64,7 +64,10 @@ export const metadata: Metadata = {
     maximumScale: 1,
     viewportFit: 'cover',
   },
-  themeColor: '#ffffff',
+}
+
+export const viewport = {
+  themeColor: '#000000',
 }
 
 interface RootLayoutProps {

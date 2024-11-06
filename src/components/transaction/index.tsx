@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { TransactionData } from '@/types/supabase'
-import { OnchainTradeInfo } from '@/types/main'
-import { Expand } from '@/icons'
 import Link from 'next/link'
 
-import Header from './header'
+import { useCompleteTrade } from '@/hooks/supabase'
+import { Expand } from '@/icons'
+import { OnchainTradeInfo } from '@/types/main'
+import { TransactionData } from '@/types/supabase'
+
 import Footer from './footer'
+import Header from './header'
 
 // Icon Components
 const Icons = {
@@ -61,8 +63,42 @@ const Icons = {
   ),
 }
 
-// Helper Components
-const NFTCard = ({ asset, isDeposited, recipient, onCopy }) => {
+const StatusBadge: React.FC<{ status: string; isDeposited?: boolean }> = ({
+  status,
+  isDeposited,
+}) => {
+  if (status === 'onchain_completed' || status === 'onchain_cancelled') {
+    return (
+      <span
+        className={`px-3 py-1.5 rounded-full text-sm ${
+          status === 'onchain_completed'
+            ? 'bg-green-100 text-green-700'
+            : 'bg-red-100 text-red-600'
+        }`}
+      >
+        {status === 'onchain_completed' ? 'completed' : 'cancelled'}
+      </span>
+    )
+  }
+
+  return (
+    <span
+      className={`px-3 py-1.5 rounded-full text-sm ${
+        isDeposited ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+      }`}
+    >
+      {isDeposited ? 'Deposited' : 'Pending'}
+    </span>
+  )
+}
+
+const NFTCard: React.FC<{
+  asset: Asset
+  isCompleted: boolean
+  status: string
+  isDeposited?: boolean
+  recipient?: string
+}> = ({ asset, isCompleted, status, isDeposited, recipient }) => {
   const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`
 
   return (
@@ -76,31 +112,68 @@ const NFTCard = ({ asset, isDeposited, recipient, onCopy }) => {
           <div className='flex flex-col gap-y-0.5'>
             <h3 className='text-sm font-medium'>{asset.name}</h3>
             <p className='text-xs text-gray-500 mt-0.5'>{asset.collection_name}</p>
-            <div className='flex items-center space-x-2'>
-              <span className='text-xs text-gray-500'>Sending to:</span>
-              <div className='flex items-center space-x-1.5 text-xs'>
-                {truncateAddress(recipient)}
+            {!isCompleted && recipient && (
+              <div className='flex items-center space-x-2'>
+                <span className='text-xs text-gray-500'>Sending to:</span>
+                <div className='flex items-center space-x-1.5 text-xs'>
+                  {truncateAddress(recipient)}
+                </div>
               </div>
-            </div>
+            )}
           </div>
-          <span
-            className={`px-3 py-1.5 rounded-full text-sm ${
-              isDeposited ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            {isDeposited ? 'Deposited' : 'Pending'}
-          </span>
+          <StatusBadge status={status} isDeposited={isDeposited} />
         </div>
       </div>
     </div>
   )
 }
 
-const TradeSection = ({ username, assets, onchainInfo }) => {
-  const depositedCount = assets.reduce((count, asset) => {
-    const onchainAsset = onchainInfo.assets.find((a) => a.tokenId.toString() === asset.token_id)
-    return onchainAsset?.isDeposited ? count + 1 : count
-  }, 0)
+const CompactView: React.FC<{
+  creatorAssets: Asset[]
+  counterpartyAssets: Asset[]
+}> = ({ creatorAssets, counterpartyAssets }) => (
+  <div className='bg-gray-50 rounded-lg p-4'>
+    <div className='flex items-center justify-between'>
+      <div className='flex items-center space-x-4'>
+        <AssetPreviewGroup assets={creatorAssets} />
+        <div className='p-2 bg-white rounded-full shadow-sm'>
+          <Icons.SwapArrow />
+        </div>
+        <AssetPreviewGroup assets={counterpartyAssets} />
+      </div>
+    </div>
+  </div>
+)
+
+const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
+  <div className='flex -space-x-2'>
+    {assets.map((asset) => (
+      <div
+        key={asset.nft_id}
+        className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
+      >
+        <img src={asset.image} alt={asset.name} className='w-full h-full object-cover' />
+      </div>
+    ))}
+  </div>
+)
+
+const TradeSection: React.FC<{
+  username: string
+  assets: Asset[]
+  onchainInfo?: OnchainTradeInfo
+  status: string
+}> = ({ username, assets, onchainInfo, status }) => {
+  const isCompleted = status === 'onchain_cancelled' || status === 'onchain_completed'
+
+  const depositedCount = onchainInfo
+    ? assets.reduce((count, asset) => {
+        const onchainAsset = onchainInfo.assets.find(
+          (a) => a.tokenId.toString() === asset.token_id,
+        )
+        return onchainAsset?.isDeposited ? count + 1 : count
+      }, 0)
+    : 0
 
   return (
     <div className='p-6 rounded-xl bg-gray-50/90 space-y-4'>
@@ -111,27 +184,32 @@ const TradeSection = ({ username, assets, onchainInfo }) => {
           </div>
           <div>
             <h2 className='text-base font-semibold'>{username}</h2>
-            <p className='text-sm text-gray-600'>
-              {depositedCount} of {assets.length} deposited
-            </p>
+            {!isCompleted && (
+              <p className='text-sm text-gray-600'>
+                {depositedCount} of {assets.length} deposited
+              </p>
+            )}
           </div>
         </div>
       </div>
 
       <div className='space-y-3'>
         {assets.map((asset) => {
-          const onchainAsset = onchainInfo.assets.find(
+          const onchainAsset = onchainInfo?.assets.find(
             (a) => a.tokenId.toString() === asset.token_id,
           )
-          return onchainAsset ? (
-            <NFTCard
-              key={asset.nft_id}
-              asset={asset}
-              isDeposited={onchainAsset?.isDeposited}
-              recipient={onchainAsset?.recipient}
-              onCopy={(text) => navigator.clipboard.writeText(text)}
-            />
-          ) : null
+          return (
+            (onchainAsset || isCompleted) && (
+              <NFTCard
+                key={asset.nft_id}
+                asset={asset}
+                isCompleted={isCompleted}
+                status={status}
+                isDeposited={onchainAsset?.isDeposited}
+                recipient={onchainAsset?.recipient}
+              />
+            )
+          )
         })}
       </div>
     </div>
@@ -144,8 +222,13 @@ const Transaction: React.FC<{
   onchainStatusLoading: boolean
   onchainInfo: OnchainTradeInfo
   showTxModal: () => void
-}> = ({ fullPage = false, transaction, onchainStatusLoading, onchainInfo, showTxModal }) => {
+}> = ({ fullPage = false, transaction, onchainInfo, showTxModal }) => {
   const [isExpanded, setIsExpanded] = useState(fullPage)
+
+  // const { isConfirming, isConfirmed, hasError, retry } = useCompleteTrade(
+  //   onchainInfo,
+  //   transaction,
+  // )
 
   const handleClick = () => {
     if (!fullPage) {
@@ -153,14 +236,11 @@ const Transaction: React.FC<{
     }
   }
 
-  const tradeNeedsConfirming =
-    onchainInfo.isActive === false &&
-    onchainInfo?.depositedAssetCount === onchainInfo?.totalAssetCount &&
-    !transaction.onchain_done
-
   return (
     <div
-      className={`p-6 w-full bg-white rounded-xl shadow-sm ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} transition-all duration-200 space-y-4`}
+      className={`p-6 w-full bg-white rounded-xl shadow-sm 
+        ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} 
+        transition-all duration-200 space-y-4`}
       onClick={handleClick}
     >
       <Header
@@ -169,121 +249,53 @@ const Transaction: React.FC<{
         isExpanded={isExpanded}
         setIsExpanded={setIsExpanded}
       />
-      {/* Compact View */}
+
       {!isExpanded && (
-        <div className='bg-gray-50 rounded-lg p-4'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center space-x-4'>
-              <div className='flex -space-x-2'>
-                {transaction.creator_assets.map((asset) => (
-                  <div
-                    key={asset.nft_id}
-                    className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
-                  >
-                    <img
-                      src={asset.image}
-                      alt={asset.name}
-                      className='w-full h-full object-cover'
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className='p-2 bg-white rounded-full shadow-sm'>
-                <Icons.SwapArrow />
-              </div>
-              <div className='flex -space-x-2'>
-                {transaction.counterparty_assets.map((asset) => (
-                  <div
-                    key={asset.nft_id}
-                    className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
-                  >
-                    <img
-                      src={asset.image}
-                      alt={asset.name}
-                      className='w-full h-full object-cover'
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+        <CompactView
+          creatorAssets={transaction.creator_assets}
+          counterpartyAssets={transaction.counterparty_assets}
+        />
+      )}
+
+      {isExpanded && (
+        <>
+          <div className='flex flex-col text-sm gap-y-2 ml-2'>
+            <Link
+              href={`/transactions/${transaction.offer_id}`}
+              target='_blank'
+              className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+            >
+              <span>Link to Offer</span>
+              <Expand />
+            </Link>
+            <Link
+              href='https://www.etherscan.io'
+              target='_blank'
+              className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+            >
+              <span>Onchain Contract</span>
+              <Expand />
+            </Link>
           </div>
-        </div>
+
+          <div className='space-y-4'>
+            <TradeSection
+              username={transaction.creator_username}
+              assets={transaction.creator_assets}
+              onchainInfo={onchainInfo}
+              status={transaction.status}
+            />
+            <TradeSection
+              username={transaction.counterparty_username}
+              assets={transaction.counterparty_assets}
+              onchainInfo={onchainInfo}
+              status={transaction.status}
+            />
+          </div>
+        </>
       )}
 
-      {isExpanded && (
-        <div className='flex flex-col text-sm gap-y-2 ml-2'>
-          <Link
-            href={`/transactions/${transaction.offer_id}`}
-            target='_blank'
-            className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
-          >
-            <span>Link to Offer</span>
-            <Expand />
-          </Link>
-          <Link
-            href='https://www.etherscan.io'
-            target='_blank'
-            className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
-          >
-            <span>Onchain Contract</span>
-            <Expand />
-          </Link>
-        </div>
-      )}
-
-      {/* Expanded View */}
-      {isExpanded && (
-        <div className='space-y-4'>
-          <TradeSection
-            username={transaction.creator_username}
-            assets={transaction.creator_assets}
-            onchainInfo={onchainInfo}
-          />
-          <TradeSection
-            username={transaction.counterparty_username}
-            assets={transaction.counterparty_assets}
-            onchainInfo={onchainInfo}
-          />
-        </div>
-      )}
-
-      {/* Progress Bar and Action Button */}
       <Footer transaction={transaction} onchainInfo={onchainInfo} showTxModal={showTxModal} />
-      {/* <div className='flex items-center justify-between'>
-        <div className='flex-1 mr-8 max-w-[300px]'>
-          {onchainInfo ? (
-            <>
-              <div className='w-full h-2 bg-gray-100 rounded-full overflow-hidden'>
-                <div
-                  className='h-full bg-blue-500 transition-all duration-500'
-                  style={{
-                    width: `${(onchainInfo.depositedAssetCount / onchainInfo.totalAssetCount) * 100}%`,
-                  }}
-                />
-              </div>
-              <div className='flex justify-between mt-2'>
-                <span className='text-xs text-gray-500'>Progress</span>
-                <span className='text-xs text-gray-500'>
-                  {onchainInfo.depositedAssetCount} of {onchainInfo.totalAssetCount} assets
-                  deposited
-                </span>
-              </div>
-            </>
-          ) : (
-            <div>loading...</div>
-          )}
-        </div>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            showTxModal()
-          }}
-          className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors'
-        >
-          Create Trade
-        </button>
-      </div> */}
     </div>
   )
 }

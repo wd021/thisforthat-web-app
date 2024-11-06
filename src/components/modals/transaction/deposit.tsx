@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { useDepositAsset } from '@/hooks'
-import { SimplifiedNFTAsset } from '@/types/supabase'
 import { NFTImage } from '@/components/shared'
+import { useDepositAsset } from '@/hooks'
 import { DepositAsset } from '@/types/main'
+import { SimplifiedNFTAsset } from '@/types/supabase'
 
 const DepositTx = ({
   assets,

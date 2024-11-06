@@ -130,12 +130,16 @@ export async function verifyNFTs(
   }
 }
 
-export async function confirmTrade() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function completeTradeWithApi(offer_id: string, token: string): Promise<any> {
   try {
-    const response = await fetch('/api/confirm-trade', {
+    const response = await fetch('/api/complete-trade', {
       method: 'POST',
+      body: JSON.stringify({ offer_id: offer_id }),
+
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     })
 
@@ -150,6 +154,18 @@ export async function confirmTrade() {
       error,
     }
   }
+}
+
+export function createTokenIdRecipientMapping(tradeAssets: any[]): Record<string, string> {
+  return tradeAssets.reduce(
+    (mapping, asset) => {
+      const { token, recipient, tokenId } = asset
+      const key = `${token}_${tokenId.toString()}`
+      mapping[key] = recipient
+      return mapping
+    },
+    {} as Record<string, string>,
+  )
 }
 
 export function formatDate(date: Date): string {
