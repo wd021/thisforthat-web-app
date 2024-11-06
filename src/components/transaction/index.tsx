@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import { useCompleteTrade } from '@/hooks/supabase'
+import { useSyncApiWithChain } from '@/hooks/supabase'
 import { Expand } from '@/icons'
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
@@ -223,12 +223,9 @@ const Transaction: React.FC<{
   onchainInfo: OnchainTradeInfo
   showTxModal: () => void
 }> = ({ fullPage = false, transaction, onchainInfo, showTxModal }) => {
-  const [isExpanded, setIsExpanded] = useState(fullPage)
+  useSyncApiWithChain(onchainInfo, transaction)
 
-  // const { isConfirming, isConfirmed, hasError, retry } = useCompleteTrade(
-  //   onchainInfo,
-  //   transaction,
-  // )
+  const [isExpanded, setIsExpanded] = useState(fullPage)
 
   const handleClick = () => {
     if (!fullPage) {
@@ -238,7 +235,7 @@ const Transaction: React.FC<{
 
   return (
     <div
-      className={`p-6 w-full bg-white rounded-xl shadow-sm 
+      className={`p-4 w-full bg-white rounded-xl shadow-sm 
         ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} 
         transition-all duration-200 space-y-4`}
       onClick={handleClick}

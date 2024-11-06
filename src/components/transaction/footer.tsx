@@ -1,5 +1,9 @@
+import { useCancelTrade } from '@/hooks'
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
+import { cancelTrade } from '@/utils/helpers'
+import { useModal } from 'connectkit'
+import { useAccount } from 'wagmi'
 
 const StatusMessage: React.FC<{
   status: string
@@ -10,17 +14,17 @@ const StatusMessage: React.FC<{
       case 'onchain_completed':
         return {
           message: `completed`,
-          className: 'text-green-700 bg-green-50',
+          className: 'text-green-700 bg-green-100',
         }
       case 'onchain_cancelled':
         return {
           message: `cancelled`,
-          className: 'text-red-700 bg-red-50',
+          className: 'text-red-700 bg-red-100',
         }
       default:
         return {
           message: '',
-          className: 'text-gray-700 bg-gray-50',
+          className: 'text-gray-700 bg-gray-100',
         }
     }
   }
@@ -29,8 +33,11 @@ const StatusMessage: React.FC<{
 
   return (
     <div
-      className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${config.className}`}
-      onClick={showTxModal}
+      className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        showTxModal()
+      }}
     >
       <span className='text-sm font-semibold'>{config.message}</span>
       {(status === 'countered' || status === 'countered-open') && (
@@ -78,6 +85,10 @@ const Footer = ({
       : false
     : undefined
 
+  const { cancelTrade, isLoading, isConfirmed, error, isError, reset } = useCancelTrade({
+    tradeId: transaction.onchain_trade_id!,
+  })
+
   return (
     <div className='flex items-center justify-between'>
       <div className='flex-1 mr-8 max-w-[300px]'>
@@ -112,18 +123,33 @@ const Footer = ({
           }}
           className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors'
         >
-          Create Trade
+          Create Contract
         </button>
       ) : onchainActive ? (
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            showTxModal()
-          }}
-          className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors'
-        >
-          Deposit NFTs
-        </button>
+        <div className='flex gap-x-2'>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              try {
+                cancelTrade()
+              } catch (e) {
+                console.log('trade cancel cancel')
+              }
+            }}
+            className='flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-colors'
+          >
+            {isLoading ? 'Cancelling...' : 'Cancel'}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              showTxModal()
+            }}
+            className='flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors'
+          >
+            Deposit
+          </button>
+        </div>
       ) : null}
     </div>
   )

@@ -1,5 +1,7 @@
 import { Asset, assetTypeMap, OfferInfo, PreparedAsset } from '@/types/main'
 
+import { writeContract } from '@wagmi/core'
+
 interface ChainInfo {
   id: string
   name: string
@@ -262,4 +264,73 @@ export const prepareAllAssets = (offerInfo: OfferInfo): PreparedAsset[][] => {
     offerInfo.offer.user.map((asset) => prepareAssetData(asset, counterUserWallet)),
     offerInfo.offer.userCounter.map((asset) => prepareAssetData(asset, userWallet)),
   ]
+}
+
+import { getPublicClient } from '@wagmi/core'
+import { createPublicClient, createWalletClient, http, type PublicClient } from 'viem'
+import ABI from '@/contracts/abi.json'
+import { TradeInfo, TradeInfoAsset } from '@/types/main'
+import { CONTRACT_ADDRESSES } from '@/utils/contracts'
+import { anvil } from 'viem/chains'
+
+const formatTradeInfo = (
+  isActive: boolean,
+  depositedAssetCount: bigint,
+  totalAssetCount: bigint,
+  assets: TradeInfoAsset[],
+): TradeInfo => {
+  return {
+    isActive,
+    depositedAssetCount: Number(depositedAssetCount),
+    totalAssetCount: Number(totalAssetCount),
+    assets,
+  }
+}
+
+const decodeAsset = (asset: TradeInfoAsset): TradeInfoAsset => {
+  if (typeof asset === 'object' && 'token' in asset) {
+    return asset as TradeInfoAsset
+  }
+  const { token, tokenId, amount, assetType, recipient, isDeposited } = asset
+  return { token, tokenId, amount, assetType, recipient, isDeposited }
+}
+
+export async function getTradeInfo(tradeId: string | number): Promise<{
+  tradeInfo: TradeInfo | undefined
+  isError: boolean
+}> {
+  try {
+    const publicClient = createPublicClient({
+      chain: anvil,
+      transport: http(),
+    })
+
+    const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] =
+      (await publicClient.readContract({
+        address: CONTRACT_ADDRESSES[31337],
+        abi: ABI,
+        functionName: 'getTradeInfo',
+        args: [BigInt(tradeId)],
+      })) as [boolean, bigint, bigint, TradeInfoAsset[]]
+
+    const decodedAssets = encodedAssets.map(decodeAsset)
+
+    const tradeInfo = formatTradeInfo(
+      isActive,
+      depositedAssetCount,
+      totalAssetCount,
+      decodedAssets,
+    )
+
+    return {
+      tradeInfo,
+      isError: false,
+    }
+  } catch (error) {
+    console.error('Error fetching trade info:', error)
+    return {
+      tradeInfo: undefined,
+      isError: true,
+    }
+  }
 }

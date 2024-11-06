@@ -5,7 +5,7 @@ import { useIsMobile, useTradeInfo } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
-import { TradeInfo } from '@/types/main'
+import { OnchainTradeInfo } from '@/types/main'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
 
 import CancelTx from './cancel'
@@ -13,9 +13,13 @@ import CompletedTx from './completed'
 import CreateTx from './create'
 import DepositTx from './deposit'
 import WaitingTx from './waiting'
+import { completeTradeWithApi, getTradeInfo } from '@/utils/helpers'
+import { useSyncApiWithChain } from '@/hooks/supabase'
+import { supabase } from '@/utils/supabaseClient'
 
-const getAssetsToDeposit = (
-  user: { id: string },
+const getDepositCount = (
+  user: 'creator' | 'counterparty',
+  onchainId: string | null,
   users: {
     creator: ProfileMinimal
     counterparty: ProfileMinimal
@@ -24,117 +28,173 @@ const getAssetsToDeposit = (
     creator: SimplifiedNFTAsset[]
     counterparty: SimplifiedNFTAsset[]
   },
-  tradeInfo: TradeInfo,
-): SimplifiedNFTAsset[] => {
-  // Determine if the current user is the creator or counterparty
-  const isCreator = user.id === users.creator.id
-  const userAssets = isCreator ? assets.creator : assets.counterparty
+  tradeInfo: OnchainTradeInfo | null,
+): number => {
+  const userAssets = user === 'creator' ? assets.creator : assets.counterparty
 
-  // If there's no tradeInfo or assets, return empty array
-  if (!tradeInfo?.assets || !userAssets) return []
+  if (!tradeInfo?.assets || !userAssets) return 0
 
-  // Filter assets that haven't been deposited yet
+  if (!onchainId) return userAssets.length
+
   return userAssets.filter((userAsset) => {
-    // Find corresponding asset in tradeInfo
     const tradeInfoAsset = tradeInfo.assets.find(
       (tAsset) =>
         tAsset.token.toLowerCase() === userAsset.collection_contract.toLowerCase() &&
         tAsset.tokenId.toString() === userAsset.token_id,
     )
 
-    // Include asset if it's found in tradeInfo and not yet deposited
     return tradeInfoAsset && !tradeInfoAsset.isDeposited
-  })
+  }).length
 }
 
-const getOtherUserPendingDeposits = (
-  user: { id: string },
-  users: {
-    creator: ProfileMinimal
-    counterparty: ProfileMinimal
-  },
-  assets: {
-    creator: SimplifiedNFTAsset[]
-    counterparty: SimplifiedNFTAsset[]
-  },
-  tradeInfo: TradeInfo,
-): {
-  hasPendingDeposits: boolean
-  pendingAssets: SimplifiedNFTAsset[]
-} => {
-  // Determine if the current user is the creator or counterparty
-  const isCreator = user.id === users.creator.id
-
-  // Get the other user's assets
-  const otherUserAssets = isCreator ? assets.counterparty : assets.creator
-
-  // If there's no tradeInfo or assets, return empty result
-  if (!tradeInfo?.assets || !otherUserAssets) {
-    return {
-      hasPendingDeposits: false,
-      pendingAssets: [],
+const TransactionModal: React.FC<{
+  transactionInfo: {
+    status: string
+    offerId: string
+    onchain: {
+      id: string | null
+      hash: string | null
+      done: boolean
+    }
+    chainId: number
+    users: {
+      creator: ProfileMinimal
+      counterparty: ProfileMinimal
+    }
+    assets: {
+      creator: SimplifiedNFTAsset[]
+      counterparty: SimplifiedNFTAsset[]
     }
   }
-
-  // Filter assets that haven't been deposited yet by the other user
-  const pendingAssets = otherUserAssets.filter((otherAsset) => {
-    // Find corresponding asset in tradeInfo
-    const tradeInfoAsset = tradeInfo.assets.find(
-      (tAsset) =>
-        tAsset.token.toLowerCase() === otherAsset.collection_contract.toLowerCase() &&
-        tAsset.tokenId.toString() === otherAsset.token_id,
-    )
-
-    // Include asset if it's found in tradeInfo and not yet deposited
-    return tradeInfoAsset && !tradeInfoAsset.isDeposited
+  onchainInfo: OnchainTradeInfo | null
+  closeModal: () => void
+}> = ({ transactionInfo, onchainInfo, closeModal }) => {
+  useSyncApiWithChain(onchainInfo, {
+    offer_id: transactionInfo.offerId,
+    onchain_done: transactionInfo.onchain.done,
   })
 
-  return {
-    hasPendingDeposits: pendingAssets.length > 0,
-    pendingAssets,
-  }
-}
-
-const TradeCreationModal: React.FC<{
-  offerId: string
-  cancelTrade: boolean
-  onchain: {
-    id: string | null
-    hash: string | null
-    done: boolean
-  }
-  chainId: number
-  users: {
-    creator: ProfileMinimal
-    counterparty: ProfileMinimal
-  }
-  assets: {
-    creator: SimplifiedNFTAsset[]
-    counterparty: SimplifiedNFTAsset[]
-  }
-  closeModal: () => void
-}> = ({ offerId, cancelTrade, onchain, chainId, users, assets, closeModal }) => {
   const { showToast } = useToast()
   const { user } = useAuth()
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
 
-  const { tradeInfo, isLoading, refetch } = useTradeInfo(onchain.id, onchain.done)
+  // determine which component to show
+  const [loading, setLoading] = useState(true)
 
-  const assetsToDeposit =
-    !isLoading && tradeInfo && user ? getAssetsToDeposit(user, users, assets, tradeInfo) : []
+  const [userDepositCount, setUserDepositCount] = useState<number | null>(null)
+  const [counterDepositCount, setCounterDepositCount] = useState<number | null>(null)
 
-  const { hasPendingDeposits, pendingAssets } =
-    !isLoading && tradeInfo && user
-      ? getOtherUserPendingDeposits(user, users, assets, tradeInfo)
-      : { hasPendingDeposits: false, pendingAssets: [] }
+  const [tradeId, setTradeId] = useState<string | null>(transactionInfo.onchain.id)
 
-  const showCancelComponent = onchain.id !== null && cancelTrade
-  const showCreateComponent = onchain.id === null
-  const showDepositComponent = onchain.id !== null && !onchain.done
-  const showCompletedComponent = onchain.done
+  const [componentToShow, setComponentToShow] = useState<string>(
+    transactionInfo.status === 'onchain_completed'
+      ? 'completed'
+      : transactionInfo.status === 'onchain_cancelled'
+        ? 'cancelled'
+        : transactionInfo.onchain.id === null
+          ? 'create'
+          : 'pending',
+  )
 
-  console.log('assetsToDeposit', assetsToDeposit)
+  useEffect(() => {
+    if (user && componentToShow === 'pending') {
+      const isCreator = user.id === transactionInfo.users.creator.id
+
+      const userDepositCount = getDepositCount(
+        isCreator ? 'creator' : 'counterparty',
+        transactionInfo.onchain.id,
+        transactionInfo.users,
+        transactionInfo.assets,
+        onchainInfo,
+      )
+
+      const counterDepositCount = getDepositCount(
+        isCreator ? 'counterparty' : 'creator',
+        transactionInfo.onchain.id,
+        transactionInfo.users,
+        transactionInfo.assets,
+        onchainInfo,
+      )
+
+      console.log('userDepositCount', userDepositCount)
+      console.log('counterDepositCount', counterDepositCount)
+      console.log('isCreator', isCreator)
+
+      setUserDepositCount(userDepositCount)
+      setCounterDepositCount(counterDepositCount)
+      setLoading(false)
+
+      if (userDepositCount > 0) {
+        setComponentToShow('deposit')
+      } else if (counterDepositCount > 0) {
+        setComponentToShow('waiting')
+      } else {
+        setComponentToShow('completed')
+      }
+    }
+  }, [user, componentToShow])
+
+  // console.log('onchainInfo.assets', onchainInfo.assets)
+
+  const renderContent = () => {
+    switch (componentToShow) {
+      case 'cancelled':
+        return <CancelTx />
+      case 'create':
+        return (
+          <CreateTx
+            offerId={transactionInfo.offerId}
+            chainId={transactionInfo.chainId}
+            users={transactionInfo.users}
+            assets={transactionInfo.assets}
+            onClose={closeModal}
+            onFinish={(hash: string, tradeId: string) => {
+              setTradeId(tradeId)
+              setComponentToShow('deposit')
+            }}
+          />
+        )
+      case 'deposit':
+        return (
+          <DepositTx
+            assets={
+              user?.id === transactionInfo.users.creator.id
+                ? transactionInfo.assets.creator
+                : transactionInfo.assets.counterparty
+            }
+            onchainDeposited={
+              onchainInfo ? onchainInfo.assets.filter((a) => a.isDeposited) : []
+            }
+            tradeId={tradeId}
+            onClose={closeModal}
+            onFinish={async () => {
+              if (counterDepositCount === 0) {
+                const {
+                  data: { session },
+                } = await supabase.auth.getSession()
+                const token = session?.access_token
+
+                if (token) {
+                  completeTradeWithApi(transactionInfo.offerId, token)
+                }
+                setComponentToShow('completed')
+              } else {
+                setComponentToShow('waiting')
+              }
+            }}
+          />
+        )
+      case 'waiting':
+        return <WaitingTx tradeId={transactionInfo.onchain.id!} onClose={closeModal} />
+      case 'completed':
+        return <CompletedTx onClose={closeModal} />
+      default:
+        return (
+          <div className='w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin' />
+        )
+    }
+  }
 
   return (
     <Modal
@@ -144,32 +204,9 @@ const TradeCreationModal: React.FC<{
       onRequestClose={closeModal}
       style={customStyles}
     >
-      <WaitingTx onClose={() => {}} />
-
-      {/* {showCancelComponent ? (
-        <CancelTx />
-      ) : showCreateComponent ? (
-        <CreateTx
-          offerId={offerId}
-          chainId={chainId}
-          users={users}
-          assets={assets}
-          onFinish={() => {}}
-        />
-      ) : showDepositComponent ? (
-        <DepositTx
-          assets={assetsToDeposit}
-          tradeId={BigInt(onchain.id!)}
-          onFinish={() => {
-            // completed or waiting
-            // if completed, call completeTrade
-          }}
-        />
-      ) : showCompletedComponent ? (
-        <CompletedTx onClose={() => {}} />
-      ) : null} */}
+      {renderContent()}
     </Modal>
   )
 }
 
-export default TradeCreationModal
+export default TransactionModal

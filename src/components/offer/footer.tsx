@@ -1,5 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
+import { useModal } from 'connectkit'
+import { useAccount } from 'wagmi'
 
 const STATUS_PENDING = ['open', 'created']
 
@@ -44,12 +46,12 @@ const StatusMessage: React.FC<{
       case 'onchain_completed':
         return {
           message: `accepted`,
-          className: 'text-green-700 bg-green-50',
+          className: 'text-green-700 bg-green-100',
         }
       case 'rejected':
         return {
           message: `rejected`,
-          className: 'text-red-700 bg-red-50',
+          className: 'text-red-700 bg-red-100',
         }
       case 'countered':
       case 'countered-open':
@@ -69,12 +71,12 @@ const StatusMessage: React.FC<{
               countered
             </Link>
           ),
-          className: 'text-blue-700 bg-blue-50',
+          className: 'text-blue-700 bg-blue-100',
         }
       default:
         return {
           message: 'Status unknown',
-          className: 'text-gray-700 bg-gray-50',
+          className: 'text-gray-700 bg-gray-100',
         }
     }
   }
@@ -82,7 +84,7 @@ const StatusMessage: React.FC<{
   const config = getStatusConfig()
 
   return (
-    <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${config.className}`}>
+    <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}>
       <span className='text-sm font-semibold'>{config.message}</span>
       {(status === 'countered' || status === 'countered-open') && (
         <svg
@@ -180,7 +182,7 @@ const Footer: React.FC<{
               )}
             </>
           ) : (
-            <div className='flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 bg-gray-50'>
+            <div className='flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 bg-gray-50'>
               <svg
                 className='w-5 h-5 text-gray-500'
                 fill='none'

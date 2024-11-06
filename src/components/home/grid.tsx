@@ -323,6 +323,7 @@ const Grid: React.FC = () => {
             <OfferFeed
               items={items as OfferData[]}
               setOfferModalInfo={setOfferModalInfo}
+              setTxModalInfo={setTxModalInfo}
               setItems={setItems}
             />
           </div>

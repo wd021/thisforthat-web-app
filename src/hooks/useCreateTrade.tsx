@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import {
   useAccount,
@@ -44,12 +44,6 @@ function prepareAsset(
       isDeposited: false,
     }
 
-    console.log('Prepared asset:', {
-      ...preparedAsset,
-      tokenId: preparedAsset.tokenId.toString(),
-      amount: preparedAsset.amount.toString(),
-    })
-
     return preparedAsset
   } catch (error) {
     console.error('Error preparing asset:', asset, error)
@@ -94,22 +88,31 @@ export default function useCreateTrade({
     counterparty: SimplifiedNFTAsset[]
   }
 }) {
+  const [isCreatingContract, setIsCreatingContract] = useState(false)
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
 
-  const { writeContract, data: hash, status: transactionStatus } = useWriteContract()
+  const {
+    writeContract,
+    data: hash,
+    status: transactionStatus,
+    error: writeError,
+  } = useWriteContract()
 
   const {
     data: txReceipt,
     isLoading: isConfirming,
     isSuccess: isConfirmed,
+    error: confirmError,
   } = useWaitForTransactionReceipt({ hash })
 
-  const createTradeOnChain = useCallback(async () => {
+  const createTradeContract = useCallback(async () => {
     if (!address || !publicClient) return
 
     try {
+      setIsCreatingContract(true)
+
       const participants = [
         users.creator.wallet as Address,
         users.counterparty.wallet as Address,
@@ -142,15 +145,20 @@ export default function useCreateTrade({
         showToast('⚠️ Transaction failed. Please try again', 2500)
       }
       throw err
+    } finally {
+      setIsCreatingContract(false)
     }
-  }, [chainId, users, assets, address, publicClient, writeContract, showToast])
+  }, [users, assets, address, publicClient, writeContract, showToast])
 
   return {
-    createTradeOnChain,
+    createTradeContract,
+    isCreatingContract,
     hash,
     transactionStatus,
     txReceipt,
     isConfirming,
     isConfirmed,
+    writeError,
+    confirmError,
   }
 }

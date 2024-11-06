@@ -67,7 +67,9 @@ const CloseButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   </div>
 )
 
-const Logo: React.FC = () => <img src='/splash.png' alt='NFT Swap Logo' className='w-64 h-64' />
+const Logo: React.FC = () => (
+  <img src='/splash.png' alt='NFT Swap Logo' className='mt-12 w-64 h-64' />
+)
 
 const Features: React.FC = () => (
   <div className='gap-y-2 flex flex-col my-4'>

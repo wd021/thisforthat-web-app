@@ -1,15 +1,16 @@
 import OfferCard from '@/components/offer'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import { OfferModalInfo } from '@/types/main'
+import { OfferModalInfo, TxModalInfo } from '@/types/main'
 import { OfferData } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
 const OfferFeed: React.FC<{
   items: OfferData[]
   setOfferModalInfo: (modalInfo: OfferModalInfo) => void
+  setTxModalInfo: (modalInfo: TxModalInfo) => void
   setItems: (items: OfferData[]) => void
-}> = ({ items, setOfferModalInfo, setItems }) => {
+}> = ({ items, setOfferModalInfo, setTxModalInfo, setItems }) => {
   const { user, profile } = useAuth()
   const { showToast } = useToast()
 
@@ -126,7 +127,40 @@ const OfferFeed: React.FC<{
         console.error('Error accepting offer:', error)
       } else {
         // prompt modal to create trade onchain
-        showToast(`✅ Offer accepted successfully`, 2500)
+        const txModalInfo = {
+          transactionInfo: {
+            status: 'accepted',
+            offerId: offer.offer_id,
+            onchain: {
+              id: null,
+              hash: null,
+              done: false,
+            },
+            chainId: offer.chain_id,
+            users: {
+              creator: {
+                id: offer.creator_id,
+                username: offer.creator_username,
+                profile_pic_url: offer.creator_profile_pic_url,
+                wallet: offer.creator_wallet,
+              },
+              counterparty: {
+                id: offer.counterparty_id,
+                username: offer.counterparty_username,
+                profile_pic_url: offer.counterparty_profile_pic_url,
+                wallet: offer.counterparty_wallet,
+              },
+            },
+            assets: {
+              creator: offer.counterparty_assets,
+              counterparty: offer.creator_assets,
+            },
+          },
+          onchainInfo: null,
+        }
+        setTxModalInfo(txModalInfo)
+
+        // showToast(`✅ Offer accepted successfully`, 2500)
       }
     } catch (error) {
       // Handle any other errors

@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react'
+// useDepositAsset.ts
+import { useCallback, useState } from 'react'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import {
   useAccount,
@@ -8,217 +9,91 @@ import {
 } from 'wagmi'
 
 import { useToast } from '@/providers/toastProvider'
-import { DepositAsset } from '@/types/main'
-import { CONTRACT_ADDRESSES } from '@/utils/contracts'
+import { AssetType } from '@/types/main'
 import ABI from '@/contracts/abi.json'
-import ERC721_ABI from '@/contracts/erc721Abi.json'
-import ERC1155_ABI from '@/contracts/erc1155Abi.json'
-import CRYPTOPUNKS_ABI from '@/contracts/punks.json'
 
-const CRYPTOPUNKS_ADDRESS = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB' as Address
+interface Asset {
+  tokenAddress: Address
+  tokenId: string
+  amount: string
+  assetType: AssetType
+}
 
-function useDepositAsset(tradeId: bigint) {
+export function useDepositAsset(contractAddress: Address, tradeId: bigint) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
 
-  // Transaction states
-  const [isProcessingApproval, setIsProcessingApproval] = useState(false)
-  const [isProcessingDeposit, setIsProcessingDeposit] = useState(false)
-
   const {
-    writeContract,
-    data: hash,
-    status: transactionStatus,
+    writeContractAsync: write,
+    isPending: isWritePending,
     error: writeError,
-    reset: resetWrite,
   } = useWriteContract()
+
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null)
 
   const {
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     error: confirmError,
-  } = useWaitForTransactionReceipt({ hash })
+  } = useWaitForTransactionReceipt({
+    hash: txHash,
+  })
 
-  const resetStates = useCallback(() => {
-    setIsProcessingApproval(false)
-    setIsProcessingDeposit(false)
-    resetWrite()
-  }, [resetWrite])
-
-  const checkAndApproveAssets = useCallback(
-    async (assets: DepositAsset[]) => {
+  const deposit = useCallback(
+    async (asset: Asset): Promise<boolean> => {
       if (!address || !publicClient) return false
 
-      console.log('assets', assets)
-
       try {
-        setIsProcessingApproval(true)
-
-        const grouped = assets.reduce(
-          (acc, asset) => {
-            const key =
-              asset.token_type === 'CRYPTOPUNK'
-                ? 'cryptoPunks'
-                : `${asset.collection_contract}-${asset.token_type}`
-            if (!acc[key]) {
-              acc[key] = []
-            }
-            acc[key].push(asset)
-            return acc
-          },
-          {} as Record<string, DepositAsset[]>,
-        )
-
-        for (const [key, groupAssets] of Object.entries(grouped)) {
-          const firstAsset = groupAssets[0]
-
-          if (firstAsset.token_type === 'CRYPTOPUNK') {
-            for (const punk of groupAssets) {
-              const punkData = await publicClient.readContract({
-                address: CRYPTOPUNKS_ADDRESS,
-                abi: CRYPTOPUNKS_ABI,
-                functionName: 'punksOfferedForSale',
-                args: [BigInt(punk.token_id)],
-              })
-
-              const isApproved =
-                punkData.isForSale &&
-                punkData.onlySellTo.toLowerCase() === CONTRACT_ADDRESSES[31337].toLowerCase() &&
-                punkData.minValue === 0n
-
-              if (!isApproved) {
-                const { request } = await publicClient.simulateContract({
-                  address: CRYPTOPUNKS_ADDRESS,
-                  abi: CRYPTOPUNKS_ABI,
-                  functionName: 'offerPunkForSaleToAddress',
-                  args: [BigInt(punk.token_id), 0n, CONTRACT_ADDRESSES[31337] as Address],
-                  account: address,
-                })
-                await writeContract(request)
-                // Wait for transaction confirmation
-                if (hash) {
-                  await publicClient.waitForTransactionReceipt({ hash })
-                }
-              }
-            }
-          } else {
-            const tokenAddress = firstAsset.collection_contract as Address
-            const abi = firstAsset.token_type === 'ERC721' ? ERC721_ABI : ERC1155_ABI
-
-            const isApproved = await publicClient.readContract({
-              address: tokenAddress,
-              abi,
-              functionName: 'isApprovedForAll',
-              args: [address, CONTRACT_ADDRESSES[31337]],
-            })
-
-            if (!isApproved) {
-              const { request } = await publicClient.simulateContract({
-                address: tokenAddress,
-                abi,
-                functionName: 'setApprovalForAll',
-                args: [CONTRACT_ADDRESSES[31337], true],
-                account: address,
-              })
-              await writeContract(request)
-              // Wait for transaction confirmation
-              if (hash) {
-                await publicClient.waitForTransactionReceipt({ hash })
-              }
-            }
-          }
-        }
-
-        console.log('Approvals successful')
-
-        return true
-      } catch (error) {
-        console.log('error', error)
-        if (error instanceof ContractFunctionExecutionError) {
-          showToast('Transaction rejected', 2500)
-        } else {
-          showToast('Failed to process approvals', 2500)
-        }
-        throw error
-      } finally {
-        setIsProcessingApproval(false)
-      }
-    },
-    [address, publicClient, writeContract, hash, showToast],
-  )
-
-  const depositAssets = useCallback(
-    async (assets: DepositAsset[]) => {
-      console.log('depositing assets', assets, isConfirmed)
-      if (!address || !publicClient) return
-
-      try {
-        setIsProcessingDeposit(true)
-
-        const internalAssets = assets.map((asset) => ({
-          token:
-            asset.token_type === 'CRYPTOPUNK'
-              ? CRYPTOPUNKS_ADDRESS
-              : (asset.collection_contract as Address),
-          tokenId: BigInt(asset.token_id),
-          amount: BigInt(
-            asset.token_type === 'ERC1155' || asset.token_type === 'ERC20'
-              ? asset.token_id
-              : '1',
-          ),
-          assetType:
-            asset.token_type === 'ERC20'
-              ? 0
-              : asset.token_type === 'ERC721'
-                ? 1
-                : asset.token_type === 'ERC1155'
-                  ? 2
-                  : 3,
-        }))
+        setTxHash(null)
 
         const { request } = await publicClient.simulateContract({
-          address: CONTRACT_ADDRESSES[31337] as Address,
+          address: contractAddress,
           abi: ABI,
-          functionName: 'batchDepositAssets',
+          functionName: 'depositAsset',
           args: [
             tradeId,
-            internalAssets.map((a) => a.token),
-            internalAssets.map((a) => a.tokenId),
-            internalAssets.map((a) => a.amount),
-            internalAssets.map((a) => a.assetType),
+            asset.tokenAddress,
+            BigInt(asset.tokenId),
+            BigInt(asset.assetType === 'ERC1155' ? asset.amount : '1'),
+            asset.assetType === 'ERC20'
+              ? 0
+              : asset.assetType === 'ERC721'
+                ? 1
+                : asset.assetType === 'ERC1155'
+                  ? 2
+                  : 3,
           ],
           account: address,
         })
 
-        await writeContract(request)
+        const hash = await write(request)
+        setTxHash(hash)
+
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
+        if (receipt.status === 'success') {
+          showToast('Asset deposited successfully!', 2500)
+          return true
+        }
+        return false
       } catch (error) {
+        console.error('Error depositing asset:', error)
         if (error instanceof ContractFunctionExecutionError) {
           showToast('Transaction rejected', 2500)
         } else {
-          showToast('Failed to deposit assets', 2500)
+          showToast('Failed to deposit asset', 2500)
         }
-        throw error
-      } finally {
-        setIsProcessingDeposit(false)
+        return false
       }
     },
-    [address, publicClient, tradeId, writeContract, isConfirmed, showToast],
+    [address, publicClient, contractAddress, tradeId, write, showToast],
   )
 
   return {
-    checkAndApproveAssets,
-    depositAssets,
-    isProcessingApproval,
-    isProcessingDeposit,
+    deposit,
+    isWritePending,
     isConfirming,
     isConfirmed,
-    transactionStatus,
-    writeError,
-    confirmError,
-    resetStates,
-    hash,
+    error: writeError || confirmError,
   }
 }
-
-export default useDepositAsset

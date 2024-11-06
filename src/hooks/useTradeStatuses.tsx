@@ -62,6 +62,7 @@ export class TradeStatusManager {
             amount: asset.amount,
             assetType: asset.assetType,
             recipient: asset.recipient,
+            isDeposited: asset.isDeposited,
           })),
         }
 

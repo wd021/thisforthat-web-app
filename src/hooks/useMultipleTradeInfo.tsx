@@ -68,8 +68,12 @@ export default function useMultipleTradeInfo(
 
   const decodeAsset = useCallback((asset: Asset): Asset => {
     if (typeof asset === 'object' && 'token' in asset) {
+      console.log('asset', asset)
       return asset as Asset
     }
+
+    console.log('decode asset', asset)
+
     const { token, tokenId, amount, assetType, recipient } = asset
     return { token, tokenId, amount, assetType, recipient }
   }, [])
@@ -97,6 +101,7 @@ export default function useMultipleTradeInfo(
   let trades: TradeInfo[] = []
 
   if (tradeData) {
+    console.log('tradeData', tradeData)
     const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] = tradeData
     trades = formatBatchTradeInfo(isActive, depositedAssetCount, totalAssetCount, encodedAssets)
   }

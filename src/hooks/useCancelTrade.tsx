@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { ContractFunctionExecutionError } from 'viem'
+import { Address, ContractFunctionExecutionError } from 'viem'
 import {
   useAccount,
   usePublicClient,
@@ -11,56 +11,80 @@ import ABI from '@/contracts/abi.json'
 import { useToast } from '@/providers/toastProvider'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
-export default function useCancelTrade(tradeId: bigint) {
+export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
 
+  // Consolidate write contract states
   const {
     writeContract,
     data: hash,
-    status: transactionStatus,
+    isPending: isWritePending,
     error: writeError,
+    isError: isWriteError,
+    reset: resetWrite,
   } = useWriteContract()
 
+  // Consolidate transaction receipt states
   const {
     data: txReceipt,
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     error: confirmError,
-  } = useWaitForTransactionReceipt({ hash })
+    isError: isConfirmError,
+  } = useWaitForTransactionReceipt({
+    hash,
+  })
+
+  // Combined loading state
+  const isLoading = isWritePending || isConfirming
 
   const cancelTrade = useCallback(async () => {
-    if (!address || !publicClient) return
+    if (!address || !publicClient || !tradeId) return
 
     try {
+      // Convert tradeId to BigInt if it's a string
+      const tradeBigInt = typeof tradeId === 'string' ? BigInt(tradeId) : tradeId
+
       const { request } = await publicClient.simulateContract({
-        address: CONTRACT_ADDRESSES[31337],
+        address: CONTRACT_ADDRESSES[31337] as Address,
         abi: ABI,
         functionName: 'cancelTrade',
-        args: [tradeId],
+        args: [tradeBigInt],
         account: address,
       })
-      writeContract(request)
+
+      await writeContract(request)
     } catch (err) {
-      console.error('Error in cancelTrade:', err)
+      console.error('Error cancelling trade:', err)
       if (err instanceof ContractFunctionExecutionError) {
-        const errorMessage = err.message.toLowerCase()
-        showToast('⚠️ ' + errorMessage, 2500)
+        const errorMessage = err.cause?.message || err.message
+        showToast(`⚠️ ${errorMessage}`, 2500)
+      } else if (err instanceof Error) {
+        showToast(`⚠️ ${err.message}`, 2500)
       } else {
-        showToast('⚠️ Failed to cancel trade. Please try again.', 2500)
+        showToast('⚠️ Transaction failed. Please try again', 2500)
       }
+      throw err
     }
-  }, [address, publicClient, tradeId, writeContract, showToast])
+  }, [tradeId, address, publicClient, writeContract, showToast])
+
+  // Reset the transaction states
+  const reset = useCallback(() => {
+    resetWrite()
+  }, [resetWrite])
 
   return {
     cancelTrade,
-    hash,
-    transactionStatus,
-    writeError,
-    txReceipt,
+    isLoading,
+    isPending: isWritePending,
     isConfirming,
     isConfirmed,
-    confirmError,
+    hash,
+    txReceipt,
+    error: writeError || confirmError,
+    isError: isWriteError || isConfirmError,
+    reset,
   }
 }

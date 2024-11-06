@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+
 import { Footer } from '@/components'
 import { UserDropdown } from '@/components/dropdowns'
-import { Offer, Transaction, Following } from '@/components/modals'
+import { OfferFeed } from '@/components/home'
+import { Following, Offer, Transaction } from '@/components/modals'
 import { NFTGridObject } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useFollow, useProfile, useUserItems } from '@/hooks/supabase'
@@ -12,7 +14,6 @@ import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo, UserTabOption } from '@/types/main'
 import { NFTGridItem, OfferData, Profile } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
-import { OfferFeed } from '@/components/home'
 
 const ProfileHeader = ({
   profile,

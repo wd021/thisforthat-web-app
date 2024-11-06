@@ -8,7 +8,7 @@ export type SubTabOption = 'latest' | 'following' | 'pinned' | 'my' | 'favorites
 
 export type UserTabOption = 'nfts' | 'offers' | 'pinned'
 
-type AssetType = 'ERC20' | 'ERC721' | 'ERC1155' | 'CRYPTOPUNK'
+export type AssetType = 'ERC20' | 'ERC721' | 'ERC1155' | 'CRYPTOPUNK'
 
 export interface Asset {
   collection_contract: string
@@ -85,19 +85,33 @@ export type OfferModalInfo = {
 }
 
 export type TxModalInfo = {
-  offerId: string | null
-  onchain: {
-    id: string | null
-    hash: string | null
-    done: boolean
+  transactionInfo: {
+    status: string
+    offerId: string
+    onchain: {
+      id: string | null
+      hash: string | null
+      done: boolean
+    }
+    chainId: number
+    users: {
+      creator: {
+        id: string
+        username: string
+        profile_pic_url: string
+        wallet: string
+      }
+      counterparty: {
+        id: string
+        username: string
+        profile_pic_url: string
+        wallet: string
+      }
+    }
+    assets: {
+      creator: SimplifiedNFTAsset[]
+      counterparty: SimplifiedNFTAsset[]
+    }
   }
-  chainId: number
-  users: {
-    creator: ProfileMinimal
-    counterparty: ProfileMinimal
-  }
-  assets: {
-    creator: SimplifiedNFTAsset[]
-    counterparty: SimplifiedNFTAsset[]
-  }
+  onchainInfo: OnchainTradeInfo | null
 }
