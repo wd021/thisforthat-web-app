@@ -9,8 +9,8 @@ import { Login as LoginModal, Onboard as OnboardModal } from '@/components/modal
 import { useIsMobile } from '@/hooks'
 import { ChainLogo, Close, Hamburger, Login, Search } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
-import { supabase } from '@/utils/supabaseClient'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
+import { supabase } from '@/utils/supabaseClient'
 
 const Navbar: FC = () => {
   const { user, loading, profile, hasProfile, updateLastSeen } = useAuth()
@@ -205,7 +205,7 @@ const Navbar: FC = () => {
     <>
       <nav className='z-[55] top-0 fixed w-full bg-white flex justify-between items-center px-2 h-[75px] border-b border-gray-200'>
         <Link href='/'>
-          <img src='/logo_header.png' className='h-[60px] p-1.5 fill' alt='Logo' />
+          <img src='/logo_header.png' className='h-[55px] p-1.5 fill' alt='Logo' />
         </Link>
         <div className='flex-1 max-w-xl mx-4'>
           <div className='relative' ref={searchRef}>
