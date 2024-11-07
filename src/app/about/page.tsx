@@ -1,11 +1,21 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
+import { DISCORD_LINK, GITHUB_LINK } from '@/utils/constants'
 
-const FeatureCard = ({ emoji, title, description }) => (
+const FeatureCard = ({
+  emoji,
+  title,
+  description,
+}: {
+  emoji: string
+  title: string
+  description: string
+}) => (
   <div className='w-full mb-6 bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow'>
     <div className='flex items-start space-x-4'>
       <div className='w-10 h-10 flex items-center justify-center bg-blue-100 rounded-lg text-xl'>
@@ -19,7 +29,7 @@ const FeatureCard = ({ emoji, title, description }) => (
   </div>
 )
 
-const SupportedChain = ({ name }) => (
+const SupportedChain = ({ name }: { name: string }) => (
   <span className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mr-2 mb-2'>
     {name}
   </span>
@@ -27,7 +37,7 @@ const SupportedChain = ({ name }) => (
 
 const AboutPage = () => {
   const isMobile = useIsMobile()
-  const supportedChains = ['Ethereum', 'Base', 'Optimism', 'Arbitrum', 'Zksync']
+  const supportedChains = ['Ethereum', 'Base', 'Optimism', 'Arbitrum', 'Polygon', 'Zksync']
 
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>
@@ -40,7 +50,7 @@ const AboutPage = () => {
             <img
               src='/about.webp'
               alt='TFT Platform'
-              className='rounded-lg shadow-lg mb-8 w-full max-w-[620px] mx-auto'
+              className='rounded-lg shadow-lg mb-8 w-full max-w-[525px] mx-auto'
             />
             <h1 className='text-3xl font-bold mb-4'>Welcome to TFT</h1>
             <p className='text-xl text-gray-600'>
@@ -91,16 +101,13 @@ const AboutPage = () => {
               All trades are executed automatically through our secure smart contracts. Our
               contracts are open-sourced and available on GitHub for complete transparency.
             </p>
-            <a
-              href='#'
+            <Link
+              href={GITHUB_LINK}
+              target='_blank'
               className='text-blue-600 hover:text-blue-800 underline'
-              onClick={(e) => {
-                e.preventDefault()
-                // Add GitHub link handler
-              }}
             >
               View on GitHub
-            </a>
+            </Link>
           </div>
 
           {/* Community Section */}
@@ -110,9 +117,13 @@ const AboutPage = () => {
               Stay up-to-date with the latest features and updates by joining our Discord
               community.
             </p>
-            <button className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'>
+            <Link
+              href={DISCORD_LINK}
+              target='_blank'
+              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+            >
               Join Discord
-            </button>
+            </Link>
           </div>
         </div>
       </div>
