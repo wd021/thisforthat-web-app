@@ -1,35 +1,119 @@
 'use client'
 
+import React from 'react'
+
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
 
-const AboutPage: React.FC = () => {
+const FeatureCard = ({ emoji, title, description }) => (
+  <div className='w-full mb-6 bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow'>
+    <div className='flex items-start space-x-4'>
+      <div className='w-10 h-10 flex items-center justify-center bg-blue-100 rounded-lg text-xl'>
+        {emoji}
+      </div>
+      <div>
+        <h3 className='font-semibold text-lg mb-2'>{title}</h3>
+        <p className='text-gray-600'>{description}</p>
+      </div>
+    </div>
+  </div>
+)
+
+const SupportedChain = ({ name }) => (
+  <span className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mr-2 mb-2'>
+    {name}
+  </span>
+)
+
+const AboutPage = () => {
   const isMobile = useIsMobile()
+  const supportedChains = ['Ethereum', 'Base', 'Optimism', 'Arbitrum', 'Zksync']
 
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>
       <div
-        className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'} items-center justify-center`}
+        className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'}`}
       >
-        <div className='max-w-[620px] px-6 mx-auto flex flex-col items-center '>
-          <img src='/about.webp' alt='about' />
-          <div className='my-8'>
-            TFT is a place for swapping NFTs. Discover NFTS, meet and connect with fellow NFT
-            owners and collectors, and trade NFTs with ease. It's very simple. You discover NFTS
-            in the 🖼️ tab. When you find something you like, you make an offer with 🤝. When 2
-            parties are done negotiating and agree on the terms, it moves to the ⛓️ tab. this is
-            where your NFTs get traded onchain and moved in your wallets!
+        <div className='max-w-[800px] px-6 mx-auto py-12'>
+          {/* Hero Section */}
+          <div className='text-center mb-12'>
+            <img
+              src='/about.webp'
+              alt='TFT Platform'
+              className='rounded-lg shadow-lg mb-8 w-full max-w-[620px] mx-auto'
+            />
+            <h1 className='text-3xl font-bold mb-4'>Welcome to TFT</h1>
+            <p className='text-xl text-gray-600'>
+              The hub for NFT trading, discovery, and connection.
+            </p>
           </div>
-          <div>
-            We currently support Ethereum, Base, Optimism, Arbitrum, Zksync. More chains to
-            come!
+
+          {/* How It Works Section */}
+          <div className='mb-12'>
+            <h2 className='text-2xl font-semibold mb-6'>How It Works</h2>
+            <div className='space-y-4'>
+              <FeatureCard
+                emoji='🖼️'
+                title='Discover NFTs'
+                description='Browse through NFTs of other users in the NFT tab.'
+              />
+              <FeatureCard
+                emoji='🤝'
+                title='Make Offers'
+                description='Found something you like? Make an offer and negotiate with fellow collectors.'
+              />
+              <FeatureCard
+                emoji='⛓️'
+                title='Complete Trades'
+                description='Once terms are agreed upon, NFTs are safely traded via smart contracts.'
+              />
+            </div>
           </div>
-          <div>
-            Currently, you can only trade with other NFTs on the same chain. Cross chain
-            swapping is coming!
+
+          {/* Supported Chains Section */}
+          <div className='mb-12'>
+            <h2 className='text-2xl font-semibold mb-4'>Supported Chains</h2>
+            <div className='mb-4'>
+              {supportedChains.map((chain) => (
+                <SupportedChain key={chain} name={chain} />
+              ))}
+            </div>
+            <p className='text-gray-600 mb-4'>
+              Currently, trades are limited to NFTs on the same chain. Cross-chain swapping is
+              coming soon!
+            </p>
           </div>
-          <div>Trades are executed automatically via smart contracts.</div>
-          <div>Join our Discord to keep up-to-date with everything.</div>
+
+          {/* Technical Details Section */}
+          <div className='mb-12 bg-white rounded-lg p-6 shadow-sm'>
+            <h2 className='text-2xl font-semibold mb-6'>Technical Details</h2>
+            <p className='text-gray-600 mb-4'>
+              All trades are executed automatically through our secure smart contracts. Our
+              contracts are open-sourced and available on GitHub for complete transparency.
+            </p>
+            <a
+              href='#'
+              className='text-blue-600 hover:text-blue-800 underline'
+              onClick={(e) => {
+                e.preventDefault()
+                // Add GitHub link handler
+              }}
+            >
+              View on GitHub
+            </a>
+          </div>
+
+          {/* Community Section */}
+          <div className='text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8 shadow-sm'>
+            <h2 className='text-2xl font-semibold mb-4'>Join Our Community</h2>
+            <p className='text-gray-600 mb-6'>
+              Stay up-to-date with the latest features and updates by joining our Discord
+              community.
+            </p>
+            <button className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'>
+              Join Discord
+            </button>
+          </div>
         </div>
       </div>
       {!isMobile && <Footer />}
