@@ -6,9 +6,10 @@ import { Expand } from '@/icons'
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
 
+import { NFTImage } from '../shared'
+
 import Footer from './footer'
 import Header from './header'
-import { NFTImage } from '../shared'
 
 // Icon Components
 const Icons = {
@@ -87,7 +88,11 @@ const StatusBadge = ({ status, isDeposited }) => (
 )
 
 const NFTCard = ({ asset, status, isDeposited, recipient }) => (
-  <div className='flex items-center p-2 bg-white rounded-lg border border-gray-100'>
+  <Link
+    href={`/nfts/${asset.nft_id}`}
+    target='_blank'
+    className='flex items-center p-2 bg-white rounded-lg border border-gray-100'
+  >
     <div className='w-12 h-12 rounded-lg object-cover'>
       <NFTImage src={asset.image} alt={asset.name} fallback={asset.name} rounded='all' />
     </div>
@@ -97,10 +102,9 @@ const NFTCard = ({ asset, status, isDeposited, recipient }) => (
           <h3 className='text-sm font-medium'>{asset.name}</h3>
           <p className='text-xs text-gray-500'>{asset.collection_name}</p>
         </div>
-        {status === 'accepted' && <StatusBadge status={status} isDeposited={isDeposited} />}
       </div>
     </div>
-  </div>
+  </Link>
 )
 
 const CompactView: React.FC<{
@@ -123,11 +127,14 @@ const CompactView: React.FC<{
 const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
   <div className='flex -space-x-2'>
     {assets.map((asset) => (
-      <div
-        key={asset.nft_id}
-        className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
-      >
-        <img src={asset.image} alt={asset.name} className='w-full h-full object-cover' />
+      <div key={asset.nft_id} className='w-12 h-12'>
+        <NFTImage
+          src={asset.image}
+          alt={asset.name}
+          fallback={asset.name}
+          rounded='all'
+          rings={true}
+        />
       </div>
     ))}
   </div>
@@ -233,7 +240,14 @@ const Transaction: React.FC<{
             </Link>
           </div>
 
-          <div className='space-y-3 space-x-0 flex flex-col md:flex-row md:justify-between md:space-y-0 md:space-x-4'>
+          <div
+            className='space-y-3 space-x-0 flex flex-col md:flex-row md:justify-between md:space-y-0 md:space-x-4'
+            onClick={(e) => {
+              if (isExpanded) {
+                e.stopPropagation()
+              }
+            }}
+          >
             <TradeSection
               username={transaction.creator_username}
               profilePic={transaction.creator_profile_pic_url}

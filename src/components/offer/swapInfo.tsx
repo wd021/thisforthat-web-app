@@ -1,6 +1,6 @@
+import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import type { FC } from 'react'
 
 import { NFTImage } from '@/components/shared'
 import { ChainLogo, Heart, SwapArrows } from '@/icons'
@@ -52,7 +52,6 @@ interface OfferSideProps {
   username: string
   profilePic: string
   isExpanded: boolean
-  side: 'creator' | 'counterparty'
   userLikes: Record<string, boolean>
   optimisticCounts: Record<string, number>
   onLike: (nftId: string, currentLikeState: boolean) => void
@@ -63,7 +62,6 @@ const OfferSide: FC<OfferSideProps> = ({
   username,
   profilePic,
   isExpanded,
-  side,
   userLikes,
   optimisticCounts,
   onLike,
@@ -147,7 +145,11 @@ const TradeOffer: FC<TradeOfferProps> = ({
     return (
       <div
         className='mb-2 flex justify-between p-3 w-full rounded-lg bg-gray-50'
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          if (isExpanded) {
+            e.stopPropagation()
+          }
+        }}
       >
         <Link
           href={`/nfts/${offer.counterparty_assets[0].nft_id}`}
@@ -204,7 +206,14 @@ const TradeOffer: FC<TradeOfferProps> = ({
   }
 
   return (
-    <div className='mb-2' onClick={(e) => e.stopPropagation()}>
+    <div
+      className='mb-2'
+      onClick={(e) => {
+        if (isExpanded) {
+          e.stopPropagation()
+        }
+      }}
+    >
       <div className='flex w-full'>
         {/* Compact View */}
         {!isExpanded && (
@@ -213,14 +222,13 @@ const TradeOffer: FC<TradeOfferProps> = ({
               <div className='flex items-center space-x-4'>
                 <div className='flex -space-x-2'>
                   {offer.creator_assets.map((asset) => (
-                    <div
-                      key={asset.nft_id}
-                      className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
-                    >
-                      <img
+                    <div key={asset.nft_id} className='w-12 h-12'>
+                      <NFTImage
                         src={asset.image}
                         alt={asset.name}
-                        className='w-full h-full object-cover'
+                        fallback={asset.name}
+                        rounded='all'
+                        rings={true}
                       />
                     </div>
                   ))}
@@ -230,14 +238,13 @@ const TradeOffer: FC<TradeOfferProps> = ({
                 </div>
                 <div className='flex -space-x-2'>
                   {offer.counterparty_assets.map((asset) => (
-                    <div
-                      key={asset.nft_id}
-                      className='w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white'
-                    >
-                      <img
+                    <div key={asset.nft_id} className='w-12 h-12'>
+                      <NFTImage
                         src={asset.image}
                         alt={asset.name}
-                        className='w-full h-full object-cover'
+                        fallback={asset.name}
+                        rounded='all'
+                        rings={true}
                       />
                     </div>
                   ))}
@@ -255,7 +262,6 @@ const TradeOffer: FC<TradeOfferProps> = ({
               username={offer.creator_username}
               profilePic={offer.creator_profile_pic_url}
               isExpanded={isExpanded}
-              side='creator'
               userLikes={userLikes}
               optimisticCounts={optimisticCounts}
               onLike={onLike}
@@ -265,7 +271,6 @@ const TradeOffer: FC<TradeOfferProps> = ({
               username={offer.counterparty_username}
               profilePic={offer.counterparty_profile_pic_url}
               isExpanded={isExpanded}
-              side='counterparty'
               userLikes={userLikes}
               optimisticCounts={optimisticCounts}
               onLike={onLike}
