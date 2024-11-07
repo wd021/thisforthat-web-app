@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+
 import { Footer } from '@/components'
+import { LoadMore } from '@/components/shared/buttons'
 import { useIsMobile } from '@/hooks'
 import { Expand, Notifications } from '@/icons'
-import { timeAgoShort } from '@/utils/helpers'
-import { FEED_ITEMS_PER_PAGE } from '@/utils/constants'
-import { supabase } from '@/utils/supabaseClient'
 import { useAuth } from '@/providers/authProvider'
+import { FEED_ITEMS_PER_PAGE } from '@/utils/constants'
+import { timeAgoShort } from '@/utils/helpers'
+import { supabase } from '@/utils/supabaseClient'
 
 interface Notification {
   id: string
@@ -150,7 +152,7 @@ const NotificationsPage: React.FC = () => {
 
           {!initialFetchComplete ? (
             <div className='flex justify-center py-8'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+              <div className='w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin' />
             </div>
           ) : notifications.length > 0 ? (
             <div className='space-y-4'>
@@ -172,21 +174,7 @@ const NotificationsPage: React.FC = () => {
                 </Link>
               ))}
 
-              {hasMore && (
-                <div className='flex justify-center pt-4'>
-                  <button
-                    onClick={handleLoadMore}
-                    disabled={isLoading}
-                    className='px-6 py-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50'
-                  >
-                    {isLoading ? (
-                      <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900' />
-                    ) : (
-                      'Load More'
-                    )}
-                  </button>
-                </div>
-              )}
+              {hasMore && <LoadMore onClick={handleLoadMore} isLoading={isLoading} />}
             </div>
           ) : (
             <div className='flex flex-col items-center justify-center py-12 text-center'>

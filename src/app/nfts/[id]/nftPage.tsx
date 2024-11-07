@@ -10,11 +10,11 @@ import { useNFTOffers } from '@/hooks/supabase'
 import { ChainLogo, Etherscan, Opensea } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
+import { OfferModalInfo, TxModalInfo } from '@/types/main'
 import { NFT, NFTGridItem } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
-import { OfferModalInfo, TxModalInfo } from '@/types/main'
 
 const LoadingState: React.FC = () => (
   <div className='w-full flex flex-col items-center justify-center mt-[150px]'>

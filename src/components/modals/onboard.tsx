@@ -12,12 +12,90 @@ import { BLOCKED_USERNAMES, MAX_IMAGE_UPLOAD_SIZE } from '@/utils/constants'
 import { uploadFile } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
+const OnboardingCompletion = ({
+  username,
+  closeModal,
+}: {
+  username: string
+  closeModal: () => void
+}) => {
+  const steps = [
+    {
+      icon: '🖼️',
+      title: 'Explore NFTs',
+      description: 'Make offers on the NFTs you like',
+    },
+    {
+      icon: '🤝',
+      title: 'Negotiate',
+      description: `Negotiate with the NFT's owner`,
+    },
+    {
+      icon: '⛓️',
+      title: 'Finalize',
+      description: 'Complete the trade onchain',
+    },
+  ]
+
+  return (
+    <div className='flex flex-col items-center text-center max-w-md mx-auto p-6'>
+      <div className='relative mb-8'>
+        <div className='text-7xl animate-bounce'>🎉</div>
+      </div>
+
+      <h2 className='text-xl font-bold mb-3 text-gray-800'>
+        Welcome aboard, <span className='text-blue-600'>{username}</span>!
+      </h2>
+
+      <p className='text-lg mb-8 text-gray-600'>
+        Here&apos;s a quick overview of how TFT works.
+      </p>
+
+      {/* Steps Section */}
+      <div className='w-full space-y-4 mb-8'>
+        {steps.map((step, index) => (
+          <div
+            key={index}
+            className='flex items-center p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow'
+          >
+            <div className='p-2 bg-blue-50 rounded-full'>{step.icon}</div>
+            <div className='ml-4 text-left'>
+              <h3 className='font-semibold text-gray-800'>{step.title}</h3>
+              <p className='text-sm text-gray-600'>{step.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Profile URL Section */}
+      <div className='w-full p-4 bg-gray-50 rounded-lg mb-8'>
+        <p className='text-sm text-gray-600 mb-2'>Share your profile with others:</p>
+        <div className='select-all bg-white p-3 rounded border border-gray-200'>
+          <p className='font-mono text-gray-800'>
+            thisforthat.app/<span className='text-blue-600'>{username}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* CTA Button */}
+      <button
+        onClick={closeModal}
+        className='w-full bg-blue-600 text-lg text-white font-semibold py-4 px-6 rounded-lg 
+                 hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg
+                 flex items-center justify-center space-x-2'
+      >
+        <span>Start Swapping</span>
+      </button>
+    </div>
+  )
+}
+
 const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
   const { showToast } = useToast()
 
-  const [completeScreen, setCompleteScreen] = useState(true)
+  const [completeScreen, setCompleteScreen] = useState(false)
   const [step, setStep] = useState(1)
 
   // Profile info state
@@ -147,40 +225,12 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
               : `Step ${step} of 2: ${step === 1 ? 'Create Your Profile' : 'Add Your NFTs'}`}
           </h2>
         </div>
-        <div
-          className={`flex flex-grow ${isMobile || step === 1 ? 'overflow-y-auto' : 'overflow-hidden'}`}
-        >
-          <div className={`p-6 w-full ${step === 2 ? `flex ${isMobile ? 'h-full' : ''}` : ''}`}>
+        <div className={`flex flex-grow overflow-y-auto custom-scrollbar`}>
+          <div
+            className={`p-6 w-full ${completeScreen ? 'h-full' : ''} ${step === 2 ? `flex ${isMobile ? 'h-full' : ''}` : ''}`}
+          >
             {completeScreen ? (
-              <div className='flex flex-col items-center text-center'>
-                <div className='text-7xl mb-6'>🎉</div>
-
-                <h2 className='text-3xl font-bold mb-4 text-gray-800'>
-                  Congratulations, <span className='text-blue-600'>{username}</span>!
-                </h2>
-
-                <p className='text-lg mb-4 text-gray-600'>
-                  You&apos;ve finished setting up your account!
-                </p>
-
-                <p className='mb-6 text-gray-600'>
-                  It&apos;s time to start swapping. Share your profile with others and check out
-                  the NFTs on offer!
-                </p>
-
-                <div className='bg-gray-100 px-6 py-3 rounded-full mb-8 select-all'>
-                  <p className='font-semibold text-lg text-gray-800'>
-                    www.thisforthat.app/<span className='text-blue-600'>{username}</span>
-                  </p>
-                </div>
-
-                <button
-                  onClick={closeModal}
-                  className='w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg'
-                >
-                  Let&apos;s Go!
-                </button>
-              </div>
+              <OnboardingCompletion username={username} closeModal={closeModal} />
             ) : (
               <>
                 {step === 1 && (
@@ -257,9 +307,10 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
                       )}
                     </div>
 
-                    <div className='bg-yellow-50 border-l-4 border-yellow-400 p-4'>
-                      <p className='text-sm text-yellow-700'>
-                        This wallet address will be used to receive assets on successful swaps.
+                    <div className='bg-blue-100 border-l-4 border-blue-400 p-4'>
+                      <p className='text-sm text-blue-700'>
+                        This wallet address is where you&apos;ll receive your new NFTs from all
+                        swaps.
                       </p>
                     </div>
 

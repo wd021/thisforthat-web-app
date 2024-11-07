@@ -6,7 +6,7 @@ import { Footer } from '@/components'
 import { UserDropdown } from '@/components/dropdowns'
 import { OfferFeed } from '@/components/home'
 import { Following, Offer, Transaction } from '@/components/modals'
-import { NFTGridObject } from '@/components/shared'
+import { LoadingIndicator, NFTGridObject } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useFollow, useProfile, useUserItems } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
@@ -29,7 +29,7 @@ const ProfileHeader = ({
   onClick: (option: string) => void
 }) => {
   const renderProfileImage = () => (
-    <div className='relative w-[175px] h-[175px] rounded-full overflow-hidden'>
+    <div className='relative h-[125px] w-[125px] sm:w-[175px] sm:h-[175px] rounded-full overflow-hidden'>
       {profile ? (
         <img
           src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL! + profile.profile_pic_url}
@@ -37,7 +37,7 @@ const ProfileHeader = ({
           className='w-full h-full object-cover'
         />
       ) : (
-        <div className='w-full h-full bg-gradient-to-br from-blue-50 to-purple-50' />
+        <div className='w-full h-full bg-gradient-to-br from-blue-50 to-blue-100' />
       )}
     </div>
   )
@@ -61,10 +61,18 @@ const ProfileHeader = ({
       </button>
     )
 
-  const StatItem = ({ value, label, onClick }) => (
+  const StatItem = ({
+    value,
+    label,
+    onClick,
+  }: {
+    value: number
+    label: string
+    onClick: () => void
+  }) => (
     <button
       onClick={onClick}
-      className='w-[100px] group flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-all duration-200'
+      className='w-[75px] sm:w-[100px] group flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-all duration-200'
     >
       <span className='text-lg font-bold text-gray-900 group-hover:text-blue-500 transition-colors'>
         {value.toLocaleString()}
@@ -95,10 +103,10 @@ const ProfileHeader = ({
   )
 
   return (
-    <div className='max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-8 mb-6'>
-      <div className='flex flex-col md:flex-row gap-8 items-center'>
+    <div className='max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-4 lg:p-8 mb-6'>
+      <div className='flex flex-col md:flex-row gap-8 items-center overflow-hidden'>
         {renderProfileImage()}
-        <div className='flex-1 min-w-0 space-y-4'>
+        <div className='flex flex-col items-center md:items-start flex-1 min-w-0 space-y-4'>
           <div className='flex items-center gap-4'>
             <h1 className='text-2xl font-bold text-gray-900 truncate'>{profile?.username}</h1>
             {renderFollowButton()}
@@ -110,12 +118,6 @@ const ProfileHeader = ({
     </div>
   )
 }
-
-const LoadingState: React.FC = () => (
-  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
-    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
-  </div>
-)
 
 const NoResultsState: React.FC<{ tab: UserTabOption }> = ({ tab }) => {
   const messages = {
@@ -230,7 +232,12 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   }
 
   const renderContent = () => {
-    if (isFirstLoad) return <LoadingState />
+    if (isFirstLoad)
+      return (
+        <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+          <LoadingIndicator />
+        </div>
+      )
     if (!isLoading && !isFirstLoad && items.length === 0)
       return <NoResultsState tab={tabOption} />
 
@@ -274,7 +281,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
       <div
         className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'}`}
       >
-        <div className='my-8 px-3 md:px-6 md:container md:mx-auto'>
+        <div className='my-4 px-4 md:my-8 md:px-6 md:container md:mx-auto'>
           <ProfileHeader
             profile={userPageProfile}
             isFollowing={isFollowing}
