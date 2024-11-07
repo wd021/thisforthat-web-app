@@ -9,6 +9,8 @@ import { getNFTFromUrl, getNFTsForWallet } from '@/utils/apis'
 import { CHAIN_LABELS, SUPPORTED_CHAINS } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
+import LoadingIndicator from './loadingIndicator'
+
 // Create a public client for ENS resolution
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -131,7 +133,7 @@ const NftImporter: FC<{
       if (!userId) throw new Error('User session not found')
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const nftsToUpload = selectedNfts.map(({ id, possible_spam, ...rest }) => ({
+      const nftsToUpload = selectedNfts.map(({ id, ...rest }) => ({
         ...rest,
         user_id: userId,
       }))
@@ -299,7 +301,7 @@ const NftImporter: FC<{
           >
             {isLoading || resolvingEns ? (
               <div className='flex items-center justify-center'>
-                <div className='w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin' />
+                <LoadingIndicator className='!w-4 !h-4 border-white !border-[2px]' />
                 <span className='ml-2'>Searching...</span>
               </div>
             ) : (
@@ -317,7 +319,7 @@ const NftImporter: FC<{
       </div>
 
       {/* NFT Grid */}
-      <div className='flex-grow overflow-y-auto min-h-0'>
+      <div className='flex-grow overflow-y-auto custom-scrollbar min-h-0'>
         {!hasSearched ? (
           <div className='flex flex-col items-center justify-center h-64 text-gray-500'>
             <div className='mb-4'>
@@ -343,7 +345,7 @@ const NftImporter: FC<{
           </div>
         ) : isLoading ? (
           <div className='flex justify-center items-center h-64'>
-            <div className='w-8 h-8 border-t-2 border-blue-500 border-solid rounded-full animate-spin' />
+            <LoadingIndicator />
           </div>
         ) : nfts.length > 0 ? (
           <div className='space-y-4'>

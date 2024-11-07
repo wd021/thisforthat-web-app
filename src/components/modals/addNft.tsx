@@ -22,9 +22,9 @@ const AddNft: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
       >
         <div className='p-5 border-b border-gray-200 flex justify-between items-center'>
           <div className='text-xl font-semibold'>Add Your NFTs</div>
-          <div className='cursor-pointer' onClick={closeModal}>
-            <Close className='w-8 h-8' />
-          </div>
+          <button className='text-gray-500' aria-label='Close modal' onClick={closeModal}>
+            <Close className='w-5 h-5' />
+          </button>
         </div>
         <div className='p-5 flex overflow-hidden'>
           <NftImporter displaySkipOption={false} onComplete={closeModal} />
