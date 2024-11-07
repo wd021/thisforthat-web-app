@@ -113,7 +113,10 @@ const NotificationDropdown: React.FC<{
                     href={
                       notification.notification_type === 'follow'
                         ? `/${notification.metadata.user.username}`
-                        : `/offers/${notification.metadata.offer_id}`
+                        : notification.notification_type === 'transaction_done' ||
+                            notification.notification_type === 'transaction_cancelled'
+                          ? `/transactions/${notification.metadata.offer_id}`
+                          : `/offers/${notification.metadata.offer_id}`
                     }
                     target='_blank'
                     className='block border-b border-gray-200 last:border-b-0 p-4 hover:bg-gray-50'

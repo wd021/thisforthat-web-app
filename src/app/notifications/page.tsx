@@ -1,18 +1,203 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
+import { Expand, Notifications } from '@/icons'
+import { timeAgoShort } from '@/utils/helpers'
+import { FEED_ITEMS_PER_PAGE } from '@/utils/constants'
+import { supabase } from '@/utils/supabaseClient'
+import { useAuth } from '@/providers/authProvider'
+
+interface Notification {
+  id: string
+  notification_type: string
+  message: string
+  metadata: {
+    offer_id?: string
+    user: {
+      username: string
+      profile_pic_url: string
+    }
+  }
+  created_at: string
+  user_id: string
+}
+
+const FeedItem = ({ notification }: { notification: Notification }) => {
+  const { user } = notification.metadata
+
+  return (
+    <div className='space-y-1'>
+      <div className='flex items-center'>
+        <Link
+          href={`/${user.username}`}
+          target='_blank'
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+          className='relative w-8 h-8 mr-2 shrink-0'
+        >
+          <img
+            src={`${process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL}${user.profile_pic_url}`}
+            alt={`${user.username}'s profile`}
+            className='w-full h-full rounded-full'
+          />
+        </Link>
+
+        <div className='flex flex-grow items-start justify-between'>
+          <div className='flex items-center gap-x-1'>
+            <span className='text-sm font-semibold'>{user.username}</span>
+            <span className='text-gray-500'>·</span>
+            <span className='text-xs text-gray-700'>
+              {timeAgoShort(new Date(notification.created_at))}
+            </span>
+          </div>
+
+          <Expand className='text-gray-500 ml-2' />
+        </div>
+      </div>
+
+      <div className='text-sm text-gray-600'>{notification.message}</div>
+    </div>
+  )
+}
 
 const NotificationsPage: React.FC = () => {
   const isMobile = useIsMobile()
+  const { user } = useAuth()
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [initialFetchComplete, setInitialFetchComplete] = useState(false)
+
+  const fetchNotifications = async (pageNum: number) => {
+    if (!user?.id) return
+
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range((pageNum - 1) * FEED_ITEMS_PER_PAGE, pageNum * FEED_ITEMS_PER_PAGE - 1)
+
+      if (error) throw error
+
+      if (data?.length > 0) {
+        setNotifications((prev) => (pageNum === 1 ? data : [...prev, ...data]))
+        setHasMore(data.length === FEED_ITEMS_PER_PAGE)
+      } else {
+        setHasMore(false)
+      }
+
+      if (pageNum === 1) setInitialFetchComplete(true)
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchNotifications(1)
+    }
+  }, [user?.id])
+
+  // Subscribe to real-time notifications
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new as Notification, ...prev])
+        },
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user?.id])
+
+  const handleLoadMore = () => {
+    if (!isLoading && hasMore) {
+      setCurrentPage((prev) => prev + 1)
+      fetchNotifications(currentPage + 1)
+    }
+  }
 
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>
       <div
-        className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'} items-center justify-center`}
+        className={`w-full relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${
+          !isMobile && 'mb-[50px]'
+        }`}
       >
-        <h1>Notifications</h1>
-        <p>No notifications available.</p>
+        <div className='max-w-2xl mx-auto w-full px-4 py-6'>
+          <h1 className='text-2xl font-bold mb-6'>Notifications</h1>
+
+          {!initialFetchComplete ? (
+            <div className='flex justify-center py-8'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900' />
+            </div>
+          ) : notifications.length > 0 ? (
+            <div className='space-y-4'>
+              {notifications.map((notification) => (
+                <Link
+                  key={notification.id}
+                  target='_blank'
+                  href={
+                    notification.notification_type === 'follow'
+                      ? `/${notification.metadata.user.username}`
+                      : notification.notification_type === 'transaction_done' ||
+                          notification.notification_type === 'transaction_cancelled'
+                        ? `/transactions/${notification.metadata.offer_id}`
+                        : `/offers/${notification.metadata.offer_id}`
+                  }
+                  className='block bg-white rounded-lg shadow-sm p-4 hover:bg-gray-50'
+                >
+                  <FeedItem notification={notification} />
+                </Link>
+              ))}
+
+              {hasMore && (
+                <div className='flex justify-center pt-4'>
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={isLoading}
+                    className='px-6 py-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50'
+                  >
+                    {isLoading ? (
+                      <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900' />
+                    ) : (
+                      'Load More'
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className='flex flex-col items-center justify-center py-12 text-center'>
+              <Notifications className='w-12 h-12 text-gray-400' />
+              <h3 className='text-lg font-semibold mt-4 mb-2'>No Notifications</h3>
+              <p className='text-sm text-gray-500 max-w-md'>
+                When you have new notifications, they&apos;ll appear here.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
       {!isMobile && <Footer />}
     </div>
