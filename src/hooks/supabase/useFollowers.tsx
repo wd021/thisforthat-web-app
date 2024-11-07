@@ -14,11 +14,11 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
   const { user } = useAuth()
   const { showToast } = useToast()
 
-  const fetchItems = async (currentPage: number) => {
+  const fetchItems = async (page: number) => {
     setIsLoading(true)
     try {
-      const rangeStart = (currentPage - 1) * GRID_ITEMS_PER_PAGE
-      const rangeEnd = currentPage * GRID_ITEMS_PER_PAGE - 1
+      const rangeStart = (page - 1) * GRID_ITEMS_PER_PAGE
+      const rangeEnd = page * GRID_ITEMS_PER_PAGE - 1
 
       let query = supabase
         .from('user_follows')
@@ -47,7 +47,7 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
 
       if (error) throw error
 
-      if (currentPage === 1) {
+      if (page === 1) {
         setItems(data)
       } else {
         setItems((prev) => [...prev, ...data])

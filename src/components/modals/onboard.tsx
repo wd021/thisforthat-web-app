@@ -307,7 +307,7 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
                       )}
                     </div>
 
-                    <div className='bg-blue-100 border-l-4 border-blue-400 p-4'>
+                    <div className='bg-blue-50 border-l-4 border-blue-400 p-4'>
                       <p className='text-sm text-blue-700'>
                         This wallet address is where you&apos;ll receive your new NFTs from all
                         swaps.

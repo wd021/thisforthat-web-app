@@ -135,7 +135,7 @@ const AccountProfilePage: React.FC = () => {
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>
       <div
-        className={`w-full py-16 px-4 relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'}`}
+        className={`w-full py-8 px-4 relative bg-[#f9f9f9] flex flex-col overflow-y-auto hide-scrollbar ${!isMobile && 'mb-[50px]'}`}
       >
         <div className='max-w-screen-md mx-auto'>
           <div className='text-2xl font-bold mb-8 text-gray-800'>Edit Profile</div>
@@ -276,7 +276,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({ profile, setProfile
         />
         {errors.wallet && <p className='mt-1 text-sm text-red-600'>{errors.wallet}</p>}
       </div>
-      <div className='mt-2 pl-4 py-3 pr-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded-r text-sm'>
+      <div className='mt-2 pl-4 py-3 pr-3 bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r text-sm'>
         Your receiving wallet – where NFTs will be delivered to you in swaps.
       </div>
     </div>

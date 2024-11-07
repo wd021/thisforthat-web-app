@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+
+import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferData } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
-import { useAuth } from '@/providers/authProvider'
 
 export default function useNFTOffers(nftId: string): {
   items: OfferData[]

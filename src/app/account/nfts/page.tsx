@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
 import { Footer } from '@/components'
 import { AddNft, VerifyNft } from '@/components/modals'
-import { NFTAccountItem } from '@/components/shared'
+import { LoadingIndicator, NFTAccountItem } from '@/components/shared'
+import { LoadMore } from '@/components/shared/buttons'
 import { useIsMobile } from '@/hooks'
 import { useNFTs } from '@/hooks/supabase'
 import { Add, VerifyIcon } from '@/icons'
@@ -52,25 +53,21 @@ const HeaderButton: React.FC<{
 )
 
 const NFTGrid: React.FC<{
-  userNfts: UserNFT[]
+  items: UserNFT[]
   profile: Profile
   hasMore: boolean
   loadMore: () => void
-}> = ({ userNfts, profile, hasMore, loadMore }) => (
+  isLoading: boolean
+}> = ({ items, profile, hasMore, loadMore, isLoading }) => (
   <div className='flex-grow overflow-y-auto hide-scrollbar'>
     <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:px-12 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-6 mb-40'>
-      {userNfts.map((userNft) => (
-        <NFTAccountItem key={userNft.id} item={userNft} profile={profile} />
+      {items.map((item) => (
+        <NFTAccountItem key={item.id} item={item} profile={profile} />
       ))}
     </div>
-    {userNfts.length > 0 && hasMore && (
+    {items.length > 0 && hasMore && (
       <div className='w-full flex items-center justify-center my-8'>
-        <button
-          onClick={loadMore}
-          className='px-10 py-3 text-lg rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors duration-300'
-        >
-          Load More
-        </button>
+        <LoadMore onClick={loadMore} isLoading={isLoading} />
       </div>
     )}
   </div>
@@ -81,13 +78,7 @@ const AccountNFTSPage: React.FC = () => {
   const router = useRouter()
   const { user, profile, loading } = useAuth()
   const [modal, setModal] = useState<'add' | 'verify' | null>(null)
-  const { userNfts, hasMore, fetchUserNfts, loadMore } = useNFTs()
-
-  useEffect(() => {
-    if (user) {
-      fetchUserNfts(user?.id, 1)
-    }
-  }, [user, fetchUserNfts])
+  const { items, hasMore, loadMore, isFirstLoad, isLoading } = useNFTs(user?.id)
 
   if (!loading && !user) {
     router.push('/')
@@ -97,16 +88,35 @@ const AccountNFTSPage: React.FC = () => {
     <>
       <div className='absolute top-[75px] bottom-0 w-full flex'>
         <div
-          className={`w-full relative bg-[#f9f9f9] flex flex-col ${isMobile ? 'mb-16' : 'mb-[50px]'}`}
+          className={`w-full relative bg-[#f9f9f9] flex flex-col ${!isMobile ? 'mb-[50px]' : ''}`}
         >
           <Header setModal={setModal} />
           <div className='max-w-7xl mx-auto p-3 md:p-6 flex flex-col flex-grow overflow-hidden'>
-            <NFTGrid
-              userNfts={userNfts}
-              profile={profile!}
-              hasMore={hasMore}
-              loadMore={() => user?.id && loadMore(user.id)}
-            />
+            {isFirstLoad ? (
+              <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+                <LoadingIndicator />
+              </div>
+            ) : (
+              <>
+                {!isLoading && items.length === 0 ? (
+                  <>
+                    <div className='w-full flex flex-col items-center justify-center my-[150px] px-16 text-center'>
+                      <div className='text-gray-400 text-6xl mb-4'>🔍</div>
+                      <h3 className='text-xl font-semibold text-gray-700 mb-2'>No NFTs yet</h3>
+                      <p className='text-gray-500'>Add your first NFT to your profile!</p>
+                    </div>
+                  </>
+                ) : (
+                  <NFTGrid
+                    items={items}
+                    profile={profile!}
+                    hasMore={hasMore}
+                    loadMore={() => user?.id && loadMore()}
+                    isLoading={isLoading}
+                  />
+                )}
+              </>
+            )}
           </div>
         </div>
         {!isMobile && <Footer />}
