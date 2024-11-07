@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { Footer } from '@/components'
+import { LoadingIndicator } from '@/components/shared'
 import TransactionPage from '@/components/transaction'
 import { useIsMobile, useTradeInfo } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'
@@ -11,12 +12,6 @@ import { TransactionData } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
 const ONCHAIN_STATUSES = ['accepted', 'onchain_cancelled', 'onchain_completed']
-
-const LoadingState: React.FC = () => (
-  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
-    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
-  </div>
-)
 
 interface NFTPageProps {
   params: {
@@ -65,7 +60,11 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
   console.log('abc', tradeInfo, txInfo)
 
   if (!txInfo || !ONCHAIN_STATUSES.includes(txInfo.status) || !tradeInfo) {
-    return <LoadingState />
+    return (
+      <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+        <LoadingIndicator />
+      </div>
+    )
   }
 
   return (

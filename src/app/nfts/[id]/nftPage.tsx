@@ -5,22 +5,16 @@ import Link from 'next/link'
 
 import { OfferFeed } from '@/components/home'
 import { Duplicates, Offer, Transaction } from '@/components/modals'
-import { NFTImage, VerifiedBadge } from '@/components/shared'
+import { LoadingIndicator, NFTImage, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
 import { ChainLogo, Etherscan, Opensea } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo } from '@/types/main'
-import { NFT, NFTGridItem } from '@/types/supabase'
+import { NFT } from '@/types/supabase'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
-
-const LoadingState: React.FC = () => (
-  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
-    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
-  </div>
-)
 
 const NFTSidebar: React.FC<{
   nft: NFT
@@ -283,7 +277,9 @@ const NFTPage: React.FC<{
             <NFTTitle nft={nft} />
             <div className='flex-grow overflow-hidden'>
               {isFirstLoad ? (
-                <LoadingState />
+                <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+                  <LoadingIndicator />
+                </div>
               ) : (
                 <>
                   {!isLoading && items.length === 0 ? (

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 
 import TransactionCard from '@/components/transaction'
 import { useTradeStatuses } from '@/hooks'
+import { useToast } from '@/providers/toastProvider'
 import { TxModalInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
-import { useToast } from '@/providers/toastProvider'
 
 const TransactionFeed: React.FC<{
   items: TransactionData[]

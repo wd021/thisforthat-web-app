@@ -141,6 +141,9 @@ const NotificationDropdown: React.FC<{
               <Link
                 href='/notifications'
                 className='text-blue-500 hover:underline text-sm font-medium'
+                onClick={() => {
+                  toggleDropdown()
+                }}
               >
                 Show All Notifications
               </Link>

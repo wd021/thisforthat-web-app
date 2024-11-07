@@ -4,17 +4,12 @@ import { useEffect, useState } from 'react'
 
 import { Footer } from '@/components'
 import OfferPage from '@/components/offer'
+import { LoadingIndicator } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferData } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
-
-const LoadingState: React.FC = () => (
-  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
-    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
-  </div>
-)
 
 interface NFTPageProps {
   params: {
@@ -59,7 +54,11 @@ const Offer: React.FC<NFTPageProps> = ({ params }) => {
   }, [params.id, loading])
 
   if (!offerInfo) {
-    return <LoadingState />
+    return (
+      <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+        <LoadingIndicator />
+      </div>
+    )
   }
 
   return (

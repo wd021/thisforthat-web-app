@@ -5,9 +5,9 @@ import { useAccount } from 'wagmi'
 
 import { useCreateTrade } from '@/hooks'
 import { Close } from '@/icons'
+import { useToast } from '@/providers/toastProvider'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
-import { useToast } from '@/providers/toastProvider'
 
 interface TradeError extends Error {
   code?: number

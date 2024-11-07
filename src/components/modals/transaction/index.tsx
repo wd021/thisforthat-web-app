@@ -2,20 +2,20 @@ import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 
 import { useIsMobile, useTradeInfo } from '@/hooks'
+import { useSyncApiWithChain } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
 import { OnchainTradeInfo } from '@/types/main'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
+import { completeTradeWithApi, getTradeInfo } from '@/utils/helpers'
+import { supabase } from '@/utils/supabaseClient'
 
 import CancelTx from './cancel'
 import CompletedTx from './completed'
 import CreateTx from './create'
 import DepositTx from './deposit'
 import WaitingTx from './waiting'
-import { completeTradeWithApi, getTradeInfo } from '@/utils/helpers'
-import { useSyncApiWithChain } from '@/hooks/supabase'
-import { supabase } from '@/utils/supabaseClient'
 
 const getDepositCount = (
   user: 'creator' | 'counterparty',
@@ -176,7 +176,7 @@ const TransactionModal: React.FC<{
                 const token = session?.access_token
 
                 if (token) {
-                  completeTradeWithApi(transactionInfo.offerId, token)
+                  await completeTradeWithApi(transactionInfo.offerId, token)
                 }
                 setComponentToShow('completed')
               } else {
@@ -186,7 +186,7 @@ const TransactionModal: React.FC<{
           />
         )
       case 'waiting':
-        return <WaitingTx tradeId={transactionInfo.onchain.id!} onClose={closeModal} />
+        return <WaitingTx onClose={closeModal} />
       case 'completed':
         return <CompletedTx onClose={closeModal} />
       default:

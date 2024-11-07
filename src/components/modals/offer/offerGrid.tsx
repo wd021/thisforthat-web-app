@@ -7,7 +7,7 @@ const OfferGrid: React.FC<{
   items: SimplifiedNFTAsset[]
   onRemoveItem: (itemId: string) => void
 }> = ({ items, onRemoveItem }) => (
-  <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+  <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-4'>
     <AnimatePresence>
       {items.map((item) => (
         <NFTItem key={item.nft_id} item={item} onRemove={onRemoveItem} />

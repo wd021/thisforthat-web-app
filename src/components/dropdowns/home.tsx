@@ -54,9 +54,11 @@ const HomeDropdown: React.FC<HomeDropdownProps> = ({ mainTab, subTab, onNavigati
       setSelectedNftOption(subTab)
       onNavigationChange('nft', subTab)
       setIsNftDropdownOpen(false)
+      setIsOfferDropdownOpen(false)
     } else if (mainTab === 'offer') {
       setSelectedOfferOption(subTab)
       onNavigationChange('offer', subTab)
+      setIsNftDropdownOpen(false)
       setIsOfferDropdownOpen(false)
     }
   }
@@ -68,10 +70,16 @@ const HomeDropdown: React.FC<HomeDropdownProps> = ({ mainTab, subTab, onNavigati
 
     if (type === 'nft') {
       onNavigationChange('nft', selectedNftOption)
+      setIsNftDropdownOpen(false)
+      setIsOfferDropdownOpen(false)
     } else if (type === 'offer') {
       onNavigationChange('offer', selectedOfferOption)
+      setIsNftDropdownOpen(false)
+      setIsOfferDropdownOpen(false)
     } else {
       onNavigationChange(type)
+      setIsNftDropdownOpen(false)
+      setIsOfferDropdownOpen(false)
     }
   }
 

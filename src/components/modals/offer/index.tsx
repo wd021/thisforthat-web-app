@@ -5,37 +5,58 @@ import Modal from 'react-modal'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { useIsMobile } from '@/hooks'
-import { Close } from '@/icons'
+import { ChainLogo, Close } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
-import { MAX_NFTS_PER_SWAP } from '@/utils/constants'
+import { CHAIN_IDS_TO_CHAINS, MAX_NFTS_PER_SWAP } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
 import SelectOverlay from './selectOverlay'
 import UserSection from './userSection'
 
-const Header: FC<{ isCounterOffer: boolean; onClose: () => void }> = ({
-  isCounterOffer,
-  onClose,
-}) => (
-  <div className='flex items-center justify-between py-5 px-6 bg-gray-50 border-b border-gray-200'>
-    <div className='flex items-center space-x-3'>
-      <span className='text-2xl'>🤝</span>
-      <h1 className='text-xl font-semibold text-gray-900'>
-        {!isCounterOffer ? 'Make an Offer' : 'Make a Counter Offer'}
-      </h1>
-    </div>
-    <button
-      className='p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors duration-200'
-      onClick={onClose}
-    >
-      <Close className='w-5 h-5' />
-    </button>
-  </div>
-)
+const Header: FC<{
+  isCounterOffer: boolean
+  onClose: () => void
+  chainId: number
+}> = ({ isCounterOffer, onClose, chainId }) => {
+  const title = !isCounterOffer ? 'Make an Offer' : 'Make a Counter Offer'
+  const chainName = CHAIN_IDS_TO_CHAINS[chainId as keyof typeof CHAIN_IDS_TO_CHAINS]
 
+  return (
+    <div className='bg-white border-b border-gray-200'>
+      <div className='px-6 py-4'>
+        <div className='flex items-center justify-between'>
+          {/* Left side with title and chain info */}
+          <div className='flex items-center space-x-4'>
+            <div className='flex items-center justify-center w-12 h-12 bg-yellow-50 rounded-full'>
+              <span className='text-2xl' role='img' aria-label='handshake'>
+                🤝
+              </span>
+            </div>
+
+            <div className='flex flex-col'>
+              <div className='text-lg font-semibold text-gray-900 mb-0.5'>{title}</div>
+
+              <div className='flex items-center'>
+                <div className='flex items-center '>
+                  <ChainLogo chainId={chainId} className='w-4 h-4 mr-1.5' />
+                  <span className='text-sm font-medium text-gray-700'>{chainName}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Close button */}
+          <button className='text-gray-500' aria-label='Close modal' onClick={onClose}>
+            <Close className='w-5 h-5' />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 const Footer: FC<{ makeOffer: () => void }> = ({ makeOffer }) => (
   <div className='p-6 bg-white border-t border-gray-200'>
     <button
@@ -199,7 +220,7 @@ const Offer: FC<{
       >
         {!showOverlayScreen ? (
           <div className='flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden h-full'>
-            <Header isCounterOffer={!!offerId} onClose={closeModal} />
+            <Header isCounterOffer={!!offerId} onClose={closeModal} chainId={chainId} />
             {!offerId && (
               <div className='border-b border-gray-200 bg-white'>
                 <div className='flex relative'>
@@ -231,7 +252,7 @@ const Offer: FC<{
                 </div>
               </div>
             )}
-            <div className='flex-1 overflow-y-auto'>
+            <div className='flex-1 overflow-y-auto custom-scrollbar'>
               {activeTab === 'trade' ? (
                 <div>
                   <UserSection

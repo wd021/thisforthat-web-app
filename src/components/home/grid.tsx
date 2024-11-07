@@ -10,22 +10,8 @@ import { NFTGridItem, OfferData, TransactionData } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
-const LoadMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <div className='w-full flex items-center justify-center my-4'>
-    <button
-      onClick={onClick}
-      className='px-10 py-3 text-lg rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors duration-300'
-    >
-      Load More
-    </button>
-  </div>
-)
-
-const LoadingState: React.FC = () => (
-  <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
-    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600'></div>
-  </div>
-)
+import { LoadingIndicator } from '../shared'
+import { LoadMore } from '../shared/buttons'
 
 const NoResultsState: React.FC<{ mainTab: MainTabOption; subTab: SubTabOption }> = ({
   mainTab,
@@ -309,7 +295,11 @@ const Grid: React.FC = () => {
 
   const renderContent = () => {
     if (isFirstLoad || authLoading) {
-      return <LoadingState />
+      return (
+        <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
+          <LoadingIndicator />
+        </div>
+      )
     }
 
     if (!isLoading && items.length === 0) {
@@ -337,12 +327,14 @@ const Grid: React.FC = () => {
         ) : (
           <NFTGrid items={items as NFTGridItem[]} newOffer={newOffer} pinItem={pinItem} />
         )}
-        {items.length > 0 && hasMore && <LoadMoreButton onClick={handleLoadMore} />}
+        {items.length > 0 && hasMore && (
+          <div className='w-full flex items-center justify-center my-4'>
+            <LoadMore onClick={handleLoadMore} isLoading={isLoading} />
+          </div>
+        )}
       </>
     )
   }
-
-  console.log('txModalInfo', txModalInfo)
 
   return (
     <>

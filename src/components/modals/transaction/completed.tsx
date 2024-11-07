@@ -1,5 +1,4 @@
 import { Close } from '@/icons'
-import { useSyncApiWithChain } from '@/hooks/supabase'
 
 const CompletedTx = ({ onClose }: { onClose: () => void }) => {
   return (

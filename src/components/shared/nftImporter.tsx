@@ -4,6 +4,7 @@ import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import { normalize } from 'viem/ens'
 
+import { NFTImage } from '@/components/shared'
 import { NFTUpload } from '@/types/supabase'
 import { getNFTFromUrl, getNFTsForWallet } from '@/utils/apis'
 import { CHAIN_LABELS, SUPPORTED_CHAINS } from '@/utils/constants'
@@ -361,12 +362,7 @@ const NftImporter: FC<{
                   }`}
                 >
                   <div className='relative aspect-square'>
-                    <img
-                      src={nft.image}
-                      alt={nft.name}
-                      className='w-full h-full object-cover'
-                      loading='lazy'
-                    />
+                    <NFTImage src={nft.image} alt={nft.name} fallback={nft.name} />
                     {nft.possible_spam && (
                       <div className='absolute top-0 left-0 right-0 bg-red-500 text-white text-xs py-1 px-2 text-center'>
                         Potential Spam
