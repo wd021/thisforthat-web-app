@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
-import { Star } from '@/icons'
+import { ChainLogo, Expand, Star } from '@/icons'
 import { OfferData } from '@/types/supabase'
 
 const Icons = {
   ChevronRight: () => (
     <svg
-      className='w-3.5 h-3.5 text-gray-400'
+      className='w-4 h-4 text-gray-600'
       fill='none'
       viewBox='0 0 24 24'
       stroke='currentColor'
@@ -22,16 +22,6 @@ const Icons = {
   ChevronUp: () => (
     <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 15l7-7 7 7' />
-    </svg>
-  ),
-  ExternalLink: () => (
-    <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth={2}
-        d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-      />
     </svg>
   ),
 }
@@ -87,16 +77,19 @@ const Header = ({
 }) => {
   return (
     <div className='flex items-center justify-between p-2 pt-0 pb-4'>
-      <div className='flex items-center space-x-1'>
-        <UserInfo
-          username={offer.creator_username}
-          profilePic={offer.creator_profile_pic_url}
-        />
-        <Icons.ChevronRight />
-        <UserInfo
-          username={offer.counterparty_username}
-          profilePic={offer.counterparty_profile_pic_url}
-        />
+      <div className='flex items-center space-x-2'>
+        <ChainLogo chainId={offer.chain_id} className='w-5 h-5' />
+        <div className='flex items-center gap-x-1'>
+          <UserInfo
+            username={offer.creator_username}
+            profilePic={offer.creator_profile_pic_url}
+          />
+          <Icons.ChevronRight />
+          <UserInfo
+            username={offer.counterparty_username}
+            profilePic={offer.counterparty_profile_pic_url}
+          />
+        </div>
       </div>
       <div className='flex items-center space-x-2.5'>
         <FavoriteButton
@@ -112,7 +105,7 @@ const Header = ({
               className='p-1.5 text-gray-500 hover:bg-gray-100 rounded-full'
               onClick={(e) => e.stopPropagation()}
             >
-              <Icons.ExternalLink />
+              <Expand className='w-4 h-4' />
             </Link>
             <button
               onClick={(e) => {

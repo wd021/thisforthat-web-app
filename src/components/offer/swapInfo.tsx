@@ -29,11 +29,11 @@ const LikeButton: FC<LikeButtonProps> = ({
       onLike()
     }}
     className={`
-      ml-4 
+      ml-3
       inline-flex 
       items-center 
-      space-x-1.5 
-      p-1.5 
+      space-x-1
+      p-1 
       hover:bg-gray-100 
       rounded-full 
       transition-colors
@@ -42,13 +42,15 @@ const LikeButton: FC<LikeButtonProps> = ({
       ${className}
     `}
   >
-    <Heart className='h-5 w-5' fill={isLiked ? 'currentColor' : 'none'} />
+    <Heart className='h-4 w-4' fill={isLiked ? 'currentColor' : 'none'} />
     {likesCount > 0 && <span className='text-xs font-medium'>{likesCount}</span>}
   </button>
 )
 
 interface OfferSideProps {
   assets: NFTAsset[]
+  username: string
+  profilePic: string
   isExpanded: boolean
   side: 'creator' | 'counterparty'
   userLikes: Record<string, boolean>
@@ -58,70 +60,68 @@ interface OfferSideProps {
 
 const OfferSide: FC<OfferSideProps> = ({
   assets,
+  username,
+  profilePic,
   isExpanded,
   side,
   userLikes,
   optimisticCounts,
   onLike,
 }) => (
-  <div
-    className={`
-      flex 
-      flex-col 
-      ${isExpanded ? 'flex-1 h-full p-4' : ''} 
-      ${side === 'creator' && isExpanded ? 'border-r border-gray-200' : ''}
-    `}
-  >
-    <div className={isExpanded ? 'flex-1' : ''}>
-      <div className={`flex ${isExpanded ? 'flex-col space-y-4' : 'flex-row space-x-6'}`}>
-        {assets?.map((asset) => (
-          <div
-            key={asset.nft_id}
-            className={`
+  <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
+    <div className='flex items-center gap-2 mb-2'>
+      <img
+        src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
+        alt={username}
+        className='w-6 h-6 rounded-full ml-2 object-cover'
+      />
+      <div className='flex items-center justify-between w-full'>
+        <span className='text-sm font-medium'>{username}</span>
+      </div>
+    </div>
+    <div className='space-y-2'>
+      {assets?.map((asset) => (
+        <div
+          key={asset.nft_id}
+          className={`
               flex 
               items-center 
               justify-between 
               group 
               transition-transform 
               duration-200
-              ${isExpanded ? 'w-full' : ''}
+              ${isExpanded ? 'w-full bg-white rounded-lg p-2' : ''}
             `}
+        >
+          <Link
+            href={`/nfts/${asset.nft_id}`}
+            target='_blank'
+            className='flex items-center space-x-2 flex-1'
           >
-            <Link
-              href={`/nfts/${asset.nft_id}`}
-              target='_blank'
-              className='flex items-center space-x-2'
-            >
-              <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-12 w-12'}`}>
-                <NFTImage
-                  src={asset.image}
-                  alt={asset.name}
-                  fallback={asset.name}
-                  rounded='all'
-                />
-              </div>
-              <div className='flex min-w-0 flex-col py-0.5'>
-                <span className='truncate pl-0.5 text-sm font-medium text-gray-900'>
-                  {asset.name}
-                </span>
-                <span className='mt-0.5 flex items-center'>
-                  <ChainLogo chainId={asset.chain_id} className='h-3 w-3' />
-                  <span className='ml-1 text-sm text-gray-600'>
-                    {CHAIN_IDS_TO_CHAINS[asset.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]}
-                  </span>
-                </span>
-              </div>
-            </Link>
-            {isExpanded && (
-              <LikeButton
-                isLiked={!!userLikes[asset.offer_nft_id]}
-                likesCount={optimisticCounts[asset.offer_nft_id] ?? asset.like_count ?? 0}
-                onLike={() => onLike(asset.offer_nft_id, !!userLikes[asset.offer_nft_id])}
+            <div className={`relative flex ${isExpanded ? 'h-12 w-12' : 'h-10 w-10'}`}>
+              <NFTImage
+                src={asset.image}
+                alt={asset.name}
+                fallback={asset.name}
+                rounded='all'
               />
+            </div>
+            {isExpanded && (
+              <div className='flex min-w-0 flex-col gap-y-0.5'>
+                <span className='truncate text-sm font-medium text-gray-900'>{asset.name}</span>
+                <span className='text-xs text-gray-500'>{asset.collection_name}</span>
+              </div>
             )}
-          </div>
-        ))}
-      </div>
+          </Link>
+          {isExpanded && (
+            <LikeButton
+              isLiked={!!userLikes[asset.offer_nft_id]}
+              likesCount={optimisticCounts[asset.offer_nft_id] ?? asset.like_count ?? 0}
+              onLike={() => onLike(asset.offer_nft_id, !!userLikes[asset.offer_nft_id])}
+            />
+          )}
+        </div>
+      ))}
     </div>
   </div>
 )
@@ -205,19 +205,10 @@ const TradeOffer: FC<TradeOfferProps> = ({
 
   return (
     <div className='mb-2' onClick={(e) => e.stopPropagation()}>
-      <div
-        className={`
-          flex 
-          rounded-lg 
-          bg-gray-50 
-          overflow-x-auto 
-          custom-scrollbar
-          ${!isExpanded ? 'custom-scrollbar' : ''}
-        `}
-      >
+      <div className='flex w-full'>
         {/* Compact View */}
         {!isExpanded && (
-          <div className='bg-gray-50 rounded-lg p-4'>
+          <div className='bg-gray-50 rounded-lg p-4 w-full'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-4'>
                 <div className='flex -space-x-2'>
@@ -258,9 +249,11 @@ const TradeOffer: FC<TradeOfferProps> = ({
 
         {/* Expanded View */}
         {isExpanded && (
-          <>
+          <div className='w-full space-y-3 space-x-0 flex flex-col md:flex-row md:justify-between md:space-y-0 md:space-x-4'>
             <OfferSide
               assets={offer.creator_assets}
+              username={offer.creator_username}
+              profilePic={offer.creator_profile_pic_url}
               isExpanded={isExpanded}
               side='creator'
               userLikes={userLikes}
@@ -269,13 +262,15 @@ const TradeOffer: FC<TradeOfferProps> = ({
             />
             <OfferSide
               assets={offer.counterparty_assets}
+              username={offer.counterparty_username}
+              profilePic={offer.counterparty_profile_pic_url}
               isExpanded={isExpanded}
               side='counterparty'
               userLikes={userLikes}
               optimisticCounts={optimisticCounts}
               onLike={onLike}
             />
-          </>
+          </div>
         )}
       </div>
     </div>

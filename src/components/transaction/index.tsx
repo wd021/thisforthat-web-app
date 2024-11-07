@@ -8,6 +8,7 @@ import { TransactionData } from '@/types/supabase'
 
 import Footer from './footer'
 import Header from './header'
+import { NFTImage } from '../shared'
 
 // Icon Components
 const Icons = {
@@ -63,70 +64,44 @@ const Icons = {
   ),
 }
 
-const StatusBadge: React.FC<{ status: string; isDeposited?: boolean }> = ({
-  status,
-  isDeposited,
-}) => {
-  if (status === 'onchain_completed' || status === 'onchain_cancelled') {
-    return (
-      <span
-        className={`px-3 py-1.5 rounded-full text-sm ${
-          status === 'onchain_completed'
+const StatusBadge = ({ status, isDeposited }) => (
+  <span
+    className={`px-2 py-0.5 rounded-full text-xs ${
+      status === 'onchain_completed'
+        ? 'bg-green-100 text-green-700'
+        : status === 'onchain_cancelled'
+          ? 'bg-red-100 text-red-600'
+          : isDeposited
             ? 'bg-green-100 text-green-700'
-            : 'bg-red-100 text-red-600'
-        }`}
-      >
-        {status === 'onchain_completed' ? 'completed' : 'cancelled'}
-      </span>
-    )
-  }
+            : 'bg-gray-100 text-gray-600'
+    }`}
+  >
+    {status === 'onchain_completed'
+      ? 'completed'
+      : status === 'onchain_cancelled'
+        ? 'cancelled'
+        : isDeposited
+          ? 'Deposited'
+          : 'Pending'}
+  </span>
+)
 
-  return (
-    <span
-      className={`px-3 py-1.5 rounded-full text-sm ${
-        isDeposited ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-      }`}
-    >
-      {isDeposited ? 'Deposited' : 'Pending'}
-    </span>
-  )
-}
-
-const NFTCard: React.FC<{
-  asset: Asset
-  isCompleted: boolean
-  status: string
-  isDeposited?: boolean
-  recipient?: string
-}> = ({ asset, isCompleted, status, isDeposited, recipient }) => {
-  const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`
-
-  return (
-    <div className='flex items-center p-4 bg-white rounded-lg border border-gray-100'>
-      <div className='relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0'>
-        <img src={asset.image} alt={asset.name} className='w-full h-full object-cover' />
-      </div>
-
-      <div className='flex-grow ml-4'>
-        <div className='flex items-center justify-between'>
-          <div className='flex flex-col gap-y-0.5'>
-            <h3 className='text-sm font-medium'>{asset.name}</h3>
-            <p className='text-xs text-gray-500 mt-0.5'>{asset.collection_name}</p>
-            {!isCompleted && recipient && (
-              <div className='flex items-center space-x-2'>
-                <span className='text-xs text-gray-500'>Sending to:</span>
-                <div className='flex items-center space-x-1.5 text-xs'>
-                  {truncateAddress(recipient)}
-                </div>
-              </div>
-            )}
-          </div>
-          <StatusBadge status={status} isDeposited={isDeposited} />
+const NFTCard = ({ asset, status, isDeposited, recipient }) => (
+  <div className='flex items-center p-2 bg-white rounded-lg border border-gray-100'>
+    <div className='w-12 h-12 rounded-lg object-cover'>
+      <NFTImage src={asset.image} alt={asset.name} fallback={asset.name} rounded='all' />
+    </div>
+    <div className='flex-grow ml-3'>
+      <div className='flex items-center justify-between'>
+        <div className='flex flex-col gap-y-0.5'>
+          <h3 className='text-sm font-medium'>{asset.name}</h3>
+          <p className='text-xs text-gray-500'>{asset.collection_name}</p>
         </div>
+        {status === 'accepted' && <StatusBadge status={status} isDeposited={isDeposited} />}
       </div>
     </div>
-  )
-}
+  </div>
+)
 
 const CompactView: React.FC<{
   creatorAssets: Asset[]
@@ -158,42 +133,30 @@ const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
   </div>
 )
 
-const TradeSection: React.FC<{
-  username: string
-  assets: Asset[]
-  onchainInfo?: OnchainTradeInfo
-  status: string
-}> = ({ username, assets, onchainInfo, status }) => {
+const TradeSection = ({ username, profilePic, assets, onchainInfo, status }) => {
   const isCompleted = status === 'onchain_cancelled' || status === 'onchain_completed'
-
-  const depositedCount = onchainInfo
-    ? assets.reduce((count, asset) => {
-        const onchainAsset = onchainInfo.assets.find(
-          (a) => a.tokenId.toString() === asset.token_id,
-        )
-        return onchainAsset?.isDeposited ? count + 1 : count
-      }, 0)
-    : 0
+  const depositedCount =
+    onchainInfo?.assets.reduce((count, asset) => (asset.isDeposited ? count + 1 : count), 0) ||
+    0
 
   return (
-    <div className='p-6 rounded-xl bg-gray-50/90 space-y-4'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center space-x-4'>
-          <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500'>
-            <Icons.Lock />
-          </div>
-          <div>
-            <h2 className='text-base font-semibold'>{username}</h2>
-            {!isCompleted && (
-              <p className='text-sm text-gray-600'>
-                {depositedCount} of {assets.length} deposited
-              </p>
-            )}
-          </div>
+    <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
+      <div className='flex items-center gap-2 mb-2'>
+        <img
+          src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
+          alt={username}
+          className='w-6 h-6 rounded-full ml-2 object-cover'
+        />
+        <div className='flex items-center justify-between w-full'>
+          <span className='text-sm font-medium'>{username}</span>
+          {!isCompleted && (
+            <span className='text-xs text-gray-600'>
+              {depositedCount} of {assets.length} deposited
+            </span>
+          )}
         </div>
       </div>
-
-      <div className='space-y-3'>
+      <div className='space-y-2'>
         {assets.map((asset) => {
           const onchainAsset = onchainInfo?.assets.find(
             (a) => a.tokenId.toString() === asset.token_id,
@@ -203,7 +166,6 @@ const TradeSection: React.FC<{
               <NFTCard
                 key={asset.nft_id}
                 asset={asset}
-                isCompleted={isCompleted}
                 status={status}
                 isDeposited={onchainAsset?.isDeposited}
                 recipient={onchainAsset?.recipient}
@@ -247,43 +209,41 @@ const Transaction: React.FC<{
         setIsExpanded={setIsExpanded}
       />
 
-      {!isExpanded && (
+      {!isExpanded ? (
         <CompactView
           creatorAssets={transaction.creator_assets}
           counterpartyAssets={transaction.counterparty_assets}
         />
-      )}
-
-      {isExpanded && (
+      ) : (
         <>
-          <div className='flex flex-col text-sm gap-y-2 ml-2'>
+          <div className='flex gap-4 text-sm ml-2'>
             <Link
               href={`/transactions/${transaction.offer_id}`}
-              target='_blank'
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
             >
               <span>Link to Offer</span>
-              <Expand />
+              <Expand className='w-4 h-4' />
             </Link>
             <Link
               href='https://www.etherscan.io'
-              target='_blank'
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
             >
               <span>Onchain Contract</span>
-              <Expand />
+              <Expand className='w-4 h-4' />
             </Link>
           </div>
 
-          <div className='space-y-4'>
+          <div className='space-y-3 space-x-0 flex flex-col md:flex-row md:justify-between md:space-y-0 md:space-x-4'>
             <TradeSection
               username={transaction.creator_username}
+              profilePic={transaction.creator_profile_pic_url}
               assets={transaction.creator_assets}
               onchainInfo={onchainInfo}
               status={transaction.status}
             />
             <TradeSection
               username={transaction.counterparty_username}
+              profilePic={transaction.counterparty_profile_pic_url}
               assets={transaction.counterparty_assets}
               onchainInfo={onchainInfo}
               status={transaction.status}
