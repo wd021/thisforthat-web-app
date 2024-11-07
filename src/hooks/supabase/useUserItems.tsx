@@ -25,15 +25,15 @@ export default function useUserItems(
   const [isFirstLoad, setIsFirstLoad] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchItems = async (tab: UserTabOption, currentPage: number) => {
+  const fetchItems = async (tab: UserTabOption, page: number) => {
     if (!userPageProfile) return
 
     setIsLoading(true)
 
-    const rangeStart = (currentPage - 1) * GRID_ITEMS_PER_PAGE
-    const rangeEnd = currentPage * GRID_ITEMS_PER_PAGE - 1
+    const rangeStart = (page - 1) * GRID_ITEMS_PER_PAGE
+    const rangeEnd = page * GRID_ITEMS_PER_PAGE - 1
 
-    let baseParams = {
+    const baseParams = {
       range_start: rangeStart,
       range_end: rangeEnd,
     }

@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import { supabase } from '@/utils/supabaseClient'
 import { FollowingProfile } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
+import { supabase } from '@/utils/supabaseClient'
 
 const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
   const [items, setItems] = useState<FollowingProfile[]>([])

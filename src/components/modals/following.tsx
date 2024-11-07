@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import Modal from 'react-modal'
 import Link from 'next/link'
-import { useFollowers } from '@/hooks/supabase'
-import { getModalStyles } from '@/styles'
-import { useAuth } from '@/providers/authProvider'
+
 import { useIsMobile } from '@/hooks'
+import { useFollowers } from '@/hooks/supabase'
+import { Close } from '@/icons'
+import { useAuth } from '@/providers/authProvider'
+import { getModalStyles } from '@/styles'
 
 interface TabProps {
   label: string
@@ -37,7 +39,7 @@ interface FollowItem {
 const Tab: React.FC<TabProps> = ({ label, isActive, onClick, count }) => (
   <button
     className={`
-      relative px-6 py-3 font-medium transition-all duration-200
+      relative px-4 py-3 font-medium transition-all duration-200
       ${
         isActive
           ? 'text-gray-900 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-gray-900'
@@ -88,9 +90,11 @@ const LoadingSpinner = () => (
 
 const Following: React.FC<{
   userId: string
+  followingCount: number
+  followersCount: number
   initialTab: 'following' | 'followers'
   closeModal: () => void
-}> = ({ userId, initialTab, closeModal }) => {
+}> = ({ userId, followingCount, followersCount, initialTab, closeModal }) => {
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -98,10 +102,7 @@ const Following: React.FC<{
   const { items, hasMore, loadMore, isLoading, unfollowUser } = useFollowers(userId, activeTab)
 
   const renderUserItem = (item: FollowItem) => (
-    <div
-      key={item.id}
-      className='flex items-center justify-between p-4 hover:bg-gray-50 transition-colors duration-200'
-    >
+    <div key={item.id} className='flex items-center justify-between p-4'>
       <Link
         href={`/${item.user_profile.username}`}
         className='flex items-center flex-1 min-w-0'
@@ -139,31 +140,27 @@ const Following: React.FC<{
       style={customStyles}
     >
       <div className='flex flex-col h-full lg:h-auto w-full bg-white rounded-lg'>
-        <div className='flex items-center justify-between px-4 my-3 border-b'>
+        <div className='flex items-center justify-between px-4 mt-3 border-b'>
           <div className='flex items-center'>
             <Tab
               label='Following'
               isActive={activeTab === 'following'}
               onClick={() => setActiveTab('following')}
-              count={items.length}
+              count={followingCount}
             />
             <Tab
               label='Followers'
               isActive={activeTab === 'followers'}
               onClick={() => setActiveTab('followers')}
-              count={items.length}
+              count={followersCount}
             />
           </div>
-          <button
-            onClick={closeModal}
-            className='p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors'
-            aria-label='Close modal'
-          >
-            <span className='text-xl leading-none'>&times;</span>
+          <button className='text-gray-500' aria-label='Close modal' onClick={closeModal}>
+            <Close className='w-5 h-5' />
           </button>
         </div>
 
-        <div className='flex-1 overflow-y-auto hide-scrollbar'>
+        <div className='flex-1 overflow-y-auto custom-scrollbar'>
           {!isLoading && items.length === 0 && <EmptyState type={activeTab} />}
 
           {items.map(renderUserItem)}

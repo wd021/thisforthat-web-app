@@ -7,6 +7,7 @@ import { UserDropdown } from '@/components/dropdowns'
 import { OfferFeed } from '@/components/home'
 import { Following, Offer, Transaction } from '@/components/modals'
 import { LoadingIndicator, NFTGridObject } from '@/components/shared'
+import { LoadMore } from '@/components/shared/buttons'
 import { useIsMobile } from '@/hooks'
 import { useFollow, useProfile, useUserItems } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
@@ -267,12 +268,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     items.length > 0 &&
     hasMore && (
       <div className='w-full flex items-center justify-center my-4'>
-        <button
-          onClick={loadMore}
-          className='px-10 py-3 text-lg rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors duration-300'
-        >
-          Load More
-        </button>
+        <LoadMore onClick={loadMore} isLoading={isLoading} />
       </div>
     )
 
@@ -305,9 +301,11 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
       {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
-      {followingModalInfo && (
+      {userPageProfile && followingModalInfo && (
         <Following
-          userId={userPageProfile?.id!}
+          userId={userPageProfile.id}
+          followingCount={userPageProfile.following_count}
+          followersCount={userPageProfile.followers_count}
           initialTab={followingModalInfo}
           closeModal={() => setFollowingModalInfo(null)}
         />
