@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import { User } from '@/icons'
 import { supabase } from '@/utils/supabaseClient'
 
 const AccountDropdown: React.FC<{ username: string }> = ({ username }) => {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -61,6 +63,7 @@ const AccountDropdown: React.FC<{ username: string }> = ({ username }) => {
               onClick={async () => {
                 await supabase.auth.signOut()
                 toggleDropdown()
+                router.push('/')
               }}
               className='flex items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100'
               role='menuitem'

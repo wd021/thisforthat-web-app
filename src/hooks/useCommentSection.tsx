@@ -55,19 +55,29 @@ export default function useCommentSection({
     setLoading(true)
 
     try {
+      // Calculate the range for pagination from the end
+      const totalMessages = await supabase
+        .from('offer_messages')
+        .select('count')
+        .eq('offer_id', offerId)
+        .single()
+
+      const total = totalMessages.data?.count || 0
+      const end = total - (pageNum - 1) * FEED_ITEMS_PER_PAGE - 1
+      const start = Math.max(end - FEED_ITEMS_PER_PAGE + 1, 0)
+
       const { data, error } = await supabase
         .from('offer_messages')
         .select('*')
         .eq('offer_id', offerId)
-        .order('created_at', { ascending: false })
-        .range((pageNum - 1) * FEED_ITEMS_PER_PAGE, pageNum * FEED_ITEMS_PER_PAGE - 1)
+        .order('created_at', { ascending: true })
+        .range(start, end)
 
       if (error) throw error
 
       if (data?.length > 0) {
-        const reversedData = data.reverse()
-        setMessages((prev) => (pageNum === 1 ? reversedData : [...prev, ...reversedData]))
-        setHasMore(data.length === FEED_ITEMS_PER_PAGE)
+        setMessages((prev) => (pageNum === 1 ? data : [...data, ...prev]))
+        setHasMore(start > 0)
       } else {
         setHasMore(false)
       }

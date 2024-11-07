@@ -5,6 +5,8 @@ import { useCommentSection } from '@/hooks'
 import { OfferMessage, Profile } from '@/types/supabase'
 import { timeAgoShort } from '@/utils/helpers'
 
+import { LoadMore } from '../shared/buttons'
+
 const MessageItem: React.FC<{ message: OfferMessage }> = ({ message }) => (
   <div className='group flex items-start space-x-2 rounded-md p-1.5 pr-4'>
     <Link
@@ -78,16 +80,14 @@ const CommentSection: React.FC<{
         onScroll={checkIfNearBottom}
       >
         {messages.length > 0 && hasMore && (
-          <button
-            className='bg-gray-100 py-2 px-6 text-gray-600 hover:bg-gray-200 transition-colors duration-300 text-sm font-medium my-4 mx-auto rounded-full shadow-sm flex items-center'
+          <LoadMore
+            isLoading={loading}
             onClick={() => {
               const nextPage = page + 1
               setPage(nextPage)
               fetchMessages(nextPage)
             }}
-          >
-            Load more
-          </button>
+          />
         )}
         {messages.map((message) => (
           <MessageItem key={message.id} message={message} />

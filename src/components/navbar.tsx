@@ -2,6 +2,7 @@
 
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { debounce } from 'lodash'
 
 import { AccountDropdown, NotificationDropdown } from '@/components/dropdowns'
@@ -13,6 +14,7 @@ import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
 const Navbar: FC = () => {
+  const router = useRouter()
   const { user, loading, profile, hasProfile, updateLastSeen } = useAuth()
   const isMobile = useIsMobile()
 
@@ -32,7 +34,7 @@ const Navbar: FC = () => {
   const searchRef = useRef<HTMLDivElement>(null)
 
   const performSearch = useCallback(async (term: string) => {
-    if (term.length < 1) {
+    if (term.length < 3) {
       setSearchResults({ nfts: [], users: [] })
       setIsSearching(false)
       return
@@ -134,6 +136,7 @@ const Navbar: FC = () => {
                 onClick={async () => {
                   await supabase.auth.signOut()
                   toggleMenu()
+                  router.push('/')
                 }}
               >
                 Logout
@@ -319,9 +322,30 @@ const Navbar: FC = () => {
           <div className='p-4 text-center text-sm text-gray-500'>
             <p>© TFT Labs</p>
             <div className='mt-2 space-x-2'>
-              <Link href='/about'>About</Link>
-              <Link href='/legal/terms'>Terms</Link>
-              <Link href='/legal/privacy'>Privacy</Link>
+              <Link
+                href='/about'
+                onClick={() => {
+                  toggleMenu()
+                }}
+              >
+                About
+              </Link>
+              <Link
+                href='/legal/terms'
+                onClick={() => {
+                  toggleMenu()
+                }}
+              >
+                Terms
+              </Link>
+              <Link
+                href='/legal/privacy'
+                onClick={() => {
+                  toggleMenu()
+                }}
+              >
+                Privacy
+              </Link>
               <Link href='https://discord.gg/qg6TeBuHeT' target='_blank'>
                 Discord
               </Link>
