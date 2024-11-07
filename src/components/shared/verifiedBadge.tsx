@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChainLogo, Etherscan, Opensea, Verified } from '@/icons'
-import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
+
+import { Etherscan, Opensea, Verified } from '@/icons'
 import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
+import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 
 interface NFTInfoPopupProps {
   id: string
   name: string
   isVerified: boolean
   chainId: string
-  chainName: string
   collectionName: string
   collectionContract: string
   tokenId: string
@@ -20,7 +20,6 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
   name,
   isVerified,
   chainId,
-  chainName,
   collectionName,
   collectionContract,
   tokenId,
@@ -102,7 +101,7 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
             </div>
 
             <div className='border-t border-gray-100'>
-              {options.map((option, index) => (
+              {options.map((option) => (
                 <button
                   key={option.label}
                   onClick={(e) => {
@@ -131,8 +130,8 @@ const VerifiedBadge: React.FC<NFTInfoPopupProps> = ({
                   className={`text-sm ${isVerified ? 'text-blue-600 font-medium' : 'text-gray-500'}`}
                 >
                   {isVerified
-                    ? `Verified on ${CHAIN_IDS_TO_CHAINS[String(chainId)]}`
-                    : `Not verified on ${CHAIN_IDS_TO_CHAINS[String(chainId)]}`}
+                    ? `Verified on ${CHAIN_IDS_TO_CHAINS[String(chainId) as unknown as keyof typeof CHAIN_IDS_TO_CHAINS]}`
+                    : `Not verified on ${CHAIN_IDS_TO_CHAINS[String(chainId) as unknown as keyof typeof CHAIN_IDS_TO_CHAINS]}`}
                 </span>
               </div>
             </div>

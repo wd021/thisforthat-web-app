@@ -66,7 +66,7 @@ const PWA = () => {
           <h3 className='font-semibold text-lg mb-2'>Get the This For That App</h3>
 
           <p className='text-gray-600 text-sm mb-3'>
-            While we're developing a mobile app, you can add TFT to your home screen by
+            While we&apos;re developing a mobile app, you can add TFT to your home screen by
             following the steps below.
           </p>
 

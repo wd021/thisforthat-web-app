@@ -17,9 +17,9 @@ const TermsPage = () => {
           <section className='mb-8'>
             <h2 className='text-xl font-semibold mb-4'>1. Acceptance of Terms</h2>
             <p className='mb-4'>
-              By accessing or using This For That (the "Platform"), you agree to be bound by
-              these Terms and Conditions. If you do not agree to these terms, please do not use
-              the Platform.
+              By accessing or using This For That (the `&quot;Platform`&quot;), you agree to be
+              bound by these Terms and Conditions. If you do not agree to these terms, please do
+              not use the Platform.
             </p>
           </section>
 
@@ -64,7 +64,7 @@ const TermsPage = () => {
               <li className='mb-2'>Impersonate others or provide false information</li>
               <li className='mb-2'>Engage in market manipulation or fraudulent activity</li>
               <li className='mb-2'>Harass or abuse other users</li>
-              <li className='mb-2'>Interfere with the Platform's security features</li>
+              <li className='mb-2'>Interfere with the Platform&apos;s security features</li>
             </ul>
           </section>
 
@@ -94,8 +94,8 @@ const TermsPage = () => {
           <section className='mb-8'>
             <h2 className='text-xl font-semibold mb-4'>8. Disclaimer of Warranties</h2>
             <p className='mb-4'>
-              The Platform is provided "as is" without warranties of any kind. We do not
-              guarantee uninterrupted or error-free service.
+              The Platform is provided &quot;as is&quot; without warranties of any kind. We do
+              not guarantee uninterrupted or error-free service.
             </p>
           </section>
 

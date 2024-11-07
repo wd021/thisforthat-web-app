@@ -5,13 +5,13 @@ import { MainTabOption, SubTabOption } from '@/types/main'
 
 const nftSubOptions = [
   { id: 'latest', label: 'Latest', emoji: '🕒' },
-  { id: 'following', label: 'Following', emoji: '👥' },
+  { id: 'following', label: 'My Friends', emoji: '👥' },
   { id: 'pinned', label: 'Pinned', emoji: '📌' },
 ]
 
 const offerSubOptions = [
   { id: 'my', label: 'My Offers', emoji: '👤' },
-  { id: 'following', label: 'Following', emoji: '👥' },
+  { id: 'following', label: 'My Friends', emoji: '👥' },
   { id: 'favorites', label: 'Favorites', emoji: '⭐' },
 ]
 

@@ -1,6 +1,10 @@
-import { Asset, assetTypeMap, OfferInfo, PreparedAsset } from '@/types/main'
+import { createPublicClient, http } from 'viem'
+import { anvil } from 'viem/chains'
 
-import { writeContract } from '@wagmi/core'
+import ABI from '@/contracts/abi.json'
+import { Asset, assetTypeMap, OfferInfo, PreparedAsset } from '@/types/main'
+import { OnchainTradeInfo, OnchainTradeInfoAsset } from '@/types/main'
+import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
 interface ChainInfo {
   id: string
@@ -266,19 +270,12 @@ export const prepareAllAssets = (offerInfo: OfferInfo): PreparedAsset[][] => {
   ]
 }
 
-import { getPublicClient } from '@wagmi/core'
-import { createPublicClient, createWalletClient, http, type PublicClient } from 'viem'
-import ABI from '@/contracts/abi.json'
-import { TradeInfo, TradeInfoAsset } from '@/types/main'
-import { CONTRACT_ADDRESSES } from '@/utils/contracts'
-import { anvil } from 'viem/chains'
-
 const formatTradeInfo = (
   isActive: boolean,
   depositedAssetCount: bigint,
   totalAssetCount: bigint,
-  assets: TradeInfoAsset[],
-): TradeInfo => {
+  assets: OnchainTradeInfoAsset[],
+): OnchainTradeInfo => {
   return {
     isActive,
     depositedAssetCount: Number(depositedAssetCount),
@@ -287,16 +284,16 @@ const formatTradeInfo = (
   }
 }
 
-const decodeAsset = (asset: TradeInfoAsset): TradeInfoAsset => {
+const decodeAsset = (asset: OnchainTradeInfoAsset): OnchainTradeInfoAsset => {
   if (typeof asset === 'object' && 'token' in asset) {
-    return asset as TradeInfoAsset
+    return asset as OnchainTradeInfoAsset
   }
   const { token, tokenId, amount, assetType, recipient, isDeposited } = asset
   return { token, tokenId, amount, assetType, recipient, isDeposited }
 }
 
 export async function getTradeInfo(tradeId: string | number): Promise<{
-  tradeInfo: TradeInfo | undefined
+  tradeInfo: OnchainTradeInfo | undefined
   isError: boolean
 }> {
   try {
@@ -311,7 +308,7 @@ export async function getTradeInfo(tradeId: string | number): Promise<{
         abi: ABI,
         functionName: 'getTradeInfo',
         args: [BigInt(tradeId)],
-      })) as [boolean, bigint, bigint, TradeInfoAsset[]]
+      })) as [boolean, bigint, bigint, OnchainTradeInfoAsset[]]
 
     const decodedAssets = encodedAssets.map(decodeAsset)
 

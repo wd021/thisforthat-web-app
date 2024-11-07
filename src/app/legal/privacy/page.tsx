@@ -17,10 +17,11 @@ const PrivacyPage = () => {
           <section className='mb-8'>
             <h2 className='text-xl font-semibold mb-4'>1. Introduction</h2>
             <p className='mb-4'>
-              This Privacy Policy explains how This For That ("we," "our," or "us") collects,
-              uses, shares, and protects user information in connection with our NFT trading
-              social network platform. We are committed to protecting your privacy while
-              providing a transparent and secure trading environment.
+              This Privacy Policy explains how This For That (&quot;we,&quot; &quot;our,&quot;
+              or &quot;us&quot;) collects, uses, shares, and protects user information in
+              connection with our NFT trading social network platform. We are committed to
+              protecting your privacy while providing a transparent and secure trading
+              environment.
             </p>
           </section>
 
@@ -111,7 +112,7 @@ const PrivacyPage = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-xl font-semibold mb-4'>8. Children's Privacy</h2>
+            <h2 className='text-xl font-semibold mb-4'>8. Children&apos;s Privacy</h2>
             <p className='mb-4'>
               Our platform is not intended for users under 18 years of age. We do not knowingly
               collect information from children.

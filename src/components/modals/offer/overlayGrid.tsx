@@ -47,7 +47,6 @@ const NFTItem: React.FC<{
       </div>
       <div className='p-3'>
         <h3 className='text-sm font-medium text-gray-900 truncate'>{item.nfts.name}</h3>
-        {/* You can add collection name here if available in your UserNFT type */}
         {item.nfts.collection_name && (
           <p className='text-xs text-gray-500 mt-1 truncate'>{item.nfts.collection_name}</p>
         )}
