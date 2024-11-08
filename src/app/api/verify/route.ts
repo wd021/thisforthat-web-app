@@ -1,60 +1,98 @@
-// TODO: add fallback of quicknode / moralis if fail with too many requests
-// if valid verifications > 0 but hits error, return the valid verifications
-
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 
-import {
-  ALCHEMY_CHAIN_ID_SLUGS,
-  CHAIN_IDS_TO_CHAINS,
-  NFT_VERIFY_LIMIT,
-} from '@/utils/constants'
+import { ALCHEMY_CHAIN_ID_SLUGS, NFT_VERIFY_LIMIT, PUNK_VERIFY_LIMIT } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
-async function fetchAlchemyOwnership(chain, contractAddress, tokenId) {
-  const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_ID
-  const url = `https://${ALCHEMY_CHAIN_ID_SLUGS[chain]}.g.alchemy.com/nft/v2/${apiKey}/getOwnersForToken/?contractAddress=${contractAddress}&tokenId=${tokenId}`
-  const response = await fetch(url, { method: 'get', redirect: 'follow' })
-
-  console.log('fetchAlchemyOwnership', response, chain, contractAddress, tokenId)
-  if (!response.ok) {
-    throw new Error('Failed to fetch NFT metadata from Alchemy')
-  }
-  return response.json()
+interface AlchemyNFT {
+  contractAddress: string
+  tokenId: string
+  balance: string
 }
 
-async function fetchCryptoPunkOwnership(contractAddress, tokenId) {
-  const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_ID
-  const url = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`
-  const payload = {
+interface AlchemyResponse {
+  ownedNfts: AlchemyNFT[]
+  totalCount: number
+  pageKey: string | null
+}
+
+async function fetchNFTsForOwner(
+  chain: string,
+  ownerAddress: string,
+  contractAddresses: string[],
+) {
+  const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+  const baseUrl = `https://${ALCHEMY_CHAIN_ID_SLUGS[chain]}.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner`
+
+  const params = new URLSearchParams({
+    owner: ownerAddress,
+    contractAddresses: JSON.stringify(contractAddresses),
+    withMetadata: 'false',
+    pageSize: '100',
+  })
+
+  const response = await fetch(`${baseUrl}?${params}`, {
+    method: 'get',
+    redirect: 'follow',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch NFTs from Alchemy')
+  }
+  return response.json() as Promise<AlchemyResponse>
+}
+
+async function getPunkOwner(contractAddress: string, tokenId: string) {
+  const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+  const ALCHEMY_URL = `https://eth-mainnet.g.alchemy.com/v2/${apiKey}`
+
+  // Create the function signature for punkIndexToAddress(uint256)
+  const functionSelector = '0x58178168' // First 4 bytes of keccak256(functionSignature)
+
+  // Encode the punk index parameter (pad to 32 bytes)
+  const paddedIndex = parseInt(tokenId).toString(16).padStart(64, '0')
+
+  // Combine function selector and encoded parameter
+  const data = `${functionSelector}${paddedIndex}`
+
+  const body = {
     jsonrpc: '2.0',
+    id: 1,
     method: 'eth_call',
     params: [
       {
         to: contractAddress,
-        data: `0x3b3b57de${tokenId.toString(16).padStart(64, '0')}`, // 'punkIndexToAddress(uint256)' selector + tokenId
+        data: data,
       },
       'latest',
     ],
-    id: 1,
   }
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-  if (!response.ok) {
-    throw new Error('Failed to fetch CryptoPunk ownership from contract')
+
+  try {
+    const response = await fetch(ALCHEMY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+    const json = await response.json()
+
+    if (json.error) {
+      throw new Error(`RPC Error: ${json.error.message}`)
+    }
+
+    // The result is a 32-byte address, remove '0x' and leading zeros
+    const address = `0x${json.result.slice(-40)}`
+    return address.toLowerCase()
+  } catch (error) {
+    console.error('Error fetching punk owner:', error)
+    throw error
   }
-  const result = await response.json()
-  return result.result
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function POST(req: any) {
   const headersList = headers()
   const authorization = headersList.get('authorization')
@@ -70,20 +108,46 @@ export async function POST(req: any) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const { address, chain, signature } = await req.json()
+  const { address, chain, signature, nftIds } = await req.json()
 
-  if (!address || !chain || !signature) {
+  if (!address || !chain || !signature || !nftIds || !Array.isArray(nftIds)) {
     return new Response('Incorrect request params', { status: 400 })
   }
 
+  // Validate NFT limits
+  if (nftIds.length > NFT_VERIFY_LIMIT) {
+    return new Response('Too many NFTs selected', { status: 400 })
+  }
+
   try {
+    // Fetch NFT details for the selected IDs
+    const { data: userNftData, error: nftError } = await supabase
+      .from('user_nfts')
+      .select(`*, nfts!inner(*)`)
+      .eq('user_id', data.user.id)
+      .eq('wallet_address', address.toLowerCase())
+      .in('nft_id', nftIds)
+
+    if (nftError) {
+      return new Response(JSON.stringify(nftError), { status: 500 })
+    }
+
+    if (!userNftData || userNftData.length === 0) {
+      return new Response('No NFTs found for the provided IDs', { status: 400 })
+    }
+
+    // Validate punk limit
+    const punkCount = userNftData.filter((nft) => nft.nfts.token_type === 'CRYPTOPUNK').length
+    if (punkCount > PUNK_VERIFY_LIMIT) {
+      return new Response('Too many CryptoPunks selected', { status: 400 })
+    }
+
     const publicClient = createPublicClient({
       chain: mainnet,
       transport: http(),
     })
 
     const message = `Verify ownership of NFTs for wallet ${address} on ${CHAIN_IDS_TO_CHAINS[chain]}`
-
     const valid = await publicClient.verifyMessage({
       address,
       message,
@@ -92,85 +156,116 @@ export async function POST(req: any) {
 
     if (!valid) {
       return new Response('Verification failed', { status: 400 })
-    } else {
-      const { data: userNftData, error } = await supabase
-        .from('user_nfts')
-        .select(`*, nfts!inner(*)`)
-        .eq('user_id', data.user.id)
-        .eq('wallet_address', address)
-        .or(`nfts.is_verified.eq.false,nfts.user_id.neq.${data.user.id}`)
-        .limit(NFT_VERIFY_LIMIT)
-
-      if (error) {
-        return new Response('Failed to fetch NFT data', { status: 500 })
-      }
-
-      let validVerifications = 0
-
-      for (const userNft of userNftData) {
-        let isOwner = false
-        let newWalletAddress = null
-
-        if (userNft.nfts.token_type === 'ERC721' || userNft.nfts.token_type === 'ERC1155') {
-          const response = await fetchAlchemyOwnership(
-            chain,
-            userNft.nfts.collection_contract,
-            userNft.nfts.token_id,
-          )
-
-          // erc1155 can have multiple owners - we only deal with 1 owner NFTS for now
-          if (response.owners.length === 1) {
-            if (response.owners[0].toLowerCase() === address.toLowerCase()) {
-              isOwner = true
-            } else {
-              newWalletAddress = response.owners[0].toLowerCase()
-            }
-          }
-        } else if (userNft.nfts.token_type === 'CRYPTOPUNK') {
-          const owner = await fetchCryptoPunkOwnership(
-            userNft.nfts.collection_contract,
-            userNft.nfts.token_id,
-          )
-
-          if (owner.toLowerCase() === address.toLowerCase()) {
-            isOwner = true
-          } else {
-            newWalletAddress = owner.toLowerCase()
-          }
-        }
-
-        if (isOwner) {
-          // Update Supabase to mark the NFT as verified
-          const { error: updateError } = await supabase
-            .from('nfts')
-            .update({
-              is_verified: true,
-              verified_at: new Date().toISOString(),
-              user_id: data.user.id,
-            })
-            .eq('id', userNft.nfts.id)
-
-          if (updateError) {
-            console.error('Error updating NFT verification status:', updateError)
-          } else {
-            validVerifications++
-          }
-        } else if (newWalletAddress) {
-          const { error: updateWalletError } = await supabase
-            .from('nfts')
-            .update({ wallet_address: newWalletAddress })
-            .eq('id', userNft.nfts.id)
-
-          if (updateWalletError) {
-            console.error('Error updating wallet address:', updateWalletError)
-          }
-        }
-      }
-
-      return NextResponse.json({ validVerifications }, { status: 200 })
     }
+
+    // Group NFTs by type
+    const standardNfts = userNftData.filter(
+      (nft) => nft.nfts.token_type === 'ERC721' || nft.nfts.token_type === 'ERC1155',
+    )
+    const cryptoPunks = userNftData.filter((nft) => nft.nfts.token_type === 'CRYPTOPUNK')
+
+    let validVerifications = 0
+    let punkVerifications = 0
+    const verifiedNftIds: string[] = []
+    const walletUpdates: Array<{ id: string; wallet_address: string }> = []
+
+    // Handle standard NFTs (ERC721 & ERC1155)
+    if (standardNfts.length > 0) {
+      const contractAddresses = [
+        ...new Set(standardNfts.map((nft) => nft.nfts.collection_contract)),
+      ]
+      const ownedNFTs = await fetchNFTsForOwner(chain, address, contractAddresses)
+
+      for (const nft of standardNfts) {
+        if (validVerifications >= NFT_VERIFY_LIMIT) break
+
+        const isOwned = ownedNFTs.ownedNfts.some((ownedNft) => {
+          const contractMatches =
+            ownedNft.contractAddress.toLowerCase() ===
+            nft.nfts.collection_contract.toLowerCase()
+          const tokenIdMatches = ownedNft.tokenId === nft.nfts.token_id
+          const hasBalance = parseInt(ownedNft.balance) > 0
+          return contractMatches && tokenIdMatches && hasBalance
+        })
+
+        if (isOwned) {
+          verifiedNftIds.push(nft.nfts.id)
+          validVerifications++
+        }
+      }
+    }
+
+    // Handle CryptoPunks
+    if (cryptoPunks.length > 0) {
+      for (const punk of cryptoPunks) {
+        if (validVerifications >= NFT_VERIFY_LIMIT) break
+
+        const owner = await getPunkOwner(punk.nfts.collection_contract, punk.nfts.token_id)
+
+        if (owner === address.toLowerCase()) {
+          verifiedNftIds.push(punk.nfts.id)
+          validVerifications++
+          punkVerifications++
+        } else if (owner) {
+          walletUpdates.push({
+            id: punk.nfts.id,
+            wallet_address: owner,
+          })
+        }
+      }
+    }
+
+    // Perform batch verification update
+    if (verifiedNftIds.length > 0) {
+      const { error: verifyError } = await supabase
+        .from('nfts')
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          user_id: data.user.id,
+        })
+        .in('id', verifiedNftIds)
+        .eq('wallet_address', address.toLowerCase())
+
+      if (verifyError) {
+        console.error('Error updating NFT verification status:', verifyError)
+        return new Response('Failed to update NFTs', { status: 500 })
+      }
+    }
+
+    // Handle wallet address updates
+    if (walletUpdates.length > 0) {
+      for (const update of walletUpdates) {
+        const { error: walletError } = await supabase
+          .from('nfts')
+          .update({ wallet_address: update.wallet_address })
+          .eq('id', update.id)
+          .eq('wallet_address', address.toLowerCase())
+
+        if (walletError) {
+          console.error('Error updating wallet address:', walletError)
+          // Continue with other updates even if one fails
+        }
+      }
+    }
+
+    return NextResponse.json(
+      {
+        validVerifications,
+        punkVerifications,
+        limitReached: validVerifications === NFT_VERIFY_LIMIT,
+        punkLimitReached: punkVerifications === PUNK_VERIFY_LIMIT,
+        remainingPunkVerifications: Math.max(0, PUNK_VERIFY_LIMIT - punkVerifications),
+        remainingVerifications: Math.max(0, NFT_VERIFY_LIMIT - validVerifications),
+      },
+      { status: 200 },
+    )
   } catch (error) {
-    console.error('Upload processing error:', error)
-    return new Response('Upload failed', { status: 500 })
+    console.error('Verification processing error:', error)
+    // return error
+    return NextResponse.json(
+      { error: 'Failed to verify NFTs', message: error },
+      { status: 500 },
+    )
   }
 }
