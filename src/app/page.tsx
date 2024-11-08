@@ -7,60 +7,76 @@ import { supabase } from "@/utils/supabaseClient";
 export default function Home() {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addToWaitlist = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { data } = await supabase
-      .from("waitlist")
-      .upsert({
-        email,
-      })
-      .select();
+    setIsLoading(true);
 
-    if (data) {
-      setSuccess(true);
+    try {
+      const { data } = await supabase
+        .from("waitlist")
+        .upsert({
+          email,
+        })
+        .select();
+
+      if (data) {
+        setSuccess(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center flex-col">
-      <Image src="/logo.png" alt="This for That" width={200} height={200} />
-      <div className="text-2xl w-[360px] text-center">
-        A Space Where We Swap NFTs for NFTs
-      </div>
-      {!success && (
-        <>
-          <div className="mt-8 mb-4 text-lg">
-            Launching in the coming weeks...
-          </div>
-          <form
-            onSubmit={addToWaitlist}
-            className="w-full px-4 max-w-[400px] space-y-4"
-          >
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50">
+      <div className="w-full max-w-md px-6 py-12 text-center">
+        <Image
+          src="/logo.png"
+          alt="This for That"
+          width={240}
+          height={240}
+          className="mx-auto"
+        />
+
+        <h1 className="text-3xl font-bold mb-3">
+          NFTS were made to be swapped
+        </h1>
+
+        <p className="text-gray-600 mb-8 mt-8">
+          Coming soon on Ethereum, Base, Optimism & more.
+        </p>
+
+        {!success ? (
+          <form onSubmit={addToWaitlist} className="space-y-4">
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 bg-gray-200 rounded-md w-full p-4"
-              placeholder="you@example.com"
+              className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="Enter your email"
             />
+
             <button
               type="submit"
-              className="w-full p-4 border border-transparent rounded-md shadow-sm bg-blue-800 text-white text-lg"
+              disabled={isLoading}
+              className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              Notify Me
+              {isLoading ? "Adding..." : "Join Waitlist"}
             </button>
           </form>
-        </>
-      )}
-      {success && (
-        <div className="mt-12 text-gray-800 font-semibold px-10 text-center">
-          Done, we&apos;ll notify you when the app is live. It&apos;s coming
-          soon!
-        </div>
-      )}
+        ) : (
+          <div className="bg-blue-50 border border-blue-100 rounded-lg p-6">
+            <p className="text-gray-800 font-medium">
+              Thanks! We'll notify you when we launch.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
