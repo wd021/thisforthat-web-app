@@ -282,34 +282,23 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   if (verificationResult) {
     return (
-      <div className='fixed inset-0 z-50'>
-        {/* Backdrop */}
-        <div className='absolute inset-0 bg-black/50 transition-opacity' onClick={onClose} />
-
-        {/* Modal */}
-        <div className='absolute inset-0 flex items-center justify-center p-4'>
-          <div
-            className='relative bg-white rounded-xl max-w-sm w-full p-6 text-center shadow-xl'
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Success Icon */}
-            <div className='bg-green-50 p-4 rounded-full inline-block mb-4'>
-              <Checkmark className='w-12 h-12 text-green-500' />
-            </div>
-
-            {/* Title */}
-            <h3 className='text-lg font-semibold text-gray-900'>Verification Complete</h3>
-
-            {/* Done Button */}
-            <button
-              onClick={onClose}
-              className='mt-6 w-full p-3 bg-blue-500 text-white rounded-lg font-medium 
+      <div className='flex'>
+        <div
+          className='w-full relative bg-white rounded-xl w-full p-6 text-center shadow-xl'
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className='bg-green-50 p-4 rounded-full inline-block mb-4'>
+            <Checkmark className='w-12 h-12 text-green-500' />
+          </div>
+          <h3 className='text-lg font-semibold text-gray-900'>Verification Complete</h3>
+          <button
+            onClick={onClose}
+            className='mt-6 w-full p-3 bg-blue-500 text-white rounded-lg font-medium 
                      hover:bg-blue-600 transition-colors focus:outline-none 
                      focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-            >
-              Done
-            </button>
-          </div>
+          >
+            Done
+          </button>
         </div>
       </div>
     )
