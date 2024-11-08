@@ -40,7 +40,7 @@ const NFTGridObject: FC<{
             collectionName={item.nft_collection_name}
             tokenId={item.nft_token_id}
             isVerified={item.nft_is_verified}
-            className='w-10 h-10 flex items-center justify-center'
+            className='w-8 h-8 flex items-center justify-center shrink-0'
             chainId={item.nft_chain_id.toString()}
             collectionContract={item.nft_collection_contract}
           />

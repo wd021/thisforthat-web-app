@@ -10,7 +10,7 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
     <NFTImage src={item.nfts.image} alt={item.nfts.name} fallback={item.nfts.name} />
     <div className='flex justify-between px-3 py-1.5'>
       <div
-        className='flex items-center w-full'
+        className='flex items-center w-full truncate'
         onClick={(e) => {
           e.preventDefault()
           window.open(`/${profile.username}`, '_blank')
@@ -30,7 +30,7 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
         collectionName={item.nfts.collection_name}
         tokenId={item.nfts.token_id}
         isVerified={item.nfts.is_verified && item.nfts.user_id === item.user_id}
-        className='w-10 h-10 flex items-center justify-center'
+        className='w-8 h-8 flex items-center justify-center shrink-0'
         chainId={item.nfts.chain_id.toString()}
         collectionContract={item.nfts.collection_contract}
       />

@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
+import { Address } from 'viem'
 
+import { LoadingIndicator } from '@/components/shared'
+import { Close } from '@/icons'
 import { OnchainTradeInfoAsset } from '@/types/main'
 import { SimplifiedNFTAsset } from '@/types/supabase'
-import { Close } from '@/icons'
-import { Address } from 'viem'
 
 import DepositCard from './depositCard'
 
@@ -37,7 +38,7 @@ const DepositTx = ({
   }).length
 
   return (
-    <div className='bg-white rounded-3xl shadow-lg flex flex-col overflow-hidden'>
+    <div className={`bg-white rounded-3xl shadow-lg flex flex-col overflow-hidden h-full`}>
       {/* Header */}
       <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div className='flex flex-col'>
@@ -49,7 +50,7 @@ const DepositTx = ({
       </div>
 
       {/* Deposit Section */}
-      <div className='bg-white rounded-lg overflow-hidden'>
+      <div className='bg-white overflow-y-auto custom-scrollbar'>
         {assets.map((asset, index) => {
           return (
             <DepositCard
@@ -72,13 +73,22 @@ const DepositTx = ({
       </div>
 
       {/* Footer Done */}
-      <div className='flex justify-center p-4'>
+      <div className='p-4 space-y-2'>
         <button
           onClick={onFinish}
           disabled={depositsRemaining > 0}
-          className='w-full p-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700'
+          className={`
+            w-full p-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2
+            ${
+              depositsRemaining > 0
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 shadow-sm hover:shadow-md'
+            }
+          `}
         >
-          Continue
+          <span>
+            {depositsRemaining > 0 ? `Complete All Deposits to Continue` : 'Continue'}
+          </span>
         </button>
       </div>
     </div>

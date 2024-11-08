@@ -30,6 +30,7 @@ const getDepositCount = (
   },
   tradeInfo: OnchainTradeInfo | null,
 ): number => {
+  console.log('getDepositCount', user)
   const userAssets = user === 'creator' ? assets.creator : assets.counterparty
 
   if (!tradeInfo?.assets || !userAssets) return 0
@@ -101,6 +102,8 @@ const TransactionModal: React.FC<{
     if (user && componentToShow === 'pending') {
       const isCreator = user.id === transactionInfo.users.creator.id
 
+      console.log('assets', transactionInfo.assets)
+
       const userDepositCount = getDepositCount(
         isCreator ? 'creator' : 'counterparty',
         transactionInfo.onchain.id,
@@ -108,6 +111,8 @@ const TransactionModal: React.FC<{
         transactionInfo.assets,
         onchainInfo,
       )
+
+      console.log('userDepositCount', userDepositCount)
 
       const counterDepositCount = getDepositCount(
         isCreator ? 'counterparty' : 'creator',
@@ -117,7 +122,6 @@ const TransactionModal: React.FC<{
         onchainInfo,
       )
 
-      console.log('userDepositCount', userDepositCount)
       console.log('counterDepositCount', counterDepositCount)
       console.log('isCreator', isCreator)
 
@@ -170,6 +174,7 @@ const TransactionModal: React.FC<{
             onClose={closeModal}
             onFinish={async () => {
               if (counterDepositCount === 0) {
+                // this took some time, need a loading screen
                 const {
                   data: { session },
                 } = await supabase.auth.getSession()

@@ -151,8 +151,8 @@ const TransactionFeed: React.FC<{
                   },
                 },
                 assets: {
-                  creator: item.counterparty_assets,
-                  counterparty: item.creator_assets,
+                  creator: item.creator_assets,
+                  counterparty: item.counterparty_assets,
                 },
               },
               onchainInfo: item.onchain_trade_id ? statusMap.get(item.onchain_trade_id) : null,

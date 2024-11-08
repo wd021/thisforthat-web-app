@@ -87,7 +87,7 @@ const StatusBadge = ({ status, isDeposited }) => (
   </span>
 )
 
-const NFTCard = ({ asset, status, isDeposited, recipient }) => (
+const NFTCard = ({ asset }) => (
   <Link
     href={`/nfts/${asset.nft_id}`}
     target='_blank'
@@ -142,18 +142,26 @@ const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
 
 const TradeSection = ({ username, profilePic, assets, onchainInfo, status }) => {
   const isCompleted = status === 'onchain_cancelled' || status === 'onchain_completed'
-  const depositedCount =
-    onchainInfo?.assets.reduce((count, asset) => (asset.isDeposited ? count + 1 : count), 0) ||
-    0
+  const depositedCount = assets.reduce((count, asset) => {
+    const isDeposited = onchainInfo?.assets.some(
+      (onchainAsset) =>
+        onchainAsset.token.toLowerCase() === asset.collection_contract.toLowerCase() &&
+        onchainAsset.tokenId.toString() === asset.token_id &&
+        onchainAsset.isDeposited,
+    )
+    return isDeposited ? count + 1 : count
+  }, 0)
 
   return (
     <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
       <div className='flex items-center gap-2 mb-2'>
-        <img
-          src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
-          alt={username}
-          className='w-6 h-6 rounded-full ml-2 object-cover'
-        />
+        <Link href={`/${username}`} target='_blank'>
+          <img
+            src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
+            alt={username}
+            className='w-6 h-6 rounded-full ml-2 object-cover'
+          />
+        </Link>
         <div className='flex items-center justify-between w-full'>
           <span className='text-sm font-medium'>{username}</span>
           {!isCompleted && (
@@ -165,20 +173,7 @@ const TradeSection = ({ username, profilePic, assets, onchainInfo, status }) => 
       </div>
       <div className='space-y-2'>
         {assets.map((asset) => {
-          const onchainAsset = onchainInfo?.assets.find(
-            (a) => a.tokenId.toString() === asset.token_id,
-          )
-          return (
-            (onchainAsset || isCompleted) && (
-              <NFTCard
-                key={asset.nft_id}
-                asset={asset}
-                status={status}
-                isDeposited={onchainAsset?.isDeposited}
-                recipient={onchainAsset?.recipient}
-              />
-            )
-          )
+          return <NFTCard key={asset.nft_id} asset={asset} />
         })}
       </div>
     </div>

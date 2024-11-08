@@ -2,7 +2,7 @@ import { Close } from '@/icons'
 
 const CompletedTx = ({ onClose }: { onClose: () => void }) => {
   return (
-    <div className='w-full max-w-2xl bg-white rounded-lg shadow-xl'>
+    <div className='w-full max-w-2xl bg-white rounded-lg shadow-xl h-full'>
       <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div className='flex flex-col'>
           <h2 className='text-xl text-gray-900 font-medium mb-1'>Trade Completed</h2>

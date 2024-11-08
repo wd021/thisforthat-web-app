@@ -34,7 +34,7 @@ const NFTSidebar: React.FC<{
             <Link
               href={`/${nft.user_profile.username}`}
               target='_blank'
-              className='flex items-center'
+              className='flex items-center truncate'
             >
               <img
                 src={
@@ -53,7 +53,7 @@ const NFTSidebar: React.FC<{
               collectionName={nft.collection_name}
               tokenId={nft.token_id}
               isVerified={nft.is_verified}
-              className='w-10 h-10 flex items-center justify-center'
+              className='w-8 h-8 flex items-center justify-center shrink-0'
               chainId={nft.chain_id.toString()}
               collectionContract={nft.collection_contract}
             />
@@ -109,7 +109,6 @@ const NFTTitle: React.FC<{ nft: NFT }> = ({ nft }) => {
     <div className='w-full bg-white p-3 md:p-4 mb-4 rounded-lg shadow-sm'>
       <div className='flex items-center justify-between px-1'>
         <div className='flex items-center'>
-          <ChainLogo chainId={nft.chain_id} className='w-6 h-6 mr-2 md:w-8 md:h-8' />
           <div>
             <h2 className='md:text-lg lg:text-xl font-bold text-gray-800'>{nft.name}</h2>
             <p className='text-sm text-gray-500'>{nft.collection_name}</p>

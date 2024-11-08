@@ -1,12 +1,15 @@
-import { NFTImage } from '@/components/shared'
-import { useDepositSingleAsset } from '@/hooks/useDepositSingleAsset'
-import { SimplifiedNFTAsset } from '@/types/supabase'
-import { Address } from 'viem'
-import { CONTRACT_ADDRESSES } from '@/utils/contracts'
-import { AssetType } from '@/types/main'
 import { useEffect, useState } from 'react'
+import { Address } from 'viem'
+
+import { NFTImage } from '@/components/shared'
+import { LoadingIndicator } from '@/components/shared'
 import { useApproveAsset } from '@/hooks/useApproveAsset'
 import { useDepositAsset } from '@/hooks/useDepositAsset'
+import { useDepositSingleAsset } from '@/hooks/useDepositSingleAsset'
+import { Checkmark } from '@/icons'
+import { AssetType } from '@/types/main'
+import { SimplifiedNFTAsset } from '@/types/supabase'
+import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
 const DepositCard = ({
   tradeId,
@@ -64,7 +67,6 @@ const DepositCard = ({
     }
   }, [asset, needsApproval, isDeposited, checkApproval])
 
-  // Reset approval state when approval is confirmed
   useEffect(() => {
     if (isApprovalConfirmed) {
       setNeedsApproval(false)
@@ -88,51 +90,72 @@ const DepositCard = ({
 
   const getButtonText = () => {
     if (isCheckingApproval) return 'Checking Approval...'
-    if (isApprovalPending || isApprovalConfirming) return 'Approving...'
-    if (isDepositPending || isDepositConfirming) return 'Depositing...'
+    if (isApprovalPending) return 'Waiting for Approval...'
+    if (isApprovalConfirming) return 'Confirming Approval...'
+    if (isDepositPending) return 'Waiting for Deposit...'
+    if (isDepositConfirming) return 'Confirming Deposit...'
     return needsApproval ? 'Approve Asset' : 'Deposit Asset'
   }
+
+  const isLoading =
+    isCheckingApproval ||
+    isApprovalPending ||
+    isApprovalConfirming ||
+    isDepositPending ||
+    isDepositConfirming
 
   useEffect(() => {
     if (isDepositConfirmed) onFinish()
   }, [isDepositConfirmed])
 
   return (
-    <div key={asset.nft_id} className='flex items-center p-6'>
-      <div className='w-12 h-12'>
+    <div className='flex items-center p-6 border-b border-gray-100'>
+      <div className='w-12 h-12 relative'>
         <NFTImage src={asset?.image} alt={asset?.name} fallback={asset?.name} rounded='all' />
+        {isDeposited && (
+          <div className='absolute -right-1 -bottom-1 bg-green-500 rounded-full p-1'>
+            <Checkmark className='w-3 h-3 text-white' />
+          </div>
+        )}
       </div>
-      <div className='ml-2 flex-1 flex flex-col gap-y-1 truncate'>
-        <p className='text-sm font-medium text-gray-900'>{asset.name}</p>
-        <p className='text-xs text-gray-500 truncate'>Token ID: {asset.token_id}</p>
+
+      <div className='ml-3 flex-1 flex flex-col gap-y-1'>
+        <div className='flex items-center gap-x-2'>
+          <p className='text-sm font-medium text-gray-900'>{asset.name}</p>
+          {isDeposited && (
+            <span className='px-2 py-0.5 text-xs font-medium bg-green-50 text-green-700 rounded-full'>
+              Deposited
+            </span>
+          )}
+        </div>
+        <p className='text-xs text-gray-500'>Token ID: {asset.token_id}</p>
       </div>
+
       {isDeposited ? (
-        <div>deposited</div>
+        <div className='flex items-center text-green-600 gap-x-1.5'>
+          <Checkmark className='w-4 h-4' />
+          <span className='text-sm font-medium'>Complete</span>
+        </div>
       ) : (
         <button
           onClick={onClickDeposit}
-          disabled={
-            isCheckingApproval ||
-            isApprovalPending ||
-            isApprovalConfirming ||
-            isDepositPending ||
-            isDepositConfirming ||
-            needsApproval === null
-          }
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors
+          disabled={isLoading || needsApproval === null}
+          className={`
+            px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
+            flex items-center gap-x-2 min-w-[140px] justify-center
             ${
-              isCheckingApproval ||
-              isApprovalPending ||
-              isApprovalConfirming ||
-              isDepositPending ||
-              isDepositConfirming
-                ? 'bg-gray-100 text-gray-500'
+              isLoading
+                ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                 : needsApproval
-                  ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
-                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-            }`}
+                  ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 active:bg-yellow-200'
+                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200'
+            }
+          `}
         >
-          {getButtonText()}
+          {isLoading && (
+            <LoadingIndicator className='!w-4 !h-4 !border-[2px] !border-gray-500 !border-t-transparent' />
+          )}
+          <span>{getButtonText()}</span>
         </button>
       )}
     </div>

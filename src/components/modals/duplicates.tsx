@@ -34,8 +34,8 @@ const Duplicates: React.FC<{
         </div>
         <div className='m-4 bg-amber-50 border border-amber-200 rounded-md p-3'>
           <p className='text-sm text-amber-700'>
-            Multiple users have added this NFT to their account. This duplication will be
-            resolved once a user verifies their ownership.
+            Multiple users have added this NFT to their accounts. When someone verifies
+            ownership, the NFT will be linked to a single account
           </p>
         </div>
         <div className='flex-1 overflow-y-auto hide-scrollbar'>
