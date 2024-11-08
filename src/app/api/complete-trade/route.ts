@@ -7,7 +7,6 @@ import { anvil, mainnet } from 'viem/chains'
 import ABI from '@/contracts/abi.json'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 import { createTokenIdRecipientMapping } from '@/utils/helpers'
-import { supabase } from '@/utils/supabaseClient'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +29,7 @@ export async function POST(req: Request) {
   }
 
   const token = authorization.split(' ')[1]
-  const { data: authData, error: authError } = await supabase.auth.getUser(token)
+  const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(token)
 
   if (authError || !authData) {
     return new Response('Unauthorized', { status: 401 })
@@ -44,7 +43,7 @@ export async function POST(req: Request) {
       return new Response('Missing offer_id', { status: 400 })
     }
 
-    const { data: offerData, error: offerError } = await supabase
+    const { data: offerData, error: offerError } = await supabaseAdmin
       .from('offers')
       .select('*')
       .eq('id', offer_id)
@@ -99,13 +98,12 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ status: 'confirm-completed' }, { status: 200 })
     } else {
-      const { error } = await supabaseAdmin
-        .from('offers')
-        .update({ status: 'onchain_cancelled', onchain_done: true })
-        .eq('id', offer_id)
-
+      // Complete the swap using service role
+      const { error } = await supabaseAdmin.rpc('cancel_onchain_swap', {
+        p_offer_id: offer_id,
+      })
       if (error) {
-        console.error('Error completing swap:', error)
+        console.error('Error cancelling swap:', error)
         return new Response(error.message, { status: 500 })
       }
 

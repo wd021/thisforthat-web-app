@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 
@@ -10,6 +11,17 @@ import {
   PUNK_VERIFY_LIMIT,
 } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  },
+)
 
 interface AlchemyNFT {
   contractAddress: string
@@ -107,7 +119,7 @@ export async function POST(req: any) {
   }
 
   const token = authorization.split(' ')[1]
-  const { data, error } = await supabase.auth.getUser(token)
+  const { data, error } = await supabaseAdmin.auth.getUser(token)
 
   if (error || !data) {
     return new Response('Unauthorized', { status: 401 })
@@ -126,7 +138,7 @@ export async function POST(req: any) {
 
   try {
     // Fetch NFT details for the selected IDs
-    const { data: userNftData, error: nftError } = await supabase
+    const { data: userNftData, error: nftError } = await supabaseAdmin
       .from('user_nfts')
       .select(`*, nfts!inner(*)`)
       .eq('user_id', data.user.id)
@@ -222,7 +234,7 @@ export async function POST(req: any) {
 
     // Perform batch verification update
     if (verifiedNftIds.length > 0) {
-      const { error: verifyError } = await supabase
+      const { error: verifyError } = await supabaseAdmin
         .from('nfts')
         .update({
           is_verified: true,
@@ -241,7 +253,7 @@ export async function POST(req: any) {
     // Handle wallet address updates
     if (walletUpdates.length > 0) {
       for (const update of walletUpdates) {
-        const { error: walletError } = await supabase
+        const { error: walletError } = await supabaseAdmin
           .from('nfts')
           .update({ wallet_address: update.wallet_address })
           .eq('id', update.id)
