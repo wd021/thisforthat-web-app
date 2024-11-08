@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
 
 import OfferGrid from './offerGrid'
@@ -12,11 +14,13 @@ const UserSection: React.FC<{
   <div className={`p-6 relative ${bg} border-b border-gray-200`}>
     <div className='flex items-center justify-between mb-6'>
       <div className='flex items-center'>
-        <img
-          src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + user?.profile_pic_url}
-          alt={user?.username}
-          className='w-12 h-12 rounded-full border-2 border-white shadow-md object-cover'
-        />
+        <Link href={`/${user?.username}`} target='_blank'>
+          <img
+            src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + user?.profile_pic_url}
+            alt={user?.username}
+            className='w-12 h-12 rounded-full border-2 border-white shadow-md object-cover'
+          />
+        </Link>
         <div className='ml-3'>
           <div className='text-lg font-semibold text-gray-900'>{user?.username}</div>
           <div className='text-sm text-gray-500'>{items.length} NFTs selected</div>

@@ -160,11 +160,15 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         .from('user_nfts')
         .select(`id, user_id, nft_id, wallet_address, nfts!inner(*)`)
         .eq('user_id', userId)
-        .eq('nfts.is_verified', false)
 
       if (error) throw error
 
       const groupedNfts = data.reduce((acc: { [key: string]: NFTGroup }, item: any) => {
+        // Skip if the NFT is already verified by the current user
+        if (item.nfts.is_verified && item.nfts.user_id === userId) {
+          return acc
+        }
+
         const key = `${item.nfts.chain_id}-${item.wallet_address}`
         if (!acc[key]) {
           acc[key] = {
@@ -276,6 +280,41 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     )
   }
 
+  if (verificationResult) {
+    return (
+      <div className='fixed inset-0 z-50'>
+        {/* Backdrop */}
+        <div className='absolute inset-0 bg-black/50 transition-opacity' onClick={onClose} />
+
+        {/* Modal */}
+        <div className='absolute inset-0 flex items-center justify-center p-4'>
+          <div
+            className='relative bg-white rounded-xl max-w-sm w-full p-6 text-center shadow-xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Success Icon */}
+            <div className='bg-green-50 p-4 rounded-full inline-block mb-4'>
+              <Checkmark className='w-12 h-12 text-green-500' />
+            </div>
+
+            {/* Title */}
+            <h3 className='text-lg font-semibold text-gray-900'>Verification Complete</h3>
+
+            {/* Done Button */}
+            <button
+              onClick={onClose}
+              className='mt-6 w-full p-3 bg-blue-500 text-white rounded-lg font-medium 
+                     hover:bg-blue-600 transition-colors focus:outline-none 
+                     focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (selectedGroup) {
     const hasCryptoPunks = selectedGroup.nfts.some((nft) => nft.token_type === 'CRYPTOPUNK')
 
@@ -344,30 +383,6 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             <VerificationStatus verifyError={verifyError} />
           </div>
         </div>
-
-        {verificationResult && (
-          <div className='absolute inset-0 bg-white rounded-lg backdrop-blur-sm flex items-center justify-center'>
-            <div className='w-full max-w-sm p-8 text-center'>
-              <div className='bg-green-50 p-4 rounded-full inline-block mb-6'>
-                <Checkmark className='w-12 h-12 text-green-500' />
-              </div>
-              <h3 className='text-xl font-semibold'>Verification Complete</h3>
-              {verificationResult.validVerifications < selectedNFTs.size && (
-                <p className='mt-2 text-gray-600'>
-                  {selectedNFTs.size - verificationResult.validVerifications} not verified
-                </p>
-              )}
-              <button
-                onClick={() => {
-                  onClose()
-                }}
-                className='mt-8 w-full p-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors'
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     )
   }

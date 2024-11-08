@@ -7,7 +7,7 @@ import { OfferFeed } from '@/components/home'
 import { Duplicates, Offer, Transaction } from '@/components/modals'
 import { LoadingIndicator, NFTImage, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
-import { ChainLogo, Etherscan, Opensea } from '@/icons'
+import { Etherscan, Opensea } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo } from '@/types/main'
@@ -23,7 +23,7 @@ const NFTSidebar: React.FC<{
   makeOffer: () => void
   pinItem: () => void
 }> = ({ nft, nftUsers, showMultiUserModal, makeOffer, pinItem }) => {
-  const multipleHolders = nftUsers.length > 1
+  const multipleHolders = nftUsers.length > 1 && !nft.is_verified
 
   return (
     <div className='w-full lg:w-[320px] flex flex-col lg:sticky lg:top-8 lg:overflow-y-auto hide-scrollbar'>
