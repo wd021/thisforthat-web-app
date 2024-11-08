@@ -72,7 +72,7 @@ export default function Home() {
         ) : (
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-6">
             <p className="text-gray-800 font-medium">
-              Thanks! We'll notify you when we launch.
+              Thanks! We&apos;ll notify you when we launch.
             </p>
           </div>
         )}
