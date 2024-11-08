@@ -3,7 +3,12 @@ import { NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 
-import { ALCHEMY_CHAIN_ID_SLUGS, NFT_VERIFY_LIMIT, PUNK_VERIFY_LIMIT } from '@/utils/constants'
+import {
+  ALCHEMY_CHAIN_ID_SLUGS,
+  CHAIN_IDS_TO_CHAINS,
+  NFT_VERIFY_LIMIT,
+  PUNK_VERIFY_LIMIT,
+} from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
 interface AlchemyNFT {
@@ -147,7 +152,7 @@ export async function POST(req: any) {
       transport: http(),
     })
 
-    const message = `Verify ownership of NFTs for wallet ${address} on ${CHAIN_IDS_TO_CHAINS[chain]}`
+    const message = `Verify ownership of NFTs for wallet ${address} on ${CHAIN_IDS_TO_CHAINS[chain as keyof typeof CHAIN_IDS_TO_CHAINS]}`
     const valid = await publicClient.verifyMessage({
       address,
       message,
@@ -223,9 +228,9 @@ export async function POST(req: any) {
           is_verified: true,
           verified_at: new Date().toISOString(),
           user_id: data.user.id,
+          wallet_address: address.toLowerCase(),
         })
         .in('id', verifiedNftIds)
-        .eq('wallet_address', address.toLowerCase())
 
       if (verifyError) {
         console.error('Error updating NFT verification status:', verifyError)

@@ -133,7 +133,7 @@ const NFTGroupSelection: React.FC<{
   )
 }
 
-const NFTVerifier: React.FC = () => {
+const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { setOpen } = useModal()
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
@@ -346,16 +346,12 @@ const NFTVerifier: React.FC = () => {
         </div>
 
         {verificationResult && (
-          <div className='absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center'>
+          <div className='absolute inset-0 bg-white rounded-lg backdrop-blur-sm flex items-center justify-center'>
             <div className='w-full max-w-sm p-8 text-center'>
               <div className='bg-green-50 p-4 rounded-full inline-block mb-6'>
                 <Checkmark className='w-12 h-12 text-green-500' />
               </div>
-              <h3 className='text-xl font-semibold'>
-                {verificationResult.validVerifications > 0
-                  ? `${verificationResult.validVerifications} NFTs Verified`
-                  : 'No NFTs Verified'}
-              </h3>
+              <h3 className='text-xl font-semibold'>Verification Complete</h3>
               {verificationResult.validVerifications < selectedNFTs.size && (
                 <p className='mt-2 text-gray-600'>
                   {selectedNFTs.size - verificationResult.validVerifications} not verified
@@ -363,8 +359,7 @@ const NFTVerifier: React.FC = () => {
               )}
               <button
                 onClick={() => {
-                  setSelectedGroup(null)
-                  setVerificationResult(null)
+                  onClose()
                 }}
                 className='mt-8 w-full p-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors'
               >

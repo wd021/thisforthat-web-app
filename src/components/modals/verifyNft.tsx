@@ -26,7 +26,7 @@ const VerifyNft: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
             <Close className='w-5 h-5' />
           </button>
         </div>
-        <NftVerifier />
+        <NftVerifier onClose={closeModal} />
       </Modal>
     </div>
   )
