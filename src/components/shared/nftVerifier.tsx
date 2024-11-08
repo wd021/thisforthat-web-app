@@ -42,7 +42,6 @@ const VerificationStatus: React.FC<{
   verifyError: string | null
 }> = ({ verifyError }) => (
   <>
-    <WalletStatus />
     {verifyError && (
       <div className='flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mt-4'>
         <svg
@@ -89,7 +88,7 @@ const NFTGroupSelection: React.FC<{
         >
           <div className='flex items-center gap-5'>
             {/* Large Chain Logo */}
-            <div className='w-12 h-12 flex-shrink-0'>
+            <div className='w-12 h-12 flex shrink-0 items-center justify-center'>
               <ChainLogo chainId={Number(group.chainId)} />
             </div>
 
@@ -309,14 +308,9 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
     return (
       <div className='relative flex flex-col h-full min-h-0'>
-        {/* Fixed header */}
-        <div className='flex-shrink-0 p-4 pb-0'>
-          <SelectionLimitsInfo hasCryptoPunks={hasCryptoPunks} />
-        </div>
-
         {/* Scrollable content */}
         <div className='flex-1 overflow-y-auto custom-scrollbar p-4 min-h-0'>
-          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-3 sm:grid-cols-4 gap-4'>
             {selectedGroup.nfts.map((nft) => (
               <div
                 key={nft.id}
@@ -369,8 +363,16 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             )}
           </button>
           <div className='mt-3'>
-            <VerificationStatus verifyError={verifyError} />
+            <WalletStatus />
           </div>
+          <div className='mt-3'>
+            <SelectionLimitsInfo hasCryptoPunks={hasCryptoPunks} />
+          </div>
+          {verifyError && (
+            <div className='mt-3'>
+              <VerificationStatus verifyError={verifyError} />
+            </div>
+          )}
         </div>
       </div>
     )
