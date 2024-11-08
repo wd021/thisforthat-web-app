@@ -97,15 +97,16 @@ export async function uploadFile(
 
 export async function verifyNFTs(
   address: string,
-  chain: number,
+  chain: string,
   signature: string,
+  nftIds: string[],
   token: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   try {
     const response = await fetch('/api/verify', {
       method: 'POST',
-      body: JSON.stringify({ address, chain, signature }),
+      body: JSON.stringify({ address, chain, signature, nftIds }),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -330,4 +331,24 @@ export async function getTradeInfo(tradeId: string | number): Promise<{
       isError: true,
     }
   }
+}
+
+export const trimAddress = (
+  addr: string,
+  startLength: number = 4,
+  endLength: number = 4,
+): string => {
+  if (typeof addr !== 'string') {
+    throw new Error('Address must be a string')
+  }
+
+  if (startLength < 0 || endLength < 0) {
+    throw new Error('Start and end lengths must be non-negative')
+  }
+
+  if (addr.length <= startLength + endLength) {
+    return addr
+  }
+
+  return `${addr.slice(0, startLength)}...${addr.slice(-endLength)}`
 }

@@ -20,8 +20,8 @@ interface Web3ProviderProps {
 }
 
 // Define the supported chains
-// const supportedChains = [mainnet, base, arbitrum, optimism, polygon, zkSync, foundry]
-const supportedChains = [anvil]
+const supportedChains = [mainnet, base, arbitrum, optimism, polygon, zkSync, foundry]
+// const supportedChains = [mainnet, anvil]
 
 // Function to get RPC URL for a chain
 const getRpcUrl = (chainId: number) => {

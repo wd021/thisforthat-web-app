@@ -70,12 +70,12 @@ const AboutPage = () => {
               <FeatureCard
                 emoji='🤝'
                 title='Make Offers'
-                description='Found something you like? Make an offer and negotiate with fellow collectors.'
+                description='Found something you like? Make an offer and negotiate with the owner.'
               />
               <FeatureCard
                 emoji='⛓️'
                 title='Complete Trades'
-                description='Once terms are agreed upon, NFTs are safely traded via smart contracts.'
+                description='Once terms are agreed upon, NFTs are safely transferred via smart contracts.'
               />
             </div>
           </div>
@@ -89,8 +89,8 @@ const AboutPage = () => {
               ))}
             </div>
             <p className='text-gray-600 mb-4'>
-              Currently, trades are limited to NFTs on the same chain. Cross-chain swapping is
-              coming soon!
+              Currently, you can only swap for NFTs on the same chain. We&apos;re working on
+              cross-chain swapping.
             </p>
           </div>
 
@@ -98,8 +98,8 @@ const AboutPage = () => {
           <div className='mb-12 bg-white rounded-lg p-6 shadow-sm'>
             <h2 className='text-2xl font-semibold mb-6'>Technical Details</h2>
             <p className='text-gray-600 mb-4'>
-              All trades are executed automatically through our secure smart contracts. Our
-              contracts are open-sourced and available on GitHub for complete transparency.
+              All trades are executed automatically through our smart contracts. Our contracts
+              are open-sourced and available on GitHub for complete transparency.
             </p>
             <Link
               href={GITHUB_LINK}

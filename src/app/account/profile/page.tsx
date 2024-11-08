@@ -41,6 +41,8 @@ const AccountProfilePage: React.FC = () => {
       newErrors.username = 'Username is required.'
     } else if (BLOCKED_USERNAMES.includes(profile.username)) {
       newErrors.username = `${profile.username} is not a valid username. Please pick another one.`
+    } else if (profile.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters long.'
     }
 
     if (!profile.bio?.trim()) {

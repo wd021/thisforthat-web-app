@@ -1,4 +1,4 @@
-// TODO: add fallback methods with other providers (Infura, QuickNode, etc.)
+// TODO: add fallback methods with other providers (Infura, QuickNode, etc.) - applies to api verify as well
 
 import { Alchemy, Network, Nft } from 'alchemy-sdk'
 

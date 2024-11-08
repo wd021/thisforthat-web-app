@@ -357,7 +357,7 @@ const NftImporter: FC<{
                   onClick={() => toggleNftSelection(nft)}
                   className={`relative bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 ${
                     selectedNfts.some((item) => item.id === nft.id)
-                      ? 'ring-4 ring-blue-500 shadow-lg'
+                      ? 'ring-2 ring-blue-500 shadow-lg'
                       : 'hover:shadow-lg border border-gray-200'
                   }`}
                 >
@@ -380,8 +380,8 @@ const NftImporter: FC<{
                       </div>
                     )}
                   </div>
-                  <div className='p-3'>
-                    <h3 className='text-sm font-medium text-gray-900 truncate'>{nft.name}</h3>
+                  <div className='p-2'>
+                    <h3 className='text-xs font-medium text-gray-900 truncate'>{nft.name}</h3>
                     <p className='text-xs text-gray-500 mt-1 truncate'>{nft.collection_name}</p>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ const NftImporter: FC<{
         >
           {uploadingNfts ? (
             <div className='flex items-center justify-center'>
-              <div className='w-5 h-5 border-t-2 border-white border-solid rounded-full animate-spin mr-2' />
+              <LoadingIndicator className='!w-4 !h-4 border-white !border-[2px] mr-2' />
               <span>Uploading...</span>
             </div>
           ) : (

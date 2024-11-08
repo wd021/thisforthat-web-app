@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useSignMessage } from 'wagmi'
+import { useModal } from 'connectkit'
+import { useAccount, useChainId, useSignMessage } from 'wagmi'
 
-import { Verified } from '@/icons'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
+import { LoadingIndicator, NFTImage, WalletStatus } from '@/components/shared'
+import { ChainLogo, Checkmark, Verified, Wallet } from '@/icons'
+import { CHAIN_IDS_TO_CHAINS, NFT_VERIFY_LIMIT, PUNK_VERIFY_LIMIT } from '@/utils/constants'
 import { verifyNFTs } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
-
-import LoadingIndicator from './loadingIndicator'
-
-interface VerifyNFTProps {
-  onComplete: () => void
-}
 
 interface NFTGroup {
   chainId: string
@@ -18,13 +14,137 @@ interface NFTGroup {
   nfts: any[]
 }
 
-const NftVerifier: React.FC<VerifyNFTProps> = ({ onComplete }) => {
+interface VerificationResult {
+  validVerifications: number
+  punkVerifications: number
+  limitReached: boolean
+  punkLimitReached: boolean
+  remainingVerifications: number
+  remainingPunkVerifications: number
+}
+
+const SelectionLimitsInfo: React.FC<{ hasCryptoPunks: boolean }> = ({ hasCryptoPunks }) => (
+  <div className='p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700'>
+    <div className='flex items-center gap-2'>
+      <div className='w-2 h-2 rounded-full bg-blue-500' />
+      <span>You can verify up to {NFT_VERIFY_LIMIT} NFTs at once</span>
+    </div>
+    {hasCryptoPunks && (
+      <div className='flex items-center gap-2 mt-2'>
+        <div className='w-2 h-2 rounded-full bg-blue-500' />
+        <span>Maximum {PUNK_VERIFY_LIMIT} CryptoPunks per verification</span>
+      </div>
+    )}
+  </div>
+)
+
+const VerificationStatus: React.FC<{
+  verifyError: string | null
+}> = ({ verifyError }) => (
+  <>
+    <WalletStatus />
+    {verifyError && (
+      <div className='flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mt-4'>
+        <svg
+          className='w-4 h-4 flex-shrink-0'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+        >
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth='2'
+            d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+          />
+        </svg>
+        <span>{verifyError}</span>
+      </div>
+    )}
+  </>
+)
+
+interface NFTGroup {
+  chainId: number
+  walletAddress: string
+  nfts: any[] // Replace 'any' with your NFT type
+}
+
+interface ChainMapping {
+  [key: number]: string
+}
+
+const NFTGroupSelection: React.FC<{
+  nftGroups: NFTGroup[]
+  handleGroupSelect: (group: NFTGroup) => void
+  CHAIN_IDS_TO_CHAINS: ChainMapping
+}> = ({ nftGroups, handleGroupSelect, CHAIN_IDS_TO_CHAINS }) => {
+  return (
+    <div className='space-y-2.5'>
+      {nftGroups.map((group, index) => (
+        <div
+          key={index}
+          className='group relative p-4 rounded-xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-50 cursor-pointer transition-all duration-200 ease-in-out'
+          onClick={() => handleGroupSelect(group)}
+        >
+          <div className='flex items-center gap-5'>
+            {/* Large Chain Logo */}
+            <div className='w-12 h-12 flex-shrink-0'>
+              <ChainLogo chainId={Number(group.chainId)} />
+            </div>
+
+            {/* Info Section */}
+            <div className='flex-grow space-y-1'>
+              {/* Chain Name */}
+              <div className='text-gray-900 font-medium'>
+                {
+                  CHAIN_IDS_TO_CHAINS[
+                    group.chainId as unknown as keyof typeof CHAIN_IDS_TO_CHAINS
+                  ]
+                }
+              </div>
+
+              {/* Wallet Address */}
+              <div className='font-mono text-sm text-gray-500'>
+                {group.walletAddress.slice(0, 10)}...{group.walletAddress.slice(-8)}
+              </div>
+
+              {/* NFT Count */}
+              <div className='text-sm text-gray-500'>
+                {group.nfts.length} NFT{group.nfts.length !== 1 ? 's' : ''} to verify
+              </div>
+            </div>
+
+            {/* Arrow Icon */}
+            <div className='flex-shrink-0 text-gray-400 group-hover:translate-x-0.5 transition-transform duration-200'>
+              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M9 5l7 7-7 7'
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const NFTVerifier: React.FC = () => {
+  const { setOpen } = useModal()
+  const { address, isConnected } = useAccount()
+  const chainId = useChainId()
   const { signMessageAsync } = useSignMessage()
   const [nftGroups, setNftGroups] = useState<NFTGroup[]>([])
   const [loading, setLoading] = useState(true)
-  const [verifying, setVerifying] = useState<string | null>(null)
+  const [verifying, setVerifying] = useState(false)
   const [verifyError, setVerifyError] = useState<string | null>(null)
-  const [verifiedGroups, setVerifiedGroups] = useState<string[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<NFTGroup | null>(null)
+  const [selectedNFTs, setSelectedNFTs] = useState<Set<string>>(new Set())
+  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null)
 
   useEffect(() => {
     fetchNFTs()
@@ -38,18 +158,18 @@ const NftVerifier: React.FC<VerifyNFTProps> = ({ onComplete }) => {
 
       const { data, error } = await supabase
         .from('user_nfts')
-        .select(`id, user_id, nft_id, nfts: nfts!inner (chain_id, wallet_address)`)
+        .select(`id, user_id, nft_id, wallet_address, nfts!inner(*)`)
         .eq('user_id', userId)
         .eq('nfts.is_verified', false)
 
       if (error) throw error
 
       const groupedNfts = data.reduce((acc: { [key: string]: NFTGroup }, item: any) => {
-        const key = `${item.nfts.chain_id}-${item.nfts.wallet_address}`
+        const key = `${item.nfts.chain_id}-${item.wallet_address}`
         if (!acc[key]) {
           acc[key] = {
             chainId: item.nfts.chain_id,
-            walletAddress: item.nfts.wallet_address,
+            walletAddress: item.wallet_address,
             nfts: [],
           }
         }
@@ -65,30 +185,86 @@ const NftVerifier: React.FC<VerifyNFTProps> = ({ onComplete }) => {
     }
   }
 
-  const handleVerify = async (group: NFTGroup) => {
-    const groupKey = `${group.chainId}-${group.walletAddress}`
-    setVerifying(groupKey)
+  const handleGroupSelect = (group: NFTGroup) => {
+    setSelectedGroup(group)
+    setSelectedNFTs(new Set())
+    setVerificationResult(null)
+    setVerifyError(null)
+  }
+
+  const handleNFTSelect = (nftId: string) => {
+    const newSelected = new Set(selectedNFTs)
+    if (selectedNFTs.has(nftId)) {
+      newSelected.delete(nftId)
+    } else {
+      const selectedPunks = countSelectedByType('CRYPTOPUNK')
+      const totalSelected = selectedNFTs.size
+      const nft = selectedGroup?.nfts.find((n) => n.id === nftId)
+
+      if (nft?.token_type === 'CRYPTOPUNK' && selectedPunks >= PUNK_VERIFY_LIMIT) {
+        setVerifyError(`Cannot select more than ${PUNK_VERIFY_LIMIT} CryptoPunks at once`)
+        return
+      }
+      if (totalSelected >= NFT_VERIFY_LIMIT) {
+        setVerifyError(`Cannot select more than ${NFT_VERIFY_LIMIT} NFTs at once`)
+        return
+      }
+
+      newSelected.add(nftId)
+      setVerifyError(null)
+    }
+    setSelectedNFTs(newSelected)
+  }
+
+  const countSelectedByType = (type: string) => {
+    if (!selectedGroup) return 0
+    return Array.from(selectedNFTs).filter(
+      (id) => selectedGroup.nfts.find((nft) => nft.id === id)?.token_type === type,
+    ).length
+  }
+
+  const handleVerify = async () => {
+    if (!selectedGroup) return
+    if (!isConnected) {
+      setOpen(true)
+      return
+    }
+
+    setVerifying(true)
     setVerifyError(null)
 
     try {
-      const message = `Verify ownership of NFTs for wallet ${group.walletAddress} on ${
-        CHAIN_IDS_TO_CHAINS[group.chainId as unknown as keyof typeof CHAIN_IDS_TO_CHAINS]
+      const message = `Verify ownership of NFTs for wallet ${selectedGroup.walletAddress} on ${
+        CHAIN_IDS_TO_CHAINS[
+          selectedGroup.chainId as unknown as keyof typeof CHAIN_IDS_TO_CHAINS
+        ]
       }`
+
       const signature = await signMessageAsync({ message })
       const token = (await supabase.auth.getSession()).data.session?.access_token
       if (!token) throw new Error('User token not found')
 
-      const response = await verifyNFTs(group.walletAddress, group.chainId, signature, token)
+      const response = await verifyNFTs(
+        selectedGroup.walletAddress,
+        selectedGroup.chainId,
+        signature,
+        Array.from(selectedNFTs),
+        token,
+      )
 
       if (response.error) {
-        setVerifyError(response.error)
+        setVerifyError(
+          typeof response.error === 'string' ? response.error : 'Verification failed.',
+        )
       } else {
-        setVerifiedGroups((prev) => [...prev, groupKey])
+        setVerificationResult(response)
+        await fetchNFTs()
       }
     } catch (error) {
-      setVerifyError(error instanceof Error ? error.message : String(error))
+      console.error('Error verifying NFTs:', error)
+      setVerifyError(error instanceof Error ? error.message : 'Error verifying NFTs')
     } finally {
-      setVerifying(null)
+      setVerifying(false)
     }
   }
 
@@ -100,158 +276,140 @@ const NftVerifier: React.FC<VerifyNFTProps> = ({ onComplete }) => {
     )
   }
 
-  return (
-    <div className='space-y-4 p-4 max-h-[80vh] overflow-y-auto custom-scrollbar'>
-      <div className='pl-4 py-2.5 pr-3 bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r text-sm'>
-        <div className='flex items-center gap-3'>
-          <div className='w-20 h-20 flex items-center'>
-            <Verified chainId={1} isVerified={true} />
+  if (selectedGroup) {
+    const hasCryptoPunks = selectedGroup.nfts.some((nft) => nft.token_type === 'CRYPTOPUNK')
+
+    return (
+      <div className='relative flex flex-col h-full min-h-0'>
+        {/* Fixed header */}
+        <div className='flex-shrink-0 p-4 pb-0'>
+          <SelectionLimitsInfo hasCryptoPunks={hasCryptoPunks} />
+        </div>
+
+        {/* Scrollable content */}
+        <div className='flex-1 overflow-y-auto custom-scrollbar p-4 min-h-0'>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+            {selectedGroup.nfts.map((nft) => (
+              <div
+                key={nft.id}
+                className={`
+                  relative border rounded-xl overflow-hidden cursor-pointer transition-all
+                  ${selectedNFTs.has(nft.id) ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-200 hover:border-blue-300'}
+                `}
+                onClick={() => handleNFTSelect(nft.id)}
+              >
+                <div className='aspect-square bg-gray-100'>
+                  <NFTImage src={nft.image} alt={nft.name} fallback={nft.name} />
+                </div>
+                <div className='p-2 bg-white'>
+                  <div className='text-xs font-medium truncate'>
+                    {nft.name || `#${nft.token_id}`}
+                  </div>
+                  <div className='text-xs text-gray-500'>{nft.collection_name}</div>
+                </div>
+                {selectedNFTs.has(nft.id) && (
+                  <div className='absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center'>
+                    <Checkmark className='w-4 h-4 text-white' />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <p>
-            Verifying your NFTs lets other users know you're the confirmed owner. If you&apos;ve
-            moved any NFTs to a different wallet, simply add the NFT again to refresh the
-            wallet.
-          </p>
+        </div>
+
+        {/* Fixed footer */}
+        <div className='flex-shrink-0 p-4 border-t bg-white md:rounded-b-lg'>
+          <button
+            onClick={handleVerify}
+            disabled={verifying || selectedNFTs.size === 0}
+            className={`
+              w-full p-4 rounded-lg font-medium transition-all
+              ${
+                verifying || selectedNFTs.size === 0
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              }
+            `}
+          >
+            {verifying ? (
+              <span className='flex items-center justify-center gap-2'>
+                <LoadingIndicator className='!w-4 !h-4 !border-[2px] !border-gray-300 !border-t-transparent' />
+                Verifying...
+              </span>
+            ) : (
+              `Verify ${selectedNFTs.size} NFT${selectedNFTs.size !== 1 ? 's' : ''}`
+            )}
+          </button>
+          <div className='mt-3'>
+            <VerificationStatus verifyError={verifyError} />
+          </div>
+        </div>
+
+        {verificationResult && (
+          <div className='absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center'>
+            <div className='w-full max-w-sm p-8 text-center'>
+              <div className='bg-green-50 p-4 rounded-full inline-block mb-6'>
+                <Checkmark className='w-12 h-12 text-green-500' />
+              </div>
+              <h3 className='text-xl font-semibold'>
+                {verificationResult.validVerifications > 0
+                  ? `${verificationResult.validVerifications} NFTs Verified`
+                  : 'No NFTs Verified'}
+              </h3>
+              {verificationResult.validVerifications < selectedNFTs.size && (
+                <p className='mt-2 text-gray-600'>
+                  {selectedNFTs.size - verificationResult.validVerifications} not verified
+                </p>
+              )}
+              <button
+                onClick={() => {
+                  setSelectedGroup(null)
+                  setVerificationResult(null)
+                }}
+                className='mt-8 w-full p-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors'
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className='flex flex-col h-full min-h-0'>
+      <div className='flex-1 overflow-y-auto custom-scrollbar p-4'>
+        <div className='space-y-4'>
+          <div className='p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r'>
+            <div className='flex items-center gap-3'>
+              <div className='w-20 h-20 flex items-center'>
+                <Verified chainId={1} isVerified={true} />
+              </div>
+              <p className='text-blue-700'>
+                Verifying your NFTs lets other users know you&apos;re the confirmed owner.
+                Select a wallet to begin verification.
+              </p>
+            </div>
+          </div>
+
+          {nftGroups.length === 0 ? (
+            <div className='flex items-center justify-center py-8 text-gray-500'>
+              <p>No NFTs to verify.</p>
+            </div>
+          ) : (
+            <div className='space-y-3'>
+              <NFTGroupSelection
+                nftGroups={nftGroups}
+                handleGroupSelect={handleGroupSelect}
+                CHAIN_IDS_TO_CHAINS={CHAIN_IDS_TO_CHAINS}
+              />
+            </div>
+          )}
         </div>
       </div>
-
-      {verifyError && (
-        <div className='flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm'>
-          <svg
-            className='w-4 h-4 flex-shrink-0'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth='2'
-              d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-            />
-          </svg>
-          <p>
-            {verifyError === 'Verification failed'
-              ? 'Please ensure your wallet is connected.'
-              : 'Error verifying NFTs.'}
-          </p>
-        </div>
-      )}
-
-      {nftGroups.length === 0 ? (
-        <div className='flex items-center justify-center py-8 text-gray-500'>
-          <p>No NFTs to verify.</p>
-        </div>
-      ) : (
-        <div className='space-y-3'>
-          {nftGroups.map((group, index) => {
-            const groupKey = `${group.chainId}-${group.walletAddress}`
-            const isVerified = verifiedGroups.includes(groupKey)
-            const isVerifying = verifying === groupKey
-
-            return (
-              <div
-                key={index}
-                className={`p-4 rounded-lg border ${
-                  isVerified ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
-                }`}
-              >
-                <div className='flex items-center justify-between gap-4'>
-                  <div className='space-y-2'>
-                    <div className='flex items-center gap-2 text-blue-900 font-medium'>
-                      <svg
-                        className='w-4 h-4'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'
-                        />
-                      </svg>
-                      {CHAIN_IDS_TO_CHAINS[group.chainId as keyof typeof CHAIN_IDS_TO_CHAINS]}
-                    </div>
-
-                    <div className='flex items-center gap-2 text-gray-500'>
-                      {/* Wallet icon */}
-                      <svg
-                        className='w-4 h-4'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
-                        />
-                      </svg>
-                      <code className='bg-gray-100 px-2 py-0.5 rounded text-sm'>
-                        {group.walletAddress.slice(0, 10)}...{group.walletAddress.slice(-8)}
-                      </code>
-                    </div>
-
-                    <div className='flex items-center gap-2 text-gray-500'>
-                      <svg
-                        className='w-4 h-4'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth='2'
-                          d='M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
-                        />
-                      </svg>
-                      <span className='text-sm'>
-                        {group.nfts.length} NFT{group.nfts.length !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleVerify(group)}
-                    disabled={isVerifying || isVerified}
-                    className={`
-                      px-4 py-1.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap
-                      ${
-                        isVerifying
-                          ? 'bg-blue-100 text-blue-400 cursor-not-allowed'
-                          : isVerified
-                            ? 'bg-green-100 text-green-600 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                      }
-                    `}
-                  >
-                    {isVerifying ? 'Verifying...' : isVerified ? 'Verified' : 'Verify'}
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {verifiedGroups.length === nftGroups.length && nftGroups.length > 0 && (
-        <div className='flex items-center justify-center gap-3 pt-4'>
-          <p className='text-green-600 font-medium text-sm'>All NFTs verified successfully!</p>
-          <button
-            onClick={onComplete}
-            className='px-4 py-1.5 bg-green-500 text-white text-sm rounded-lg font-medium 
-                     hover:bg-green-600 transition-colors'
-          >
-            Continue
-          </button>
-        </div>
-      )}
     </div>
   )
 }
 
-export default NftVerifier
+export default NFTVerifier
