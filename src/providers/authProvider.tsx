@@ -104,8 +104,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('onAuthStateChange', event, session)
-
       const user = session?.user || null
 
       if (user && (event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) {

@@ -68,15 +68,7 @@ const OfferSide: FC<OfferSideProps> = ({
       {assets?.map((asset) => (
         <div
           key={asset.nft_id}
-          className={`
-              flex 
-              items-center 
-              justify-between 
-              group 
-              transition-transform 
-              duration-200
-              ${isExpanded ? 'w-full bg-white rounded-lg p-2' : ''}
-            `}
+          className={`flex items-center justify-between group transition-transform duration-200 ${isExpanded ? 'w-full bg-white rounded-lg p-2' : ''}`}
         >
           <Link
             href={`/nfts/${asset.nft_id}`}

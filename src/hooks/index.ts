@@ -1,6 +1,7 @@
 export { default as useIsMobile } from './useIsMobile'
 export { default as useChatScroll } from './useChatScroll'
 export { default as useCreateTrade } from './useCreateTrade'
+export { default as useApproveAsset } from './useApproveAsset'
 export { default as useDepositAsset } from './useDepositAsset'
 export { default as useCancelTrade } from './useCancelTrade'
 export { default as useMultipleTradeInfo } from './useMultipleTradeInfo'

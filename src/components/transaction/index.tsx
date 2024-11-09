@@ -223,14 +223,14 @@ const Transaction: React.FC<{
               href={`/transactions/${transaction.offer_id}`}
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
             >
-              <span>Link to Offer</span>
+              <span>🤝 Offer</span>
               <Expand className='w-4 h-4' />
             </Link>
             <Link
               href='https://www.etherscan.io'
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
             >
-              <span>Onchain Contract</span>
+              <span>📝 Contract</span>
               <Expand className='w-4 h-4' />
             </Link>
           </div>

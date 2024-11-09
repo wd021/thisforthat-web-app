@@ -82,7 +82,7 @@ const StatusMessage: React.FC<{
   return (
     <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}>
       <span className='text-sm font-semibold'>{config.message}</span>
-      {(status === 'countered' || status === 'countered-open') && (
+      {(status === 'countered' || status === 'countered-open') && childOfferId && (
         <svg
           className='text-blue-700'
           fill='none'

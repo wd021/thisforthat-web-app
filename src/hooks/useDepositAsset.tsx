@@ -1,4 +1,3 @@
-// useDepositAsset.ts
 import { useCallback, useState } from 'react'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import {
@@ -8,9 +7,9 @@ import {
   useWriteContract,
 } from 'wagmi'
 
+import ABI from '@/contracts/abi.json'
 import { useToast } from '@/providers/toastProvider'
 import { AssetType } from '@/types/main'
-import ABI from '@/contracts/abi.json'
 
 interface Asset {
   tokenAddress: Address
@@ -19,7 +18,7 @@ interface Asset {
   assetType: AssetType
 }
 
-export function useDepositAsset(contractAddress: Address, tradeId: bigint) {
+export default function useDepositAsset(contractAddress: Address, tradeId: bigint) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()

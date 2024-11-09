@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Address } from 'viem'
 
 import { NFTImage } from '@/components/shared'
 import { LoadingIndicator } from '@/components/shared'
-import { useApproveAsset } from '@/hooks/useApproveAsset'
-import { useDepositAsset } from '@/hooks/useDepositAsset'
-import { useDepositSingleAsset } from '@/hooks/useDepositSingleAsset'
+import { useApproveAsset, useDepositAsset } from '@/hooks'
 import { Checkmark } from '@/icons'
 import { AssetType } from '@/types/main'
 import { SimplifiedNFTAsset } from '@/types/supabase'
@@ -110,14 +109,14 @@ const DepositCard = ({
 
   return (
     <div className='flex items-center p-6 border-b border-gray-100'>
-      <div className='w-12 h-12 relative'>
+      <Link href={`/nfts/${asset.nft_id}`} target='_blank' className='w-12 h-12 relative'>
         <NFTImage src={asset?.image} alt={asset?.name} fallback={asset?.name} rounded='all' />
         {isDeposited && (
           <div className='absolute -right-1 -bottom-1 bg-green-500 rounded-full p-1'>
             <Checkmark className='w-3 h-3 text-white' />
           </div>
         )}
-      </div>
+      </Link>
 
       <div className='ml-3 flex-1 flex flex-col gap-y-1'>
         <div className='flex items-center gap-x-2'>

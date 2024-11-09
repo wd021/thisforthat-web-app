@@ -7,12 +7,11 @@ import {
   useWriteContract,
 } from 'wagmi'
 
-import { useToast } from '@/providers/toastProvider'
-import { AssetType } from '@/types/main'
-
 import ERC721_ABI from '@/contracts/erc721Abi.json'
 import ERC1155_ABI from '@/contracts/erc1155Abi.json'
 import CRYPTOPUNKS_ABI from '@/contracts/punks.json'
+import { useToast } from '@/providers/toastProvider'
+import { AssetType } from '@/types/main'
 
 const CRYPTOPUNKS_ADDRESS = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB' as Address
 
@@ -23,7 +22,7 @@ interface Asset {
   assetType: AssetType
 }
 
-export function useApproveAsset(contractAddress: Address) {
+export default function useApproveAsset(contractAddress: Address) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
