@@ -28,6 +28,7 @@ export interface UserNFT {
   id: string
   user_id: string
   nft_id: string
+  wallet_address: string
   nfts: NFT
 }
 

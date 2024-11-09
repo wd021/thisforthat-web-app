@@ -10,11 +10,6 @@ import { useToast } from '@/providers/toastProvider'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
-interface TradeError extends Error {
-  code?: number
-  message: string
-}
-
 const CreateTx: React.FC<{
   offerId: string
   chainId: number
@@ -131,19 +126,22 @@ const CreateTx: React.FC<{
       }
 
       await createTradeContract()
-    } catch (err) {
-      let errorMessage = 'Something went wrong while creating the trade.'
+    } catch (error) {
+      let errorMessage = 'Something went wrong while creating trade.'
 
-      const tradeError = err as TradeError
+      const tradeError = error as { code?: number; message: string }
 
-      if (tradeError.code === 4001) {
-        errorMessage = 'Please connect your wallet to continue.'
+      if (tradeError.message?.includes('User rejected the request')) {
+        errorMessage = 'Transaction cancelled.'
       } else if (tradeError.message?.includes('network')) {
         errorMessage = 'Please switch to the correct network and try again.'
       } else if (tradeError.message?.includes('insufficient funds')) {
         errorMessage = 'Insufficient funds to create the contract.'
+      } else if (tradeError.code === 4001) {
+        errorMessage = 'Please connect your wallet to continue.'
       }
 
+      console.error('Error creating contract:', error)
       setError(errorMessage)
     }
   }
