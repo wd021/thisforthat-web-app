@@ -36,7 +36,7 @@ export default function useDepositAsset(contractAddress: Address, tradeId: bigin
     isSuccess: isConfirmed,
     error: confirmError,
   } = useWaitForTransactionReceipt({
-    hash: txHash,
+    hash: txHash as `0x${string}`,
   })
 
   const deposit = useCallback(
@@ -71,7 +71,7 @@ export default function useDepositAsset(contractAddress: Address, tradeId: bigin
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash })
         if (receipt.status === 'success') {
-          showToast('✅ NFT deposited successfully!', 2500)
+          showToast('NFT deposited successfully!', 2500)
           return true
         }
         return false

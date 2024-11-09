@@ -1,23 +1,15 @@
 import { useCallback } from 'react'
-import { Address } from 'viem'
 import { usePublicClient } from 'wagmi'
 
 import ABI from '@/contracts/abi.json'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
-
-interface Asset {
-  token: Address
-  tokenId: bigint
-  amount: bigint
-  assetType: number
-  recipient: Address
-}
+import { PreparedAsset } from '@/types/main'
 
 interface TradeInfo {
   isActive: boolean
   depositedAssetCount: number
   totalAssetCount: number
-  assets: Asset[]
+  assets: PreparedAsset[]
 }
 
 interface TradeStatus {
@@ -56,7 +48,7 @@ export class TradeStatusManager {
           isActive: isActive[index],
           depositedAssetCount: Number(depositedAssetCount[index]),
           totalAssetCount: Number(totalAssetCount[index]),
-          assets: assets[index].map((asset) => ({
+          assets: assets[index].map((asset: PreparedAsset) => ({
             token: asset.token,
             tokenId: asset.tokenId,
             amount: asset.amount,

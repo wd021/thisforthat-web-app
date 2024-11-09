@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { OnchainTradeInfo } from '@/types/main'
-import { TransactionData } from '@/types/supabase'
 import { completeTradeWithApi } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
 function useSyncApiWithChain(
-  onchainInfo: OnchainTradeInfo,
+  onchainInfo: OnchainTradeInfo | null,
   transaction: {
     offer_id: string
     onchain_done: boolean
@@ -30,10 +29,9 @@ function useSyncApiWithChain(
         throw new Error('User token not found')
       }
 
-      console.log('sync?')
-      // TODO - update feed item status
+      // TODO: optimistic upgrade feed
       await completeTradeWithApi(transaction.offer_id, token)
-    } catch (err) {}
+    } catch {}
 
     setFetched(true)
   }, [transaction.offer_id])

@@ -13,7 +13,7 @@ import { supabase } from '@/utils/supabaseClient'
 import LoadingIndicator from './loadingIndicator'
 
 // Create a public client for ENS resolution
-const publicClient = createPublicClient({
+const ensResolutionClient = createPublicClient({
   chain: mainnet,
   transport: http(),
 })
@@ -48,7 +48,7 @@ const NftImporter: FC<{
       setResolvingEns(true)
       try {
         const normalized = normalize(input)
-        const address = await publicClient.getEnsAddress({
+        const address = await ensResolutionClient.getEnsAddress({
           name: normalized,
         })
         if (!address) throw new Error('ENS name not found')

@@ -2,70 +2,16 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 
 import { useSyncApiWithChain } from '@/hooks/supabase'
-import { Expand } from '@/icons'
+import { Expand, SwapArrows } from '@/icons'
 import { OnchainTradeInfo } from '@/types/main'
-import { TransactionData } from '@/types/supabase'
+import { NFTAsset, TransactionData } from '@/types/supabase'
 
 import { NFTImage } from '../shared'
 
 import Footer from './footer'
 import Header from './header'
 
-// Icon Components
-const Icons = {
-  Lock: () => (
-    <svg className='w-5 h-5' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
-      />
-    </svg>
-  ),
-  Copy: () => (
-    <svg className='w-4 h-4' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
-      />
-    </svg>
-  ),
-  ExternalLink: () => (
-    <svg className='w-4 h-4' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-      />
-    </svg>
-  ),
-  SwapArrow: () => (
-    <svg className='w-5 h-5' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'
-      />
-    </svg>
-  ),
-  Wallet: () => (
-    <svg className='w-5 h-5' viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        d='M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
-      />
-    </svg>
-  ),
-}
-
-const NFTCard = ({ asset }) => (
+const NFTCard = ({ asset }: { asset: NFTAsset }) => (
   <Link
     href={`/nfts/${asset.nft_id}`}
     target='_blank'
@@ -86,15 +32,15 @@ const NFTCard = ({ asset }) => (
 )
 
 const CompactView: React.FC<{
-  creatorAssets: Asset[]
-  counterpartyAssets: Asset[]
+  creatorAssets: NFTAsset[]
+  counterpartyAssets: NFTAsset[]
 }> = ({ creatorAssets, counterpartyAssets }) => (
   <div className='bg-gray-50 rounded-lg p-4'>
     <div className='flex items-center justify-between'>
       <div className='flex items-center space-x-4'>
         <AssetPreviewGroup assets={creatorAssets} />
         <div className='p-2 bg-white rounded-full shadow-sm'>
-          <Icons.SwapArrow />
+          <SwapArrows />
         </div>
         <AssetPreviewGroup assets={counterpartyAssets} />
       </div>
@@ -102,7 +48,7 @@ const CompactView: React.FC<{
   </div>
 )
 
-const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
+const AssetPreviewGroup: React.FC<{ assets: NFTAsset[] }> = ({ assets }) => (
   <div className='flex -space-x-2'>
     {assets.map((asset) => (
       <div key={asset.nft_id} className='w-12 h-12'>
@@ -118,7 +64,19 @@ const AssetPreviewGroup: React.FC<{ assets: Asset[] }> = ({ assets }) => (
   </div>
 )
 
-const TradeSection = ({ username, profilePic, assets, onchainInfo, status }) => {
+const TradeSection = ({
+  username,
+  profilePic,
+  assets,
+  onchainInfo,
+  status,
+}: {
+  username: string
+  profilePic: string
+  assets: NFTAsset[]
+  onchainInfo: OnchainTradeInfo
+  status: string
+}) => {
   const isCompleted = status === 'onchain_cancelled' || status === 'onchain_completed'
   const depositedCount = assets.reduce((count, asset) => {
     const isDeposited = onchainInfo?.assets.some(

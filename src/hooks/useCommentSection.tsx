@@ -22,7 +22,6 @@ export default function useCommentSection({
   const { showToast } = useToast()
   const commentsContainerRef = useRef<HTMLDivElement>(null)
 
-  // State management
   const [messages, setMessages] = useState<OfferMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,7 +32,6 @@ export default function useCommentSection({
   const [wasNearBottom, setWasNearBottom] = useState(false)
   const [commentCount, setCommentCount] = useState(initialCommentCount)
 
-  // Scroll handling
   const scrollToBottom = () => {
     if (!commentsContainerRef.current) return
     commentsContainerRef.current.scrollTop = commentsContainerRef.current.scrollHeight
@@ -49,13 +47,11 @@ export default function useCommentSection({
     return isNear
   }
 
-  // Data fetching
   const fetchMessages = async (pageNum: number) => {
     if (loading || !hasMore) return
     setLoading(true)
 
     try {
-      // Calculate the range for pagination from the end
       const totalMessages = await supabase
         .from('offer_messages')
         .select('count')
@@ -91,7 +87,6 @@ export default function useCommentSection({
     }
   }
 
-  // Message submission
   const submitMessage = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!newMessage.trim()) return

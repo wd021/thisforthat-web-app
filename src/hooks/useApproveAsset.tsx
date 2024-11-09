@@ -41,7 +41,7 @@ export default function useApproveAsset(contractAddress: Address) {
     isSuccess: isConfirmed,
     error: confirmError,
   } = useWaitForTransactionReceipt({
-    hash: txHash,
+    hash: txHash as `0x${string}`,
   })
 
   const checkApproval = useCallback(
@@ -51,12 +51,12 @@ export default function useApproveAsset(contractAddress: Address) {
 
       try {
         if (asset.assetType === 'CRYPTOPUNK') {
-          const punkData = await publicClient.readContract({
+          const punkData = (await publicClient.readContract({
             address: CRYPTOPUNKS_ADDRESS,
             abi: CRYPTOPUNKS_ABI,
             functionName: 'punksOfferedForSale',
             args: [BigInt(asset.tokenId)],
-          })
+          })) as [boolean, bigint, string, bigint, string]
 
           const isForSale = punkData[0]
           const onlySellTo = punkData[4]
@@ -68,20 +68,20 @@ export default function useApproveAsset(contractAddress: Address) {
             minValue === 0n
           )
         } else if (asset.assetType === 'ERC721') {
-          const approved = await publicClient.readContract({
+          const approved = (await publicClient.readContract({
             address: asset.tokenAddress,
             abi: ERC721_ABI,
             functionName: 'getApproved',
             args: [BigInt(asset.tokenId)],
-          })
+          })) as string
           return approved.toLowerCase() === contractAddress.toLowerCase()
         } else {
-          return await publicClient.readContract({
+          return (await publicClient.readContract({
             address: asset.tokenAddress,
             abi: ERC1155_ABI,
             functionName: 'isApprovedForAll',
             args: [address, contractAddress],
-          })
+          })) as boolean
         }
       } catch (error) {
         console.error('Error checking approval:', error)
@@ -132,7 +132,7 @@ export default function useApproveAsset(contractAddress: Address) {
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash })
         if (receipt.status === 'success') {
-          showToast('✅ NFT approved successfully! Click Deposit to continue', 5000)
+          showToast('NFT approved successfully! Click Deposit to continue', 5000)
           return true
         }
         return false

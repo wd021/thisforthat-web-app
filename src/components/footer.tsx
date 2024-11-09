@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
+import { DISCORD_LINK } from '@/utils/constants'
 
 const Footer: FC = () => {
   return (
@@ -12,7 +13,7 @@ const Footer: FC = () => {
         <span className='mx-2 text-gray-400'>·</span>
         <Link href='/legal/privacy'>Privacy</Link>
         <span className='mx-2 text-gray-400'>·</span>
-        <Link href='https://discord.gg/qg6TeBuHeT' target='_blank'>
+        <Link href={DISCORD_LINK} target='_blank'>
           Discord
         </Link>
       </nav>

@@ -5,7 +5,6 @@ import { LoadingIndicator } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useSyncApiWithChain } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
-import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
 import { OnchainTradeInfo } from '@/types/main'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
@@ -31,21 +30,15 @@ const TradeProgress = () => {
 const getDepositCount = (
   user: 'creator' | 'counterparty',
   onchainId: string | null,
-  users: {
-    creator: ProfileMinimal
-    counterparty: ProfileMinimal
-  },
   assets: {
     creator: SimplifiedNFTAsset[]
     counterparty: SimplifiedNFTAsset[]
   },
   tradeInfo: OnchainTradeInfo | null,
 ): number => {
-  console.log('getDepositCount', user)
   const userAssets = user === 'creator' ? assets.creator : assets.counterparty
 
   if (!tradeInfo?.assets || !userAssets) return 0
-
   if (!onchainId) return userAssets.length
 
   return userAssets.filter((userAsset) => {
@@ -88,17 +81,11 @@ const TransactionModal: React.FC<{
     onchain_done: transactionInfo.onchain.done,
   })
 
-  const { showToast } = useToast()
   const { user } = useAuth()
   const isMobile = useIsMobile()
   const customStyles = getModalStyles(isMobile)
 
-  // determine which component to show
-  const [loading, setLoading] = useState(true)
-
-  const [userDepositCount, setUserDepositCount] = useState<number | null>(null)
   const [counterDepositCount, setCounterDepositCount] = useState<number | null>(null)
-
   const [tradeId, setTradeId] = useState<string | null>(transactionInfo.onchain.id)
 
   const [componentToShow, setComponentToShow] = useState<string>(
@@ -115,32 +102,21 @@ const TransactionModal: React.FC<{
     if (user && componentToShow === 'pending') {
       const isCreator = user.id === transactionInfo.users.creator.id
 
-      console.log('assets', transactionInfo.assets)
-
       const userDepositCount = getDepositCount(
         isCreator ? 'creator' : 'counterparty',
         transactionInfo.onchain.id,
-        transactionInfo.users,
         transactionInfo.assets,
         onchainInfo,
       )
-
-      console.log('userDepositCount', userDepositCount)
 
       const counterDepositCount = getDepositCount(
         isCreator ? 'counterparty' : 'creator',
         transactionInfo.onchain.id,
-        transactionInfo.users,
         transactionInfo.assets,
         onchainInfo,
       )
 
-      console.log('counterDepositCount', counterDepositCount)
-      console.log('isCreator', isCreator)
-
-      setUserDepositCount(userDepositCount)
       setCounterDepositCount(counterDepositCount)
-      setLoading(false)
 
       if (userDepositCount > 0) {
         setComponentToShow('deposit')

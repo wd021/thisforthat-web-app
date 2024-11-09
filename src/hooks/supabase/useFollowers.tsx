@@ -23,15 +23,8 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
       let query = supabase
         .from('user_follows')
         .select(
-          `
-          id,
-          follower_id,
-          followed_id,
-          user_profile!user_follows_${activeTab === 'following' ? 'followed' : 'follower'}_id_fkey1 (
-            id,
-            username,
-            profile_pic_url
-          )
+          `id, follower_id, followed_id,
+          user_profile!user_follows_${activeTab === 'following' ? 'followed' : 'follower'}_id_fkey1 (id, username, profile_pic_url)
         `,
         )
         .order('created_at', { ascending: false })
@@ -48,9 +41,9 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
       if (error) throw error
 
       if (page === 1) {
-        setItems(data)
+        setItems(data as unknown as FollowingProfile[])
       } else {
-        setItems((prev) => [...prev, ...data])
+        setItems((prev) => [...prev, ...(data as unknown as FollowingProfile[])])
       }
 
       setHasMore(data.length === GRID_ITEMS_PER_PAGE)
@@ -73,7 +66,7 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
       if (error) throw error
 
       setItems((prev) => prev.filter((item) => item.id !== targetUserId))
-      showToast('✅ Unfollowed successfully', 2500)
+      showToast('Unfollowed successfully', 2500)
     } catch (error) {
       console.error('Error unfollowing user:', error)
       showToast('⚠️ Error unfollowing user', 2500)

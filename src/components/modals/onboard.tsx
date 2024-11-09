@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import Modal from 'react-modal'
 import { isAddress } from 'viem'
 
-import { NftImporter } from '@/components/shared'
+import { LoadingIndicator, NftImporter } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { User } from '@/icons'
 import { useToast } from '@/providers/toastProvider'
@@ -251,15 +251,15 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
                           <User width={48} height={48} className='text-gray-400' />
                         )}
                       </div>
-                      <div>
+                      <div className='flex items-center'>
                         <button
                           type='button'
                           onClick={open}
-                          className='px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                          className='px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
                         >
                           {profileImage ? 'Change Picture' : 'Upload Picture'}
                         </button>
-                        {loadingFileUpload && <span className='ml-2'>Uploading...</span>}
+                        {loadingFileUpload && <LoadingIndicator className='ml-4 !w-6 !h-6' />}
                       </div>
                     </div>
                     {formErrors.file && (

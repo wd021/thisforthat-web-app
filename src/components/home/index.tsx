@@ -101,7 +101,7 @@ const NFTGrid: React.FC<{
   </div>
 )
 
-const Grid: React.FC = () => {
+const Homepage: React.FC = () => {
   const { user, profile, loading: authLoading } = useAuth()
   const { showToast } = useToast()
 
@@ -420,4 +420,4 @@ const Grid: React.FC = () => {
   )
 }
 
-export default Grid
+export default Homepage

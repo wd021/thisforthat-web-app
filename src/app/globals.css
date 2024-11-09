@@ -61,29 +61,6 @@ body {
   text-decoration: underline;
 }
 
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2; /* Limit text to 2 lines */
-  line-clamp: 2; /* Standard property for compatibility */
-}
-
-.loader {
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #222222;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
-}
-
-.writing-vertical-lr {
-  writing-mode: vertical-lr;
-  text-orientation: mixed;
-}
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);

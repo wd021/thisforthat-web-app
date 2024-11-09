@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { useIsMobile } from '@/hooks'
 import { getModalStyles } from '@/styles'
+import { Close } from '@/icons'
 
 const Duplicates: React.FC<{
   users: any[]
@@ -24,11 +25,8 @@ const Duplicates: React.FC<{
         <div className='p-4 border-b border-gray-200 sticky top-0'>
           <div className='flex justify-between items-center'>
             <h2 className='text-lg font-bold'>NFT Holders</h2>
-            <button
-              onClick={closeModal}
-              className='text-gray-500 hover:text-gray-700 transition-colors'
-            >
-              ✕
+            <button className='text-gray-500' aria-label='Close modal' onClick={closeModal}>
+              <Close className='w-5 h-5' />
             </button>
           </div>
         </div>

@@ -16,17 +16,14 @@ export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }
   const publicClient = usePublicClient()
   const { showToast } = useToast()
 
-  // Consolidate write contract states
   const {
     writeContract,
     data: hash,
     isPending: isWritePending,
     error: writeError,
     isError: isWriteError,
-    reset: resetWrite,
   } = useWriteContract()
 
-  // Consolidate transaction receipt states
   const {
     data: txReceipt,
     isLoading: isConfirming,
@@ -37,14 +34,12 @@ export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }
     hash,
   })
 
-  // Combined loading state
   const isLoading = isWritePending || isConfirming
 
   const cancelTrade = useCallback(async () => {
     if (!address || !publicClient || !tradeId) return
 
     try {
-      // Convert tradeId to BigInt if it's a string
       const tradeBigInt = typeof tradeId === 'string' ? BigInt(tradeId) : tradeId
 
       const { request } = await publicClient.simulateContract({
@@ -70,11 +65,6 @@ export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }
     }
   }, [tradeId, address, publicClient, writeContract, showToast])
 
-  // Reset the transaction states
-  const reset = useCallback(() => {
-    resetWrite()
-  }, [resetWrite])
-
   return {
     cancelTrade,
     isLoading,
@@ -85,6 +75,5 @@ export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }
     txReceipt,
     error: writeError || confirmError,
     isError: isWriteError || isConfirmError,
-    reset,
   }
 }

@@ -122,11 +122,11 @@ const LoginButton: React.FC<{ onClick: () => Promise<void> }> = ({ onClick }) =>
 const TermsNote: React.FC = () => (
   <p className='mb-4 text-sm text-gray-500'>
     By signing in, you agree to our{' '}
-    <a href='/terms' className='underline'>
+    <a href='/terms' target='_blank' className='underline'>
       Terms
     </a>{' '}
     and{' '}
-    <a href='/privacy' className='underline'>
+    <a href='/privacy' target='_blank' className='underline'>
       Privacy Policy
     </a>
   </p>
