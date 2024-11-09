@@ -13,6 +13,7 @@ const TransactionFeed: React.FC<{
 }> = ({ items, setTxModalInfo, setTxCancelModalInfo }) => {
   const { showToast } = useToast()
   const { getStatuses } = useTradeStatuses()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [statusMap, setStatusMap] = useState<Map<string | number, any>>(new Map())
   const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -49,6 +50,7 @@ const TransactionFeed: React.FC<{
     }
 
     fetchNewStatuses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, getStatuses])
 
   return (
@@ -168,13 +170,18 @@ const TransactionFeed: React.FC<{
             }
           }}
           showTxCancelModal={() => {
+            if (!item.onchain_trade_id || !item.onchain_tx) {
+              showToast('⚠️ Unable to connect to network. Please try again later.')
+              return
+            }
+
             const txCancelModalInfo = {
               transactionInfo: {
                 status: item.status,
                 offerId: item.offer_id,
                 onchain: {
-                  id: item.onchain_trade_id,
-                  hash: item.onchain_tx,
+                  id: item.onchain_trade_id as string,
+                  hash: item.onchain_tx as string,
                   done: item.onchain_done,
                 },
                 chainId: item.chain_id,

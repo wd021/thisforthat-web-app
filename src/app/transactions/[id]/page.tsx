@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react'
 
 import { Footer } from '@/components'
+import { Transaction } from '@/components/modals'
+import TransactionCancel from '@/components/modals/transaction/cancel'
 import { LoadingIndicator } from '@/components/shared'
-import TransactionPage from '@/components/transaction'
+import TransactionCard from '@/components/transaction'
 import { useIsMobile, useTradeInfo } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
+import { TxCancelModalInfo, TxModalInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
@@ -20,12 +23,18 @@ interface NFTPageProps {
 }
 
 const Transactions: React.FC<NFTPageProps> = ({ params }) => {
-  const { user, loading, profile } = useAuth()
+  const { user, loading } = useAuth()
   const { showToast } = useToast()
   const isMobile = useIsMobile()
   const [txInfo, setTxInfo] = useState<TransactionData | null>(null)
 
-  const { tradeInfo, isLoading, refetch } = useTradeInfo(txInfo?.onchain_trade_id || null)
+  const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
+  const [txCancelModalInfo, setTxCancelModalInfo] = useState<TxCancelModalInfo | null>(null)
+
+  const { tradeInfo, isLoading } = useTradeInfo(
+    txInfo?.onchain_trade_id || null,
+    txInfo?.onchain_done as boolean,
+  )
 
   const fetchOfferInfo = async () => {
     try {
@@ -57,8 +66,6 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, loading])
 
-  console.log('abc', tradeInfo, txInfo)
-
   if (!txInfo || !ONCHAIN_STATUSES.includes(txInfo.status) || !tradeInfo) {
     return (
       <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
@@ -73,43 +80,120 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
     >
       {txInfo && (
         <div className='max-w-screen-lg px-4 mx-auto my-8'>
-          <TransactionPage
+          <TransactionCard
             key={txInfo.offer_id}
             fullPage={true}
             transaction={txInfo}
+            onchainStatusLoading={isLoading}
             onchainInfo={tradeInfo}
             showTxModal={() => {
               const txModalInfo = {
-                offerId: txInfo.offer_id,
-                onchain: {
-                  id: txInfo.onchain_trade_id,
-                  hash: txInfo.onchain_tx,
-                  done: txInfo.onchain_done,
-                },
-                chainId: txInfo.chain_id,
-                users: {
-                  creator: {
-                    id: txInfo.creator_id,
-                    username: txInfo.creator_username,
-                    profile_pic_url: txInfo.creator_profile_pic_url,
-                    wallet: txInfo.creator_wallet,
+                transactionInfo: {
+                  status: txInfo.status,
+                  offerId: txInfo.offer_id,
+                  onchain: {
+                    id: txInfo.onchain_trade_id,
+                    hash: txInfo.onchain_tx,
+                    done: txInfo.onchain_done,
                   },
-                  counterparty: {
-                    id: txInfo.counterparty_id,
-                    username: txInfo.counterparty_username,
-                    profile_pic_url: txInfo.counterparty_profile_pic_url,
-                    wallet: txInfo.counterparty_wallet,
+                  chainId: txInfo.chain_id,
+                  users: {
+                    creator: {
+                      id: txInfo.creator_id,
+                      username: txInfo.creator_username,
+                      profile_pic_url: txInfo.creator_profile_pic_url,
+                      wallet: txInfo.creator_wallet,
+                    },
+                    counterparty: {
+                      id: txInfo.counterparty_id,
+                      username: txInfo.counterparty_username,
+                      profile_pic_url: txInfo.counterparty_profile_pic_url,
+                      wallet: txInfo.counterparty_wallet,
+                    },
+                  },
+                  assets: {
+                    creator: txInfo.creator_assets,
+                    counterparty: txInfo.counterparty_assets,
                   },
                 },
-                assets: {
-                  creator: txInfo.creator_assets,
-                  counterparty: txInfo.counterparty_assets,
+                onchainInfo: tradeInfo,
+              }
+
+              setTxModalInfo(txModalInfo)
+            }}
+            showTxCancelModal={() => {
+              if (!txInfo.onchain_trade_id || !txInfo.onchain_tx) {
+                showToast('⚠️ Unable to connect to network. Please try again later.')
+                return
+              }
+
+              const txCancelModalInfo = {
+                transactionInfo: {
+                  status: txInfo.status,
+                  offerId: txInfo.offer_id,
+                  onchain: {
+                    id: txInfo.onchain_trade_id,
+                    hash: txInfo.onchain_tx,
+                    done: txInfo.onchain_done,
+                  },
+                  chainId: txInfo.chain_id,
+                  users: {
+                    creator: {
+                      id: txInfo.creator_id,
+                      username: txInfo.creator_username,
+                      profile_pic_url: txInfo.creator_profile_pic_url,
+                      wallet: txInfo.creator_wallet,
+                    },
+                    counterparty: {
+                      id: txInfo.counterparty_id,
+                      username: txInfo.counterparty_username,
+                      profile_pic_url: txInfo.counterparty_profile_pic_url,
+                      wallet: txInfo.counterparty_wallet,
+                    },
+                  },
                 },
               }
-              // setTxModalInfo(txModalInfo)
+
+              setTxCancelModalInfo(txCancelModalInfo)
             }}
           />
         </div>
+      )}
+      {txModalInfo && (
+        <Transaction
+          {...txModalInfo}
+          closeModal={() => setTxModalInfo(null)}
+          onCreateTrade={(offerId: string, tradeId: string, tx: string) => {
+            setTxInfo((prevTxInfo) => {
+              if (prevTxInfo) {
+                return { ...prevTxInfo, onchain_trade_id: tradeId, onchain_tx: tx }
+              }
+              return prevTxInfo
+            })
+          }}
+          onCompleteTrade={() => {
+            setTxInfo((prevTxInfo) => {
+              if (prevTxInfo) {
+                return { ...prevTxInfo, status: 'onchain_completed', onchain_done: true }
+              }
+              return prevTxInfo
+            })
+          }}
+        />
+      )}
+      {txCancelModalInfo && (
+        <TransactionCancel
+          {...txCancelModalInfo}
+          closeModal={() => setTxCancelModalInfo(null)}
+          onCancelTrade={() => {
+            setTxInfo((prevTxInfo) => {
+              if (prevTxInfo) {
+                return { ...prevTxInfo, status: 'onchain_cancelled', onchain_done: true }
+              }
+              return prevTxInfo
+            })
+          }}
+        />
       )}
       {!isMobile && <Footer />}
     </div>
