@@ -9,8 +9,9 @@ import { Web3Provider } from '@/providers/web3Provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'This For That',
-  description: 'NFTs were made to be swapped.',
+  title: 'TFT - NFTs were made to be swapped',
+  description:
+    'Meet fellow NFT enthusiasts, make trades, negotiate, and have a blast while building your collection.',
   manifest: '/manifest.json',
   icons: {
     // Apple touch icons

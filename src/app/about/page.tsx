@@ -52,7 +52,7 @@ const AboutPage = () => {
               alt='TFT Platform'
               className='rounded-lg shadow-lg mb-8 w-full max-w-[525px] mx-auto'
             />
-            <h1 className='text-3xl font-bold mb-4'>Welcome to TFT</h1>
+            <h1 className='text-2xl font-bold mb-2'>THIS FOR THAT</h1>
             <p className='text-xl text-gray-600'>
               The hub for NFT trading, discovery, and connection.
             </p>

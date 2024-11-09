@@ -80,7 +80,9 @@ const TransactionModal: React.FC<{
   }
   onchainInfo: OnchainTradeInfo | null
   closeModal: () => void
-}> = ({ transactionInfo, onchainInfo, closeModal }) => {
+  onCreateTrade: (offerId: string, tradeId: string, tx: string) => void
+  onCompleteTrade: (offerId: string) => void
+}> = ({ transactionInfo, onchainInfo, closeModal, onCreateTrade, onCompleteTrade }) => {
   useSyncApiWithChain(onchainInfo, {
     offer_id: transactionInfo.offerId,
     onchain_done: transactionInfo.onchain.done,
@@ -165,6 +167,7 @@ const TransactionModal: React.FC<{
             onFinish={(hash: string, tradeId: string) => {
               setTradeId(tradeId)
               setComponentToShow('deposit')
+              onCreateTrade(transactionInfo.offerId, tradeId, hash)
             }}
           />
         )
@@ -179,7 +182,7 @@ const TransactionModal: React.FC<{
             onchainDeposited={
               onchainInfo ? onchainInfo.assets.filter((a) => a.isDeposited) : []
             }
-            tradeId={tradeId}
+            tradeId={tradeId!}
             onClose={closeModal}
             onFinish={async () => {
               if (counterDepositCount === 0) {
@@ -192,6 +195,7 @@ const TransactionModal: React.FC<{
                 if (token) {
                   await completeTradeWithApi(transactionInfo.offerId, token)
                 }
+                onCompleteTrade(transactionInfo.offerId)
                 setComponentToShow('completed')
               } else {
                 setComponentToShow('waiting')

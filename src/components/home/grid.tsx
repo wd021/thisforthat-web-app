@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { HomeDropdown, HomeTabBar } from '@/components/dropdowns'
-import { NFTGrid, OfferFeed, TransactionFeed } from '@/components/home'
+import { OfferFeed, TransactionFeed } from '@/components/feeds'
 import { Offer, Transaction } from '@/components/modals'
 import TransactionCancel from '@/components/modals/transaction/cancel'
+import { NFTGridObject } from '@/components/shared'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import {
@@ -87,6 +88,18 @@ const NoResultsState: React.FC<{ mainTab: MainTabOption; subTab: SubTabOption }>
     </div>
   )
 }
+
+const NFTGrid: React.FC<{
+  items: NFTGridItem[]
+  newOffer: (item: NFTGridItem) => void
+  pinItem: (item: NFTGridItem) => void
+}> = ({ items, newOffer, pinItem }) => (
+  <div className='p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:px-12 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 mb-24'>
+    {items.map((item) => (
+      <NFTGridObject key={item.nft_id} item={item} newOffer={newOffer} pinItem={pinItem} />
+    ))}
+  </div>
+)
 
 const Grid: React.FC = () => {
   const { user, profile, loading: authLoading } = useAuth()
@@ -355,11 +368,52 @@ const Grid: React.FC = () => {
       {offerModalInfo && (
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
-      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+      {txModalInfo && (
+        <Transaction
+          {...txModalInfo}
+          closeModal={() => setTxModalInfo(null)}
+          onCreateTrade={(offerId: string, tradeId: string, tx: string) => {
+            if (mainTab === 'transactions') {
+              setItems((prevItems) =>
+                prevItems.map((item) => {
+                  if ('offer_id' in item && item.offer_id === offerId) {
+                    return { ...item, onchain_trade_id: tradeId, onchain_tx: tx }
+                  }
+                  return item
+                }),
+              )
+            }
+          }}
+          onCompleteTrade={(offerId: string) => {
+            if (mainTab === 'transactions') {
+              setItems((prevItems) =>
+                prevItems.map((item) => {
+                  if ('offer_id' in item && item.offer_id === offerId) {
+                    return { ...item, status: 'onchain_completed', onchain_done: true }
+                  }
+                  return item
+                }),
+              )
+            }
+          }}
+        />
+      )}
       {txCancelModalInfo && (
         <TransactionCancel
           {...txCancelModalInfo}
           closeModal={() => setTxCancelModalInfo(null)}
+          onCancelTrade={(offerId: string) => {
+            if (mainTab === 'transactions') {
+              setItems((prevItems) =>
+                prevItems.map((item) => {
+                  if ('offer_id' in item && item.offer_id === offerId) {
+                    return { ...item, status: 'onchain_cancelled', onchain_done: true }
+                  }
+                  return item
+                }),
+              )
+            }
+          }}
         />
       )}
     </>

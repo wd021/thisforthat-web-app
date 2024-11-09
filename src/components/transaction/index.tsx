@@ -65,28 +65,6 @@ const Icons = {
   ),
 }
 
-const StatusBadge = ({ status, isDeposited }) => (
-  <span
-    className={`px-2 py-0.5 rounded-full text-xs ${
-      status === 'onchain_completed'
-        ? 'bg-green-100 text-green-700'
-        : status === 'onchain_cancelled'
-          ? 'bg-red-100 text-red-600'
-          : isDeposited
-            ? 'bg-green-100 text-green-700'
-            : 'bg-gray-100 text-gray-600'
-    }`}
-  >
-    {status === 'onchain_completed'
-      ? 'completed'
-      : status === 'onchain_cancelled'
-        ? 'cancelled'
-        : isDeposited
-          ? 'Deposited'
-          : 'Pending'}
-  </span>
-)
-
 const NFTCard = ({ asset }) => (
   <Link
     href={`/nfts/${asset.nft_id}`}

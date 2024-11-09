@@ -64,9 +64,9 @@ const config = createConfig(
       configuredChains.map((chain) => [chain.id, http(chain.rpcUrls.default.http[0])]),
     ),
     walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-    appName: 'TFT - Swap NFTS for NFTs',
+    appName: 'TFT - NFTs were made to be swapped',
     appDescription:
-      'Where NFT enthusiasts swap, trade, and connect. Why sell when you can have fun building your collection?',
+      'Meet fellow NFT enthusiasts, make trades, negotiate, and have a blast while building your collection.',
     appUrl: 'https://www.thisforthat.app',
     appIcon: 'https://www.thisforthat.app/logo.png',
   }),

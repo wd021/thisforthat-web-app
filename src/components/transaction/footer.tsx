@@ -61,7 +61,7 @@ const Footer = ({
   return (
     <div className='flex items-center justify-between'>
       <div className='flex-1 mr-8 max-w-[300px]'>
-        {tradeStarted && onchainActive && !onchainCancelled && (
+        {tradeStarted && onchainActive && !onchainCancelled && !tradeEnded && (
           <>
             <div className='w-full h-2 bg-gray-100 rounded-full overflow-hidden'>
               <div

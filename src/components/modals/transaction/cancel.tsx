@@ -14,6 +14,7 @@ import { supabase } from '@/utils/supabaseClient'
 const CancelTx = ({
   transactionInfo,
   closeModal,
+  onCancelTrade,
 }: {
   transactionInfo: {
     status: string
@@ -30,6 +31,7 @@ const CancelTx = ({
     }
   }
   closeModal: () => void
+  onCancelTrade: (offerId: string) => void
 }) => {
   const { showToast } = useToast()
   const isMobile = useIsMobile()
@@ -75,6 +77,7 @@ const CancelTx = ({
           console.error('Error updating offer status:', error)
           showToast('⚠️ Error updating offer status. Please try again.')
         } else {
+          onCancelTrade(transactionInfo.offerId)
           setCancelComplete(true)
         }
       } catch (error) {

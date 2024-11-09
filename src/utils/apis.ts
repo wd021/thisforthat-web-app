@@ -46,6 +46,7 @@ const NFT_FORMATTERS = {
           thumbnail: nft.image?.thumbnailUrl || nft.image?.cachedUrl || '',
           possible_spam: spamCheck ? getFloorPrice(nft) === -Infinity : false,
           wallet_address: walletAddress.toLowerCase(),
+          collection_floor_price: getFloorPrice(nft) === -Infinity ? 0 : getFloorPrice(nft),
         })),
         pageKey: null,
       }
@@ -299,5 +300,6 @@ function convertCryptoPunkToNFT(
     thumbnail: metadata.image,
     possible_spam: false,
     wallet_address: walletAddress.toLowerCase(),
+    collection_floor_price: 30,
   }
 }

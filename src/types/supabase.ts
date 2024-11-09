@@ -46,12 +46,11 @@ export interface NFT {
   created_at: string
   updated_at: string
   wallet_address: string
-  offers: number // not being used
+  collection_floor_price: number
   is_verified: boolean
   verified_at: string
   user_id: string
   possible_spam?: boolean
-  pins: number // not being used
   user_profile: Profile
 }
 
