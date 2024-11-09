@@ -54,7 +54,7 @@ const AboutPage = () => {
             />
             <h1 className='text-2xl font-bold mb-2'>THIS FOR THAT</h1>
             <p className='text-xl text-gray-600'>
-              The hub for NFT trading, discovery, and connection.
+              Trade, explore, and connect in the world of NFTs.
             </p>
           </div>
 
