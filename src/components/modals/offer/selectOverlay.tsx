@@ -22,21 +22,20 @@ const SelectNFT: FC<{
   const [selectedItems, setSelectedItems] = useState(selectedNFTs)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
-  const [hasOtherChainNFTs, setHasOtherChainNFTs] = useState(false)
 
   useEffect(() => {
-    fetchUserNFTs()
+    fetchUserNFTs(1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, page])
+  }, [user.id])
 
-  const fetchUserNFTs = async () => {
+  const fetchUserNFTs = async (page: number) => {
     const rangeStart = (page - 1) * GRID_ITEMS_PER_PAGE
     const rangeEnd = page * GRID_ITEMS_PER_PAGE - 1
 
     const { data, error } = await supabase
       .from('user_nfts')
       .select('*, nfts!user_nfts_nft_id_fkey(*)')
-      .eq('user_id', user?.id)
+      .eq('user_id', user.id)
       .eq('nfts.chain_id', chainId)
       .not('nfts', 'is', null)
       .range(rangeStart, rangeEnd)
@@ -49,7 +48,6 @@ const SelectNFT: FC<{
     } else {
       setAvailableNFTs((prev) => [...prev, ...data])
       setHasMore(data.length === GRID_ITEMS_PER_PAGE)
-      setHasOtherChainNFTs(data.some((nft) => nft.nfts.chain_id !== chainId))
     }
   }
 
@@ -60,10 +58,13 @@ const SelectNFT: FC<{
         return
       }
 
-      const itemFormatted = {
+      const itemFormatted: SimplifiedNFTAsset = {
         nft_id: item.nfts.id,
         name: item.nfts.name,
         image: item.nfts.image,
+        collection_contract: item.nfts.collection_contract,
+        token_id: item.nfts.token_id,
+        token_type: item.nfts.token_type,
       }
 
       setSelectedItems((prevItems) => {
@@ -97,7 +98,9 @@ const SelectNFT: FC<{
   )
 
   const handleLoadMore = () => {
-    setPage((prevPage) => prevPage + 1)
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchUserNFTs(nextPage)
   }
 
   return (

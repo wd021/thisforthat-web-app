@@ -83,6 +83,7 @@ const useFollowers = (userId: string, activeTab: 'following' | 'followers') => {
   useEffect(() => {
     fetchItems(1)
     setPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, activeTab])
 
   const loadMore = () => {

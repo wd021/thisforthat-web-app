@@ -98,8 +98,8 @@ const AboutPage = () => {
           <div className='mb-12 bg-white rounded-lg p-6 shadow-sm'>
             <h2 className='text-2xl font-semibold mb-6'>Technical Details</h2>
             <p className='text-gray-600 mb-4'>
-              All trades are executed automatically through our smart contracts. Our contracts
-              are open-sourced and available on GitHub for complete transparency.
+              All trades are executed automatically through smart contracts. Our contracts are
+              open-sourced and available on GitHub for complete transparency.
             </p>
             <Link
               href={GITHUB_LINK}
@@ -114,8 +114,7 @@ const AboutPage = () => {
           <div className='text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8 shadow-sm'>
             <h2 className='text-2xl font-semibold mb-4'>Join Our Community</h2>
             <p className='text-gray-600 mb-6'>
-              Stay up-to-date with the latest features and updates by joining our Discord
-              community.
+              Stay up-to-date with the latest features and updates by joining our Discord.
             </p>
             <Link
               href={DISCORD_LINK}

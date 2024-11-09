@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useModal } from 'connectkit'
 import { Address } from 'viem'
+import { useAccount } from 'wagmi'
 
 import { NFTImage } from '@/components/shared'
 import { LoadingIndicator } from '@/components/shared'
@@ -24,6 +26,9 @@ const DepositCard = ({
   }[]
   onFinish: () => void
 }) => {
+  const { setOpen } = useModal()
+  const { isConnected } = useAccount()
+
   const isDeposited = depositedAssets.some(
     (dAsset) =>
       dAsset.token.toLowerCase() === asset.collection_contract.toLowerCase() &&
@@ -73,6 +78,11 @@ const DepositCard = ({
   }, [isApprovalConfirmed])
 
   const onClickDeposit = async () => {
+    if (!isConnected) {
+      setOpen(true)
+      return
+    }
+
     const depositAsset = {
       tokenAddress: asset.collection_contract as `0x${string}`,
       tokenId: asset.token_id,
@@ -93,7 +103,7 @@ const DepositCard = ({
     if (isApprovalConfirming) return 'Confirming Approval...'
     if (isDepositPending) return 'Waiting for Deposit...'
     if (isDepositConfirming) return 'Confirming Deposit...'
-    return needsApproval ? 'Approve Asset' : 'Deposit Asset'
+    return needsApproval ? 'Approve NFT' : 'Deposit NFT'
   }
 
   const isLoading =
@@ -105,6 +115,7 @@ const DepositCard = ({
 
   useEffect(() => {
     if (isDepositConfirmed) onFinish()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDepositConfirmed])
 
   return (

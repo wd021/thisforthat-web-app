@@ -53,19 +53,38 @@ const StatusMessage: React.FC<{
       case 'countered-open':
         return {
           message: (
-            <Link
-              href={`/offers/${childOfferId}`}
-              target='_blank'
-              onClick={(e) => {
-                e.stopPropagation()
+            <>
+              <Link
+                className='flex items-center'
+                href={`/offers/${childOfferId}`}
+                target='_blank'
+                onClick={(e) => {
+                  e.stopPropagation()
 
-                if (!childOfferId) {
-                  e.preventDefault()
-                }
-              }}
-            >
-              countered
-            </Link>
+                  if (!childOfferId) {
+                    e.preventDefault()
+                  }
+                }}
+              >
+                countered
+                {(status === 'countered' || status === 'countered-open') && childOfferId && (
+                  <svg
+                    className='ml-1 text-blue-700'
+                    fill='none'
+                    height='14'
+                    width='14'
+                    stroke='currentColor'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                  >
+                    <line x1='7' x2='17' y1='17' y2='7' />
+                    <polyline points='7 7 17 7 17 17' />
+                  </svg>
+                )}
+              </Link>
+            </>
           ),
           className: 'text-blue-700 bg-blue-100',
         }
@@ -82,22 +101,6 @@ const StatusMessage: React.FC<{
   return (
     <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}>
       <span className='text-sm font-semibold'>{config.message}</span>
-      {(status === 'countered' || status === 'countered-open') && childOfferId && (
-        <svg
-          className='text-blue-700'
-          fill='none'
-          height='14'
-          width='14'
-          stroke='currentColor'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth='2'
-          viewBox='0 0 24 24'
-        >
-          <line x1='7' x2='17' y1='17' y2='7' />
-          <polyline points='7 7 17 7 17 17' />
-        </svg>
-      )}
     </div>
   )
 }

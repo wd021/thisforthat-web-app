@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Address } from 'viem'
 
-import { LoadingIndicator } from '@/components/shared'
+import { LoadingIndicator, WalletStatus } from '@/components/shared'
 import { Close } from '@/icons'
 import { OnchainTradeInfoAsset } from '@/types/main'
 import { SimplifiedNFTAsset } from '@/types/supabase'
@@ -73,7 +73,7 @@ const DepositTx = ({
       </div>
 
       {/* Footer Done */}
-      <div className='p-4 space-y-2'>
+      <div className='p-4 pb-0 space-y-2'>
         <button
           onClick={onFinish}
           disabled={depositsRemaining > 0}
@@ -90,6 +90,9 @@ const DepositTx = ({
             {depositsRemaining > 0 ? `Complete All Deposits to Continue` : 'Continue'}
           </span>
         </button>
+      </div>
+      <div className='p-4'>
+        <WalletStatus />
       </div>
     </div>
   )

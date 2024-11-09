@@ -74,6 +74,7 @@ export async function POST(req: Request) {
     const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] = tradeInfo
     const tokenMapping = createTokenIdRecipientMapping(tradeInfo[3])
 
+    console.log('tradeInfo', tradeInfo)
     console.log('tokenMapping', tokenMapping)
     // map the assets and new wallets and pass it with the rpc call
 
@@ -83,6 +84,8 @@ export async function POST(req: Request) {
 
     const onchainSuccess =
       depositedAssetCount === totalAssetCount && Number(depositedAssetCount) > 0 ? true : false
+
+    console.log('onchainSuccess', onchainSuccess)
 
     if (onchainSuccess) {
       // Complete the swap using service role

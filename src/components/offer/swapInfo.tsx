@@ -181,7 +181,7 @@ const TradeOffer: FC<TradeOfferProps> = ({
 
   return (
     <div
-      className='mb-2'
+      className='mb-2 overflow-hidden'
       onClick={(e) => {
         if (isExpanded) {
           e.stopPropagation()

@@ -28,18 +28,12 @@ const OfferFeed: React.FC<{
         ),
       )
 
-      const { error } = await supabase.from('offer_favorites').upsert(
-        [
-          {
-            user_id: user.id,
-            offer_id: offer.offer_id,
-          },
-        ],
-        {
+      const { error } = await supabase
+        .from('offer_favorites')
+        .upsert([{ user_id: user.id, offer_id: offer.offer_id }], {
           onConflict: 'user_id,offer_id',
           ignoreDuplicates: true,
-        },
-      )
+        })
 
       if (error) {
         // Revert the optimistic update if there's an error
@@ -65,7 +59,8 @@ const OfferFeed: React.FC<{
   }
 
   const counterOffer = async (offer: OfferData) => {
-    const modalInfo = {
+    // counter offer reverses the creator and counterparty
+    const offerModalInfo = {
       offerId: offer.offer_id,
       chainId: offer.chain_id,
       users: {
@@ -73,11 +68,13 @@ const OfferFeed: React.FC<{
           id: offer.counterparty_id,
           username: offer.counterparty_username,
           profile_pic_url: offer.counterparty_profile_pic_url,
+          wallet: offer.counterparty_wallet,
         },
         counterparty: {
           id: offer.creator_id,
           username: offer.creator_username,
           profile_pic_url: offer.creator_profile_pic_url,
+          wallet: offer.creator_wallet,
         },
       },
       assets: {
@@ -86,7 +83,7 @@ const OfferFeed: React.FC<{
       },
     }
 
-    setOfferModalInfo(modalInfo)
+    setOfferModalInfo(offerModalInfo)
 
     setItems(
       items.map((item) =>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 
+import { LoadingIndicator } from '@/components/shared'
 import { useIsMobile, useTradeInfo } from '@/hooks'
 import { useSyncApiWithChain } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
@@ -16,6 +17,17 @@ import CompletedTx from './completed'
 import CreateTx from './create'
 import DepositTx from './deposit'
 import WaitingTx from './waiting'
+
+const TradeProgress = () => {
+  return (
+    <div className='flex flex-col items-center justify-center space-y-4 p-6 my-4'>
+      <LoadingIndicator />
+      <p className='text-lg font-medium text-gray-700'>
+        Transaction successful. Finishing up trade...
+      </p>
+    </div>
+  )
+}
 
 const getDepositCount = (
   user: 'creator' | 'counterparty',
@@ -174,7 +186,7 @@ const TransactionModal: React.FC<{
             onClose={closeModal}
             onFinish={async () => {
               if (counterDepositCount === 0) {
-                // this took some time, need a loading screen
+                setComponentToShow('completing')
                 const {
                   data: { session },
                 } = await supabase.auth.getSession()
@@ -192,6 +204,8 @@ const TransactionModal: React.FC<{
         )
       case 'waiting':
         return <WaitingTx onClose={closeModal} />
+      case 'completing':
+        return <TradeProgress />
       case 'completed':
         return <CompletedTx onClose={closeModal} />
       default:

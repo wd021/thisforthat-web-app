@@ -174,7 +174,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
       return
     }
 
-    setOfferModalInfo({
+    const offerModalInfo = {
       offerId: null,
       chainId: nft.nft_chain_id,
       users: {
@@ -204,7 +204,9 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
           },
         ],
       },
-    })
+    }
+
+    setOfferModalInfo(offerModalInfo)
   }
 
   const handlePinItem = async (nft: NFTGridItem) => {

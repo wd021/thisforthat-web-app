@@ -150,6 +150,8 @@ export async function completeTradeWithApi(offer_id: string, token: string): Pro
       },
     })
 
+    console.log('complete trade response', response)
+
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`HTTP error ${response.status}: ${errorText}`)

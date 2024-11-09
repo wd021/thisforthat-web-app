@@ -24,7 +24,7 @@ const FeedItem = ({ notification }: { notification: Notification }) => {
   const { user } = notification.metadata
 
   return (
-    <div className='space-y-1'>
+    <div className='space-y-3'>
       <div className='flex items-center'>
         <Link
           href={`/${user.username}`}

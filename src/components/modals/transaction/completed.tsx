@@ -1,4 +1,4 @@
-import { Close } from '@/icons'
+import { Checkmark, Close } from '@/icons'
 
 const CompletedTx = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -16,19 +16,7 @@ const CompletedTx = ({ onClose }: { onClose: () => void }) => {
         <div className='bg-white rounded-lg overflow-hidden mb-6'>
           <div className='p-4 flex flex-col items-center'>
             <div className='mb-6 bg-green-100 rounded-full p-3'>
-              <svg
-                className='h-12 w-12 text-green-500'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M5 13l4 4L19 7'
-                />
-              </svg>
+              <Checkmark className='w-10 h-10 text-green-500' />
             </div>
             <div>NFTs have been sent to your wallet</div>
           </div>
