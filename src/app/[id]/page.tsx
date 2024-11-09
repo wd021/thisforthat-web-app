@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { Footer } from '@/components'
 import { UserDropdown } from '@/components/dropdowns'
-import { OfferFeed } from '@/components/home'
+import { OfferFeed } from '@/components/feeds'
 import { Following, Offer, Transaction } from '@/components/modals'
 import { LoadingIndicator, NFTGridObject } from '@/components/shared'
 import { LoadMore } from '@/components/shared/buttons'
@@ -261,6 +261,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
           items={items as OfferData[]}
           setOfferModalInfo={setOfferModalInfo}
           setItems={setItems}
+          setTxModalInfo={setTxModalInfo}
         />
       </div>
     )
@@ -302,7 +303,14 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
       {offerModalInfo && (
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
-      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+      {txModalInfo && (
+        <Transaction
+          {...txModalInfo}
+          closeModal={() => setTxModalInfo(null)}
+          onCreateTrade={() => {}}
+          onCompleteTrade={() => {}}
+        />
+      )}
       {userPageProfile && followingModalInfo && (
         <Following
           userId={userPageProfile.id}

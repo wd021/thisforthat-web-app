@@ -89,8 +89,7 @@ export async function uploadFile(
     }
 
     return { key }
-  } catch (error) {
-    alert('Upload error:' + error)
+  } catch {
     return null
   }
 }

@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import { OfferFeed } from '@/components/home'
+import { OfferFeed } from '@/components/feeds'
 import { Duplicates, Offer, Transaction } from '@/components/modals'
 import { LoadingIndicator, NFTImage, VerifiedBadge } from '@/components/shared'
 import { useNFTOffers } from '@/hooks/supabase'
@@ -11,13 +11,13 @@ import { Etherscan, Opensea } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo } from '@/types/main'
-import { NFT } from '@/types/supabase'
+import { NFT, UserNFT } from '@/types/supabase'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
 const NFTSidebar: React.FC<{
   nft: NFT
-  nftUsers: any[]
+  nftUsers: UserNFT[]
   showMultiUserModal: () => void
   makeOffer: () => void
   pinItem: () => void
@@ -182,7 +182,7 @@ const MobileActionButtons: React.FC<{ makeOffer: () => void; pinItem: () => void
 
 const NFTPage: React.FC<{
   nft: NFT
-  nftUsers: any[]
+  nftUsers: UserNFT[]
 }> = ({ nft, nftUsers }) => {
   const { user, profile } = useAuth()
   const { showToast } = useToast()
@@ -296,8 +296,9 @@ const NFTPage: React.FC<{
                       <div className='flex flex-col gap-y-4'>
                         <OfferFeed
                           items={items}
+                          setOfferModalInfo={setOfferModalInfo}
+                          setTxModalInfo={setTxModalInfo}
                           setItems={setItems}
-                          setOfferModalInfo={() => {}}
                         />
                       </div>
                       {items.length > 0 && hasMore && (
@@ -321,7 +322,14 @@ const NFTPage: React.FC<{
       {offerModalInfo && (
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
-      {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+      {txModalInfo && (
+        <Transaction
+          {...txModalInfo}
+          closeModal={() => setTxModalInfo(null)}
+          onCreateTrade={() => {}}
+          onCompleteTrade={() => {}}
+        />
+      )}
       {multiUserModal && (
         <Duplicates users={nftUsers} closeModal={() => setShowMultiUserModal(false)} />
       )}

@@ -30,6 +30,7 @@ export interface UserNFT {
   nft_id: string
   wallet_address: string
   nfts: NFT
+  user_profile?: Profile
 }
 
 export interface NFT {

@@ -2,15 +2,15 @@ import { useCallback } from 'react'
 import { useReadContract } from 'wagmi'
 
 import ABI from '@/contracts/abi.json'
-import { TradeInfo, TradeInfoAsset } from '@/types/main'
+import { OnchainTradeInfo, OnchainTradeInfoAsset } from '@/types/main'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
 const formatTradeInfo = (
   isActive: boolean,
   depositedAssetCount: bigint,
   totalAssetCount: bigint,
-  assets: TradeInfoAsset[],
-): TradeInfo => {
+  assets: OnchainTradeInfoAsset[],
+): OnchainTradeInfo => {
   return {
     isActive,
     depositedAssetCount: Number(depositedAssetCount),
@@ -34,23 +34,22 @@ export default function useTradeInfo(tradeId: string | number | null, done: bool
       enabled: Boolean(tradeId) && !done,
     },
   }) as {
-    data: [boolean, bigint, bigint, TradeInfoAsset[]] | undefined
+    data: [boolean, bigint, bigint, OnchainTradeInfoAsset[]] | undefined
     isError: boolean
     isLoading: boolean
-    refetch: () => Promise<any>
+    refetch: () => Promise<unknown>
   }
 
-  const decodeAsset = useCallback((asset: TradeInfoAsset): TradeInfoAsset => {
+  const decodeAsset = useCallback((asset: OnchainTradeInfoAsset): OnchainTradeInfoAsset => {
     if (typeof asset === 'object' && 'token' in asset) {
-      // If the asset is already in the correct format, return it as is
-      return asset as TradeInfoAsset
+      return asset as OnchainTradeInfoAsset
     }
-    // If it's not, assume it's a tuple and decode it
+
     const { token, tokenId, amount, assetType, recipient, isDeposited } = asset
     return { token, tokenId, amount, assetType, recipient, isDeposited }
   }, [])
 
-  let tradeInfo: TradeInfo | undefined
+  let tradeInfo: OnchainTradeInfo | undefined
 
   if (tradeData) {
     const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] = tradeData

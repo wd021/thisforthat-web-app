@@ -106,31 +106,7 @@ const NotificationsPage: React.FC = () => {
     if (user?.id) {
       fetchNotifications(1)
     }
-  }, [user?.id])
-
-  // Subscribe to real-time notifications
-  useEffect(() => {
-    if (!user?.id) return
-
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          setNotifications((prev) => [payload.new as Notification, ...prev])
-        },
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
   const handleLoadMore = () => {

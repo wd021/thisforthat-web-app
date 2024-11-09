@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Footer } from '@/components'
 import { useIsMobile } from '@/hooks'
 import { useToast } from '@/providers/toastProvider'
-import { NFT as NFTType } from '@/types/supabase'
+import { NFT as NFTType, UserNFT } from '@/types/supabase'
 import { supabase } from '@/utils/supabaseClient'
 
 import NFTPage from './nftPage'
@@ -20,8 +20,7 @@ const NFT: React.FC<NFTPageProps> = ({ params }) => {
   const isMobile = useIsMobile()
   const { showToast } = useToast()
   const [nftInfo, setNftInfo] = useState<NFTType | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [nftUsers, setNftUsers] = useState<any[]>([])
+  const [nftUsers, setNftUsers] = useState<UserNFT[]>([])
 
   const fetchNftData = async () => {
     try {
@@ -49,7 +48,7 @@ const NFT: React.FC<NFTPageProps> = ({ params }) => {
       }
 
       setNftInfo(nftResponse.data)
-      setNftUsers(usersResponse.data ? usersResponse.data : [])
+      setNftUsers(usersResponse.data ? (usersResponse.data as unknown as UserNFT[]) : [])
     } catch (error) {
       showToast('⚠️ Failed to fetch NFT data', 2500)
       console.error('Failed to fetch NFT data', error)

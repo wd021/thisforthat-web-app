@@ -5,6 +5,7 @@ import { createPublicClient, http } from 'viem'
 import { anvil, mainnet } from 'viem/chains'
 
 import ABI from '@/contracts/abi.json'
+import { OnchainTradeInfo } from '@/types/main'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 import { createTokenIdRecipientMapping } from '@/utils/helpers'
 
@@ -16,14 +17,10 @@ const supabaseAdmin = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-    // db: {
-    //   schema: 'public',
-    // },
   },
 )
 
 export async function POST(req: Request) {
-  // 1. Authentication check
   const headersList = headers()
   const authorization = headersList.get('authorization')
 
@@ -39,7 +36,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    // 2. Get offer details
     const { offer_id } = await req.json()
 
     if (!offer_id) {
@@ -67,19 +63,15 @@ export async function POST(req: Request) {
       transport: http(),
     })
 
-    const tradeInfo = await publicClient.readContract({
+    const tradeInfo = (await publicClient.readContract({
       address: CONTRACT_ADDRESSES[31337],
       abi: ABI,
       functionName: 'getTradeInfo',
       args: [BigInt(offerData.onchain_trade_id)],
-    })
+    })) as [boolean, bigint, bigint, OnchainTradeInfo[]]
 
-    const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] = tradeInfo
+    const [isActive, depositedAssetCount, totalAssetCount] = tradeInfo
     const tokenMapping = createTokenIdRecipientMapping(tradeInfo[3])
-
-    console.log('tradeInfo', tradeInfo)
-    console.log('tokenMapping', tokenMapping)
-    // map the assets and new wallets and pass it with the rpc call
 
     if (isActive === true) {
       return new Response('Trade is still active onchain', { status: 400 })
@@ -88,10 +80,7 @@ export async function POST(req: Request) {
     const onchainSuccess =
       depositedAssetCount === totalAssetCount && Number(depositedAssetCount) > 0 ? true : false
 
-    console.log('onchainSuccess', onchainSuccess)
-
     if (onchainSuccess) {
-      // Complete the swap using service role
       const { error } = await supabaseAdmin.rpc('complete_onchain_swap', {
         p_offer_id: offer_id,
         p_nft_wallets: tokenMapping,
@@ -104,7 +93,6 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ status: 'confirm-completed' }, { status: 200 })
     } else {
-      // Complete the swap using service role
       const { error } = await supabaseAdmin.rpc('cancel_onchain_swap', {
         p_offer_id: offer_id,
       })

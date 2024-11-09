@@ -90,7 +90,7 @@ const AccountProfilePage: React.FC = () => {
     const file = acceptedFiles[0]
 
     if (file.size > MAX_IMAGE_UPLOAD_SIZE) {
-      alert('File size exceeds 3MB.')
+      showToast('⚠️ File size exceeds 3MB.')
       return
     }
 
@@ -110,8 +110,8 @@ const AccountProfilePage: React.FC = () => {
           prevProfile ? { ...prevProfile, profile_pic_url: response.key } : prevProfile,
         )
       }
-    } catch (error) {
-      alert('Unexpected error. Please try again.')
+    } catch {
+      showToast('⚠️ Unexpected error. Please try again.', 2500)
     } finally {
       setLoadingFileUpload(false)
     }

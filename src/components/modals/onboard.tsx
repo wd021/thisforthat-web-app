@@ -185,7 +185,7 @@ const Onboard: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 
     if (!token) {
       setLoadingFileUpload(false)
-      alert('Unexpected error. Please try again.')
+      showToast('⚠️ Unexpected error. Please try again.')
       return
     }
 
