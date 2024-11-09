@@ -293,7 +293,7 @@ interface SaveButtonProps {
 const SaveButton: React.FC<SaveButtonProps> = ({ handleSaveProfile, loading }) => (
   <button
     onClick={handleSaveProfile}
-    className='w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50'
+    className='w-full p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50'
     disabled={loading}
   >
     {loading ? 'Saving...' : 'Save Changes'}

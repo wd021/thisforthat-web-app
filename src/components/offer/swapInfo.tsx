@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { NFTImage } from '@/components/shared'
-import { ChainLogo, Heart, SwapArrows } from '@/icons'
+import { Heart, SwapArrows } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import type { NFTAsset, OfferData } from '@/types/supabase'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
 interface LikeButtonProps {
@@ -28,19 +27,7 @@ const LikeButton: FC<LikeButtonProps> = ({
       e.stopPropagation()
       onLike()
     }}
-    className={`
-      ml-3
-      inline-flex 
-      items-center 
-      space-x-1
-      p-1 
-      hover:bg-gray-100 
-      rounded-full 
-      transition-colors
-      ${isLiked ? 'text-red-500' : 'text-gray-500'}
-      hover:text-red-500
-      ${className}
-    `}
+    className={`ml-3 inline-flex  items-center space-x-1 p-1  hover:bg-gray-100  rounded-full transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500 ${className}`}
   >
     <Heart className='h-4 w-4' fill={isLiked ? 'currentColor' : 'none'} />
     {likesCount > 0 && <span className='text-xs font-medium'>{likesCount}</span>}
@@ -142,6 +129,8 @@ const TradeOffer: FC<TradeOfferProps> = ({
   onLike,
 }) => {
   if (isOpenOffer) {
+    const openAsset = offer.counterparty_assets[0]
+
     return (
       <div
         className='mb-2 flex justify-between p-3 w-full rounded-lg bg-gray-50'
@@ -152,36 +141,29 @@ const TradeOffer: FC<TradeOfferProps> = ({
         }}
       >
         <Link
-          href={`/nfts/${offer.counterparty_assets[0].nft_id}`}
+          href={`/nfts/${openAsset.nft_id}`}
           target='_blank'
           className='flex items-center space-x-2.5 transition-colors hover:bg-gray-50'
+          onClick={(e) => {
+            if (!isExpanded) {
+              e.preventDefault()
+            }
+          }}
         >
           <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-12 w-12'}`}>
             <NFTImage
-              src={offer.counterparty_assets[0].image}
-              alt={offer.counterparty_assets[0].name}
-              fallback={offer.counterparty_assets[0].name}
+              src={openAsset.image}
+              alt={openAsset.name}
+              fallback={openAsset.name}
               rounded='all'
             />
           </div>
           {isExpanded && (
-            <div className='flex min-w-0 flex-col py-0.5'>
+            <div className='flex min-w-0 flex-col gap-y-0.5'>
               <span className='truncate text-sm font-medium text-gray-900'>
-                {offer.counterparty_assets[0].name}
+                {openAsset.name}
               </span>
-              <span className='mt-0.5 flex items-center'>
-                <ChainLogo
-                  chainId={offer.counterparty_assets[0].chain_id}
-                  className='h-3 w-3'
-                />
-                <span className='ml-1 text-sm text-gray-600'>
-                  {
-                    CHAIN_IDS_TO_CHAINS[
-                      offer.counterparty_assets[0].chain_id as keyof typeof CHAIN_IDS_TO_CHAINS
-                    ]
-                  }
-                </span>
-              </span>
+              <span className='text-xs text-gray-500'>{openAsset.collection_name}</span>
             </div>
           )}
         </Link>

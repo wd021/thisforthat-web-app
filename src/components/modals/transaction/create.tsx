@@ -3,6 +3,7 @@ import { useModal } from 'connectkit'
 import { decodeEventLog } from 'viem'
 import { useAccount } from 'wagmi'
 
+import { WalletStatus } from '@/components/shared'
 import { useCreateTrade } from '@/hooks'
 import { Close } from '@/icons'
 import { useToast } from '@/providers/toastProvider'
@@ -31,7 +32,7 @@ const CreateTx: React.FC<{
   const { showToast } = useToast()
   const [error, setError] = useState<string | null>(null)
   const { setOpen } = useModal()
-  const { account, isConnected } = useAccount()
+  const { isConnected } = useAccount()
 
   const {
     createTradeContract,
@@ -50,7 +51,7 @@ const CreateTx: React.FC<{
   useEffect(() => {
     const updateOffer = async (hash: string, tradeId: bigint) => {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('offers')
           .update({
             onchain_trade_id: tradeId.toString(),
@@ -68,9 +69,19 @@ const CreateTx: React.FC<{
           return
         }
 
-        console.log('do we get here')
+        // If update returned no data (meaning it didn't update because values existed),
+        // fetch the existing record
+        if (!data?.length) {
+          const { data: existingOffer } = await supabase
+            .from('offers')
+            .select('onchain_trade_id, onchain_tx')
+            .match({ id: offerId })
+            .single()
 
-        onFinish(hash, tradeId.toString())
+          onFinish(existingOffer?.onchain_tx, existingOffer?.onchain_trade_id)
+        } else {
+          onFinish(hash, tradeId.toString())
+        }
       } catch (error) {
         console.error('Error creating contract:', error)
         showToast('⚠️ Error creating contract. Please try again.')
@@ -98,6 +109,7 @@ const CreateTx: React.FC<{
       const tradeId = decodedLog.args.tradeId
       updateOffer(hash!, tradeId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, isConfirmed, txReceipt, offerId])
 
   useEffect(() => {
@@ -106,11 +118,18 @@ const CreateTx: React.FC<{
     } else {
       setOpen(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleCreateTrade = async (): Promise<void> => {
     try {
       setError(null)
+
+      if (!isConnected) {
+        setOpen(true)
+        return
+      }
+
       await createTradeContract()
     } catch (err) {
       let errorMessage = 'Something went wrong while creating the trade.'
@@ -155,7 +174,6 @@ const CreateTx: React.FC<{
         >
           Create Contract
         </button>
-        {error && <div className='text-red-500'>{error}</div>}
       </div>
     )
   }
@@ -175,11 +193,29 @@ const CreateTx: React.FC<{
         {renderContent()}
       </div>
 
-      <div className='px-6 pb-6 pt-4 text-center bg-gray-50'>
-        <p className='text-sm text-gray-500 '>
-          You&apos;ll need to connect your wallet to execute the trade.
-        </p>
+      <div className='p-4'>
+        <WalletStatus />
       </div>
+      {error && (
+        <div className='p-4 pt-0'>
+          <div className='flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm'>
+            <svg
+              className='w-4 h-4 flex-shrink-0'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

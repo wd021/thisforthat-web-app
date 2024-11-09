@@ -10,7 +10,6 @@ import {
   NFT_VERIFY_LIMIT,
   PUNK_VERIFY_LIMIT,
 } from '@/utils/constants'
-import { supabase } from '@/utils/supabaseClient'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -110,7 +109,7 @@ async function getPunkOwner(contractAddress: string, tokenId: string) {
   }
 }
 
-export async function POST(req: any) {
+export async function POST(req: Request) {
   const headersList = headers()
   const authorization = headersList.get('authorization')
 

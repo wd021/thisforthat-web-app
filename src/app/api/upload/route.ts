@@ -20,8 +20,7 @@ const generatePresignedUrl = async ({ Bucket, Key, Expires = 3600 }: PreSignedUr
   return url
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function POST(req: any) {
+export async function POST(req: Request) {
   const headersList = headers()
   const authorization = headersList.get('authorization')
 

@@ -1,11 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
-import { useModal } from 'connectkit'
-import { useAccount } from 'wagmi'
 
 const STATUS_PENDING = ['open', 'created']
 
-// Using the same icons as ActionButton
 const Icons = {
   accept: (className: string) => (
     <svg className={className} fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -36,9 +33,8 @@ const Icons = {
 
 const StatusMessage: React.FC<{
   status: string
-  counterparty: string
   childOfferId: string | null
-}> = ({ status, counterparty, childOfferId }) => {
+}> = ({ status, childOfferId }) => {
   const getStatusConfig = () => {
     switch (status) {
       case 'accepted':
@@ -196,16 +192,12 @@ const Footer: React.FC<{
                   d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
                 />
               </svg>
-              <span className='text-sm font-medium'>Waiting for {counterparty} to decide</span>
+              <span className='text-sm font-medium'>Waiting for {counterparty} to act</span>
             </div>
           )}
         </>
       ) : (
-        <StatusMessage
-          status={status}
-          counterparty={counterparty}
-          childOfferId={childOfferId}
-        />
+        <StatusMessage status={status} childOfferId={childOfferId} />
       )}
     </div>
   )

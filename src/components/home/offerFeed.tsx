@@ -201,8 +201,6 @@ const OfferFeed: React.FC<{
         )
         showToast(`⚠️ Error declining offer`, 2500)
         console.error('Error declining offer:', error)
-      } else {
-        showToast(`✅ Offer declined`, 2500)
       }
     } catch (error) {
       // Handle any other errors

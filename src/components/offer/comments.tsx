@@ -8,7 +8,7 @@ import { timeAgoShort } from '@/utils/helpers'
 import { LoadMore } from '../shared/buttons'
 
 const MessageItem: React.FC<{ message: OfferMessage }> = ({ message }) => (
-  <div className='group flex items-start space-x-2 rounded-md p-1.5 pr-4'>
+  <div className='group flex items-start space-x-2.5 rounded-md p-1.5 pr-4'>
     <Link
       href={`/${message.username ? message.username : '/about'}`}
       target='_blank'
@@ -26,7 +26,7 @@ const MessageItem: React.FC<{ message: OfferMessage }> = ({ message }) => (
     </Link>
     <div className='flex-1 min-w-0'>
       <div className='flex items-center gap-x-1'>
-        <span className='text-xs text-gray-900 cursor-pointer'>
+        <span className='text-xs text-gray-900 font-semibold cursor-pointer'>
           {message.type === 'user' ? message.username : 'This For That'}
         </span>
         <span className='text-gray-400'>·</span>

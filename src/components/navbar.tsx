@@ -7,10 +7,11 @@ import { debounce } from 'lodash'
 
 import { AccountDropdown, NotificationDropdown } from '@/components/dropdowns'
 import { Login as LoginModal, Onboard as OnboardModal } from '@/components/modals'
+import { LoadingIndicator } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
-import { ChainLogo, Close, Hamburger, Login, Search } from '@/icons'
+import { Close, Hamburger, Login, Search, Verified } from '@/icons'
 import { useAuth } from '@/providers/authProvider'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
+import { DISCORD_LINK } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
 
 const Navbar: FC = () => {
@@ -44,7 +45,7 @@ const Navbar: FC = () => {
 
     const nftResults = await supabase
       .from('nfts')
-      .select('id, name, image, chain_id')
+      .select('id, name, image, chain_id, collection_name, is_verified')
       .ilike('name', `%${term}%`)
       .limit(5)
 
@@ -226,8 +227,8 @@ const Navbar: FC = () => {
             {showResults && (
               <div className='absolute min-h-[50px] mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10'>
                 {isSearching ? (
-                  <div className='p-4 text-center'>
-                    <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto'></div>
+                  <div className='p-4 flex justify-center items-center'>
+                    <LoadingIndicator />
                   </div>
                 ) : (
                   <>
@@ -245,19 +246,17 @@ const Navbar: FC = () => {
                               setSearchResults({ nfts: [], users: [] })
                             }}
                           >
+                            <Verified
+                              chainId={Number(nft.chain_id)}
+                              isVerified={nft.is_verified}
+                              className='w-6 h-6 mr-4'
+                            />
+                            {/* eslint-disable-next-line */}
                             <img src={nft.image} className='w-10 h-10 rounded-md' />
-                            <div className='ml-1 flex flex-col gap-y-1'>
-                              <div className='ml-1 text-sm'>{nft.name}</div>
-                              <div className='flex text-xs'>
-                                <ChainLogo
-                                  chainId={nft.chain_id}
-                                  className='w-3.5 h-3.5 mr-0.5'
-                                />
-                                {
-                                  CHAIN_IDS_TO_CHAINS[
-                                    nft.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS
-                                  ]
-                                }
+                            <div className='ml-2 flex flex-col gap-y-1'>
+                              <div className='text-sm'>{nft.name}</div>
+                              <div className='flex text-xs text-gray-500'>
+                                {nft.collection_name}
                               </div>
                             </div>
                           </Link>
@@ -278,6 +277,7 @@ const Navbar: FC = () => {
                               setSearchResults({ nfts: [], users: [] })
                             }}
                           >
+                            {/* eslint-disable-next-line */}
                             <img
                               src={
                                 process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL +
@@ -346,7 +346,7 @@ const Navbar: FC = () => {
               >
                 Privacy
               </Link>
-              <Link href='https://discord.gg/qg6TeBuHeT' target='_blank'>
+              <Link href={DISCORD_LINK} target='_blank'>
                 Discord
               </Link>
             </div>

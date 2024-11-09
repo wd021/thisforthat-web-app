@@ -12,7 +12,6 @@ import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo } from '@/types/main'
 import { NFT } from '@/types/supabase'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 import { getBlockExplorerUrl, getOpenSeaUrl } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
@@ -49,7 +48,6 @@ const NFTSidebar: React.FC<{
             <VerifiedBadge
               id={nft.id}
               name={nft.name}
-              chainName={CHAIN_IDS_TO_CHAINS[nft.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]}
               collectionName={nft.collection_name}
               tokenId={nft.token_id}
               isVerified={nft.is_verified}

@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { Profile, UserNFT } from '@/types/supabase'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, profile }) => (
   <div className='flex flex-col bg-white shadow-md rounded-lg relative'>
@@ -26,7 +25,6 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
       <VerifiedBadge
         id={item.nft_id}
         name={item.nfts.name}
-        chainName={CHAIN_IDS_TO_CHAINS[item.nfts.chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]}
         collectionName={item.nfts.collection_name}
         tokenId={item.nfts.token_id}
         isVerified={item.nfts.is_verified && item.nfts.user_id === item.user_id}

@@ -1,7 +1,6 @@
 export { default as Verified } from './verified'
 export { default as Activity } from './activity'
 export { default as Close } from './close'
-export { default as Google } from './google'
 export { default as User } from './user'
 export { default as Wallet } from './wallet'
 export { default as Notifications } from './notifications'

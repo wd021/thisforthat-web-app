@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { NFTImage, VerifiedBadge } from '@/components/shared'
 import { NFTGridItem } from '@/types/supabase'
-import { CHAIN_IDS_TO_CHAINS } from '@/utils/constants'
 
 const NFTGridObject: FC<{
   item: NFTGridItem
@@ -34,9 +33,6 @@ const NFTGridObject: FC<{
           <VerifiedBadge
             id={item.nft_id}
             name={item.nft_name}
-            chainName={
-              CHAIN_IDS_TO_CHAINS[item.nft_chain_id as keyof typeof CHAIN_IDS_TO_CHAINS]
-            }
             collectionName={item.nft_collection_name}
             tokenId={item.nft_token_id}
             isVerified={item.nft_is_verified}

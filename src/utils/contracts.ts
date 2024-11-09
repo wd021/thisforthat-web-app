@@ -7,5 +7,5 @@ type ContractAddresses = {
 export const CONTRACT_ADDRESSES: ContractAddresses = {
   1: '0x...' as Address, // mainnet
   11155111: '0x...' as Address, // sepolia
-  31337: '0x810090f35DFA6B18b5EB59d298e2A2443a2811E2' as Address, // anvil
+  31337: '0xA899118f4BCCb62F8c6A37887a4F450D8a4E92E0' as Address, // anvil
 }

@@ -66,7 +66,14 @@ export const Offer: React.FC<OfferCardProps> = ({
         isExpanded={isExpanded}
         setIsExpanded={setIsExpanded}
       />
-      <SwapInfo offer={offer} isOpenOffer={offer.status === 'open'} isExpanded={isExpanded} />
+      <SwapInfo
+        offer={offer}
+        isOpenOffer={
+          offer.status === 'open' ||
+          (offer.counterparty_assets.length === 1 && offer.creator_assets.length === 0)
+        }
+        isExpanded={isExpanded}
+      />
       <div className={isExpanded ? 'mt-4 space-y-4' : undefined}>
         {isExpanded && (
           <CommentSection
