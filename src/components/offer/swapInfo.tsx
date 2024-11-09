@@ -53,7 +53,7 @@ const OfferSide: FC<OfferSideProps> = ({
   optimisticCounts,
   onLike,
 }) => (
-  <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
+  <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full overflow-hidden'>
     <div className='flex items-center gap-2 mb-2'>
       <img
         src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
@@ -64,7 +64,7 @@ const OfferSide: FC<OfferSideProps> = ({
         <span className='text-sm font-medium'>{username}</span>
       </div>
     </div>
-    <div className='space-y-2'>
+    <div className='space-y-2 w-full overflow-hidden'>
       {assets?.map((asset) => (
         <div
           key={asset.nft_id}
@@ -73,7 +73,7 @@ const OfferSide: FC<OfferSideProps> = ({
           <Link
             href={`/nfts/${asset.nft_id}`}
             target='_blank'
-            className='flex items-center space-x-2 flex-1'
+            className='flex items-center space-x-2 flex-1 overflow-hidden'
           >
             <div className={`relative flex ${isExpanded ? 'h-12 w-12' : 'h-10 w-10'}`}>
               <NFTImage
@@ -85,8 +85,10 @@ const OfferSide: FC<OfferSideProps> = ({
             </div>
             {isExpanded && (
               <div className='flex min-w-0 flex-col gap-y-0.5'>
-                <span className='truncate text-sm font-medium text-gray-900'>{asset.name}</span>
-                <span className='text-xs text-gray-500'>{asset.collection_name}</span>
+                <span className='truncate text-sm font-medium text-gray-900 truncate'>
+                  {asset.name}
+                </span>
+                <span className='text-xs text-gray-500 truncate'>{asset.collection_name}</span>
               </div>
             )}
           </Link>
@@ -125,7 +127,7 @@ const TradeOffer: FC<TradeOfferProps> = ({
 
     return (
       <div
-        className='mb-2 flex justify-between p-3 w-full rounded-lg bg-gray-50'
+        className='mb-2 flex justify-between p-3 w-full rounded-lg bg-gray-50 overflow-hidden'
         onClick={(e) => {
           if (isExpanded) {
             e.stopPropagation()

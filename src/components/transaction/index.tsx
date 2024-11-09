@@ -93,7 +93,7 @@ const NFTCard = ({ asset }) => (
     target='_blank'
     className='flex items-center p-2 bg-white rounded-lg border border-gray-100'
   >
-    <div className='w-12 h-12 rounded-lg object-cover'>
+    <div className='w-12 h-12 rounded-lg object-cover shrink-0'>
       <NFTImage src={asset.image} alt={asset.name} fallback={asset.name} rounded='all' />
     </div>
     <div className='flex-grow ml-3'>

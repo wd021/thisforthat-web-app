@@ -103,7 +103,7 @@ const HomeDropdown: React.FC<HomeDropdownProps> = ({ mainTab, subTab, onNavigati
               className='flex items-center flex-grow'
               onClick={() => handleMainClick('nft')}
             >
-              <span className='mr-2 text-lg'>🖼️</span>
+              <span className='mr-2 text-2xl'>🖼️</span>
               <div className='flex flex-col items-start'>
                 <span className='font-medium'>NFTs</span>
                 <span className='text-xs text-gray-500'>
@@ -177,7 +177,7 @@ const HomeDropdown: React.FC<HomeDropdownProps> = ({ mainTab, subTab, onNavigati
               className='flex items-center flex-grow'
               onClick={() => handleMainClick('offer')}
             >
-              <span className='mr-2 text-lg'>🤝</span>
+              <span className='mr-2 text-3xl'>🤝</span>
               <div className='flex flex-col items-start'>
                 <span className='font-medium'>Offers</span>
                 <span className='text-xs text-gray-500'>
@@ -247,7 +247,7 @@ const HomeDropdown: React.FC<HomeDropdownProps> = ({ mainTab, subTab, onNavigati
           `}
         >
           <button className='flex items-center' onClick={() => handleMainClick('transactions')}>
-            <span className='mr-2 text-lg'>⛓️</span>
+            <span className='mr-2 text-2xl'>⛓️</span>
             <div className='flex flex-col items-start'>
               <span className='font-medium'>Transactions</span>
               <span className='text-xs text-gray-500'>Onchain</span>
