@@ -132,16 +132,19 @@ export default function useApproveAsset(contractAddress: Address) {
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash })
         if (receipt.status === 'success') {
-          showToast('Asset approved successfully! Click Deposit to continue', 5000)
+          showToast('✅ NFT approved successfully! Click Deposit to continue', 5000)
           return true
         }
         return false
       } catch (error) {
         console.error('Error approving asset:', error)
         if (error instanceof ContractFunctionExecutionError) {
-          showToast('Transaction rejected', 2500)
+          showToast(
+            `⚠️ Transaction failed. Please check that you are connected to the wallet and network containing the NFT.`,
+            4000,
+          )
         } else {
-          showToast('Failed to approve asset', 2500)
+          showToast('⚠️ Failed to approve asset', 2500)
         }
         return false
       }

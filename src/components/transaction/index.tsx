@@ -186,7 +186,8 @@ const Transaction: React.FC<{
   onchainStatusLoading: boolean
   onchainInfo: OnchainTradeInfo
   showTxModal: () => void
-}> = ({ fullPage = false, transaction, onchainInfo, showTxModal }) => {
+  showTxCancelModal: () => void
+}> = ({ fullPage = false, transaction, onchainInfo, showTxModal, showTxCancelModal }) => {
   useSyncApiWithChain(onchainInfo, transaction)
 
   const [isExpanded, setIsExpanded] = useState(fullPage)
@@ -220,8 +221,11 @@ const Transaction: React.FC<{
         <>
           <div className='flex gap-4 text-sm ml-2'>
             <Link
-              href={`/transactions/${transaction.offer_id}`}
+              href={`/offers/${transaction.offer_id}`}
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
             >
               <span>🤝 Offer</span>
               <Expand className='w-4 h-4' />
@@ -229,6 +233,9 @@ const Transaction: React.FC<{
             <Link
               href='https://www.etherscan.io'
               className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
             >
               <span>📝 Contract</span>
               <Expand className='w-4 h-4' />
@@ -261,7 +268,12 @@ const Transaction: React.FC<{
         </>
       )}
 
-      <Footer transaction={transaction} onchainInfo={onchainInfo} showTxModal={showTxModal} />
+      <Footer
+        transaction={transaction}
+        onchainInfo={onchainInfo}
+        showTxModal={showTxModal}
+        showTxCancelModal={showTxCancelModal}
+      />
     </div>
   )
 }

@@ -2,17 +2,16 @@ import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 
 import { LoadingIndicator } from '@/components/shared'
-import { useIsMobile, useTradeInfo } from '@/hooks'
+import { useIsMobile } from '@/hooks'
 import { useSyncApiWithChain } from '@/hooks/supabase'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { getModalStyles } from '@/styles'
 import { OnchainTradeInfo } from '@/types/main'
 import { ProfileMinimal, SimplifiedNFTAsset } from '@/types/supabase'
-import { completeTradeWithApi, getTradeInfo } from '@/utils/helpers'
+import { completeTradeWithApi } from '@/utils/helpers'
 import { supabase } from '@/utils/supabaseClient'
 
-import CancelTx from './cancel'
 import CompletedTx from './completed'
 import CreateTx from './create'
 import DepositTx from './deposit'
@@ -151,12 +150,10 @@ const TransactionModal: React.FC<{
     }
   }, [user, componentToShow])
 
-  // console.log('onchainInfo.assets', onchainInfo.assets)
-
   const renderContent = () => {
     switch (componentToShow) {
       case 'cancelled':
-        return <CancelTx />
+        return <>Swap was cancelled</>
       case 'create':
         return (
           <CreateTx

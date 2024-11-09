@@ -115,3 +115,30 @@ export type TxModalInfo = {
   }
   onchainInfo: OnchainTradeInfo | null
 }
+
+export type TxCancelModalInfo = {
+  transactionInfo: {
+    status: string
+    offerId: string
+    onchain: {
+      id: string
+      hash: string
+      done: boolean
+    }
+    chainId: number
+    users: {
+      creator: {
+        id: string
+        username: string
+        profile_pic_url: string
+        wallet: string
+      }
+      counterparty: {
+        id: string
+        username: string
+        profile_pic_url: string
+        wallet: string
+      }
+    }
+  }
+}

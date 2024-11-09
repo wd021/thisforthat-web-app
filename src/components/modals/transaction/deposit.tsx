@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { Address } from 'viem'
 
-import { LoadingIndicator, WalletStatus } from '@/components/shared'
+import { WalletStatus } from '@/components/shared'
 import { Close } from '@/icons'
-import { OnchainTradeInfoAsset } from '@/types/main'
 import { SimplifiedNFTAsset } from '@/types/supabase'
 
 import DepositCard from './depositCard'
@@ -28,7 +27,6 @@ const DepositTx = ({
     }[]
   >(onchainDeposited)
 
-  // loop through assets to see if in onchaindeposited, get count of how many left
   const depositsRemaining = assets.filter((asset) => {
     return !onchainDone.some(
       (done) =>
@@ -39,7 +37,6 @@ const DepositTx = ({
 
   return (
     <div className={`bg-white rounded-3xl shadow-lg flex flex-col overflow-hidden h-full`}>
-      {/* Header */}
       <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div className='flex flex-col'>
           <h2 className='text-xl text-gray-900 font-medium mb-1'>Deposit Your NFTs</h2>
@@ -49,7 +46,6 @@ const DepositTx = ({
         </button>
       </div>
 
-      {/* Deposit Section */}
       <div className='bg-white overflow-y-auto custom-scrollbar'>
         {assets.map((asset, index) => {
           return (
@@ -72,7 +68,6 @@ const DepositTx = ({
         })}
       </div>
 
-      {/* Footer Done */}
       <div className='p-4 pb-0 space-y-2'>
         <button
           onClick={onFinish}

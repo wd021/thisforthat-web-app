@@ -149,8 +149,8 @@ const OfferFeed: React.FC<{
               },
             },
             assets: {
-              creator: offer.counterparty_assets,
-              counterparty: offer.creator_assets,
+              creator: offer.creator_assets,
+              counterparty: offer.counterparty_assets,
             },
           },
           onchainInfo: null,

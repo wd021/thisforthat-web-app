@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react'
 import TransactionCard from '@/components/transaction'
 import { useTradeStatuses } from '@/hooks'
 import { useToast } from '@/providers/toastProvider'
-import { TxModalInfo } from '@/types/main'
+import { TxCancelModalInfo, TxModalInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
 
 const TransactionFeed: React.FC<{
   items: TransactionData[]
   setTxModalInfo: (modalInfo: TxModalInfo) => void
-}> = ({ items, setTxModalInfo }) => {
+  setTxCancelModalInfo: (modalInfo: TxCancelModalInfo) => void
+}> = ({ items, setTxModalInfo, setTxCancelModalInfo }) => {
   const { showToast } = useToast()
   const { getStatuses } = useTradeStatuses()
   const [statusMap, setStatusMap] = useState<Map<string | number, any>>(new Map())
@@ -163,6 +164,36 @@ const TransactionFeed: React.FC<{
             } else {
               setTxModalInfo(txModalInfo)
             }
+          }}
+          showTxCancelModal={() => {
+            const txCancelModalInfo = {
+              transactionInfo: {
+                status: item.status,
+                offerId: item.offer_id,
+                onchain: {
+                  id: item.onchain_trade_id,
+                  hash: item.onchain_tx,
+                  done: item.onchain_done,
+                },
+                chainId: item.chain_id,
+                users: {
+                  creator: {
+                    id: item.creator_id,
+                    username: item.creator_username,
+                    profile_pic_url: item.creator_profile_pic_url,
+                    wallet: item.creator_wallet,
+                  },
+                  counterparty: {
+                    id: item.counterparty_id,
+                    username: item.counterparty_username,
+                    profile_pic_url: item.counterparty_profile_pic_url,
+                    wallet: item.counterparty_wallet,
+                  },
+                },
+              },
+            }
+
+            setTxCancelModalInfo(txCancelModalInfo)
           }}
         />
       ))}

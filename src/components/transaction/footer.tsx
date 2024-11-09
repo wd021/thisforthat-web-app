@@ -1,14 +1,7 @@
-import { useCancelTrade } from '@/hooks'
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
-import { cancelTrade } from '@/utils/helpers'
-import { useModal } from 'connectkit'
-import { useAccount } from 'wagmi'
 
-const StatusMessage: React.FC<{
-  status: string
-  showTxModal: () => void
-}> = ({ status, showTxModal }) => {
+const StatusMessage: React.FC<{ status: string }> = ({ status }) => {
   const getStatusConfig = () => {
     switch (status) {
       case 'onchain_completed':
@@ -32,30 +25,8 @@ const StatusMessage: React.FC<{
   const config = getStatusConfig()
 
   return (
-    <div
-      className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}
-      onClick={(e) => {
-        e.stopPropagation()
-        showTxModal()
-      }}
-    >
+    <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${config.className}`}>
       <span className='text-sm font-semibold'>{config.message}</span>
-      {(status === 'countered' || status === 'countered-open') && (
-        <svg
-          className='text-blue-700'
-          fill='none'
-          height='14'
-          width='14'
-          stroke='currentColor'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth='2'
-          viewBox='0 0 24 24'
-        >
-          <line x1='7' x2='17' y1='17' y2='7' />
-          <polyline points='7 7 17 7 17 17' />
-        </svg>
-      )}
     </div>
   )
 }
@@ -64,10 +35,12 @@ const Footer = ({
   transaction,
   onchainInfo,
   showTxModal,
+  showTxCancelModal,
 }: {
   transaction: TransactionData
   onchainInfo: OnchainTradeInfo
   showTxModal: () => void
+  showTxCancelModal: () => void
 }) => {
   const tradeStarted = transaction.onchain_trade_id ? true : false
   const tradeEnded = transaction.onchain_done ? true : false
@@ -85,10 +58,6 @@ const Footer = ({
       : false
     : undefined
 
-  const { cancelTrade, isLoading, isConfirmed, error, isError, reset } = useCancelTrade({
-    tradeId: transaction.onchain_trade_id!,
-  })
-
   return (
     <div className='flex items-center justify-between'>
       <div className='flex-1 mr-8 max-w-[300px]'>
@@ -105,7 +74,7 @@ const Footer = ({
             <div className='flex justify-between mt-2'>
               <span className='text-xs text-gray-500'>Progress</span>
               <span className='text-xs text-gray-500'>
-                {onchainInfo.depositedAssetCount} of {onchainInfo.totalAssetCount} assets
+                {onchainInfo.depositedAssetCount} of {onchainInfo.totalAssetCount} NFTs
                 deposited
               </span>
             </div>
@@ -114,7 +83,7 @@ const Footer = ({
       </div>
 
       {tradeEnded || onchainCancelled ? (
-        <StatusMessage status={transaction.status} showTxModal={showTxModal} />
+        <StatusMessage status={transaction.status} />
       ) : !tradeStarted ? (
         <button
           onClick={(e) => {
@@ -130,15 +99,11 @@ const Footer = ({
           <button
             onClick={(e) => {
               e.stopPropagation()
-              try {
-                cancelTrade()
-              } catch (e) {
-                console.log('trade cancel cancel')
-              }
+              showTxCancelModal()
             }}
             className='flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-colors'
           >
-            {isLoading ? 'Cancelling...' : 'Cancel'}
+            Cancel
           </button>
           <button
             onClick={(e) => {

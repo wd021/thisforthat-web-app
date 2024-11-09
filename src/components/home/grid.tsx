@@ -3,9 +3,16 @@ import { useEffect, useState } from 'react'
 import { HomeDropdown, HomeTabBar } from '@/components/dropdowns'
 import { NFTGrid, OfferFeed, TransactionFeed } from '@/components/home'
 import { Offer, Transaction } from '@/components/modals'
+import TransactionCancel from '@/components/modals/transaction/cancel'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
-import { MainTabOption, OfferModalInfo, SubTabOption, TxModalInfo } from '@/types/main'
+import {
+  MainTabOption,
+  OfferModalInfo,
+  SubTabOption,
+  TxCancelModalInfo,
+  TxModalInfo,
+} from '@/types/main'
 import { NFTGridItem, OfferData, TransactionData } from '@/types/supabase'
 import { GRID_ITEMS_PER_PAGE } from '@/utils/constants'
 import { supabase } from '@/utils/supabaseClient'
@@ -95,6 +102,7 @@ const Grid: React.FC = () => {
 
   const [offerModalInfo, setOfferModalInfo] = useState<OfferModalInfo | null>(null)
   const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
+  const [txCancelModalInfo, setTxCancelModalInfo] = useState<TxCancelModalInfo | null>(null)
 
   const fetchItems = async (mainTab: MainTabOption, subTab: SubTabOption, page: number) => {
     setIsLoading(true)
@@ -322,6 +330,7 @@ const Grid: React.FC = () => {
             <TransactionFeed
               items={items as TransactionData[]}
               setTxModalInfo={setTxModalInfo}
+              setTxCancelModalInfo={setTxCancelModalInfo}
             />
           </div>
         ) : (
@@ -347,6 +356,12 @@ const Grid: React.FC = () => {
         <Offer {...offerModalInfo} closeModal={() => setOfferModalInfo(null)} />
       )}
       {txModalInfo && <Transaction {...txModalInfo} closeModal={() => setTxModalInfo(null)} />}
+      {txCancelModalInfo && (
+        <TransactionCancel
+          {...txCancelModalInfo}
+          closeModal={() => setTxCancelModalInfo(null)}
+        />
+      )}
     </>
   )
 }

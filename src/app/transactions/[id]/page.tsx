@@ -102,8 +102,8 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
                   },
                 },
                 assets: {
-                  creator: txInfo.counterparty_assets,
-                  counterparty: txInfo.creator_assets,
+                  creator: txInfo.creator_assets,
+                  counterparty: txInfo.counterparty_assets,
                 },
               }
               // setTxModalInfo(txModalInfo)

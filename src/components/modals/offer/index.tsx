@@ -38,7 +38,6 @@ const Header: FC<{
 
             <div className='flex flex-col'>
               <div className='text-lg font-semibold text-gray-900 mb-0.5'>{title}</div>
-
               <div className='flex items-center'>
                 <div className='flex items-center '>
                   <ChainLogo chainId={chainId} className='w-4 h-4 mr-1.5' />

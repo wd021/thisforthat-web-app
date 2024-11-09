@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { isAddress } from 'viem'
 
 import { Footer } from '@/components'
+import { LoadingIndicator } from '@/components/shared'
 import { useIsMobile } from '@/hooks'
 import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
@@ -129,7 +130,7 @@ const AccountProfilePage: React.FC = () => {
   if (!profile) {
     return (
       <div className='flex justify-center items-center h-full'>
-        <div className='loader'></div>
+        <LoadingIndicator />
       </div>
     )
   }
@@ -279,7 +280,8 @@ const BasicInformation: React.FC<BasicInformationProps> = ({ profile, setProfile
         {errors.wallet && <p className='mt-1 text-sm text-red-600'>{errors.wallet}</p>}
       </div>
       <div className='mt-2 pl-4 py-3 pr-3 bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r text-sm'>
-        Your receiving wallet – where NFTs will be delivered to you in swaps.
+        Your Trade Wallet – This is the wallet where you’ll receive your NFTs and the one you’ll
+        need to use to cancel trades.
       </div>
     </div>
   </div>

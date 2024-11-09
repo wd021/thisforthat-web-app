@@ -3,7 +3,7 @@ import { useModal } from 'connectkit'
 import { decodeEventLog } from 'viem'
 import { useAccount } from 'wagmi'
 
-import { WalletStatus } from '@/components/shared'
+import { ErrorBubble, WalletStatus } from '@/components/shared'
 import { useCreateTrade } from '@/hooks'
 import { Close } from '@/icons'
 import { useToast } from '@/providers/toastProvider'
@@ -29,6 +29,8 @@ const CreateTx: React.FC<{
   const { setOpen } = useModal()
   const { isConnected } = useAccount()
 
+  console.log('create trade modal', 'users', users, 'assets', assets)
+
   const {
     createTradeContract,
     isCreatingContract,
@@ -37,6 +39,7 @@ const CreateTx: React.FC<{
     txReceipt,
     isConfirmed,
     isConfirming,
+    error: writeError,
   } = useCreateTrade({
     chainId,
     users,
@@ -194,24 +197,9 @@ const CreateTx: React.FC<{
       <div className='p-4'>
         <WalletStatus />
       </div>
-      {error && (
+      {(error || writeError) && (
         <div className='p-4 pt-0'>
-          <div className='flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm'>
-            <svg
-              className='w-4 h-4 flex-shrink-0'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              />
-            </svg>
-            <span>{error}</span>
-          </div>
+          <ErrorBubble errorMsg={writeError ? writeError.message : error!} />
         </div>
       )}
     </div>

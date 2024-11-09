@@ -125,6 +125,8 @@ export default function useCreateTrade({
         counterparty_assets: assets.counterparty,
       })
 
+      console.log('CREATE TRADE', participants, assetsArg)
+
       const { request } = await publicClient.simulateContract({
         address: CONTRACT_ADDRESSES[31337] as Address,
         abi: ABI,
@@ -158,7 +160,6 @@ export default function useCreateTrade({
     txReceipt,
     isConfirming,
     isConfirmed,
-    writeError,
-    confirmError,
+    error: writeError || confirmError,
   }
 }

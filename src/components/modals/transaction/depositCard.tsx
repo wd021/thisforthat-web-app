@@ -129,9 +129,9 @@ const DepositCard = ({
         )}
       </Link>
 
-      <div className='ml-3 flex-1 flex flex-col gap-y-1'>
+      <div className='ml-3 flex-1 flex flex-col gap-y-1 truncate mr-4'>
         <div className='flex items-center gap-x-2'>
-          <p className='text-sm font-medium text-gray-900'>{asset.name}</p>
+          <p className='text-sm font-medium text-gray-900 truncate'>{asset.name}</p>
           {isDeposited && (
             <span className='px-2 py-0.5 text-xs font-medium bg-green-50 text-green-700 rounded-full'>
               Deposited

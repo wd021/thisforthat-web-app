@@ -71,16 +71,19 @@ export default function useDepositAsset(contractAddress: Address, tradeId: bigin
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash })
         if (receipt.status === 'success') {
-          showToast('Asset deposited successfully!', 2500)
+          showToast('✅ NFT deposited successfully!', 2500)
           return true
         }
         return false
       } catch (error) {
-        console.error('Error depositing asset:', error)
+        console.error('Error depositing NFT:', error)
         if (error instanceof ContractFunctionExecutionError) {
-          showToast('Transaction rejected', 2500)
+          showToast(
+            `⚠️ Transaction failed. Please check that you are connected to the wallet and network containing the NFT.`,
+            4000,
+          )
         } else {
-          showToast('Failed to deposit asset', 2500)
+          showToast('⚠️ Failed to deposit NFT', 2500)
         }
         return false
       }
