@@ -122,7 +122,7 @@ const Footer = ({
       ) : onchainLoading ? (
         <LoadingIndicator className='!w-4 !h-4 mr-2' />
       ) : (
-        <div className='text-sm text-gray-600'>checking status</div>
+        <div className='text-sm text-gray-600'>⚠️ chain can&apos;t be reached</div>
       )}
     </div>
   )
