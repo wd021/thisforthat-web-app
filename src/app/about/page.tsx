@@ -37,7 +37,7 @@ const SupportedChain = ({ name }: { name: string }) => (
 
 const AboutPage = () => {
   const isMobile = useIsMobile()
-  const supportedChains = ['Ethereum', 'Base', 'Optimism', 'Arbitrum', 'Polygon', 'Zksync']
+  const supportedChains = ['Ethereum', 'Base', 'Polygon', 'Optimism', 'Arbitrum']
 
   return (
     <div className='absolute top-[75px] bottom-0 w-full flex'>

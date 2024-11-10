@@ -1,4 +1,4 @@
-import { anvil, arbitrum, base, mainnet, optimism, polygon, zksync } from 'wagmi/chains'
+import { anvil, arbitrum, base, mainnet, optimism, polygon } from 'wagmi/chains'
 
 export const supportedChains: readonly [
   typeof mainnet,
@@ -6,9 +6,8 @@ export const supportedChains: readonly [
   typeof arbitrum,
   typeof optimism,
   typeof polygon,
-  typeof zksync,
   typeof anvil,
-] = [mainnet, base, arbitrum, optimism, polygon, zksync, anvil]
+] = [mainnet, base, arbitrum, optimism, polygon, anvil]
 
 export const chainInfoMap: {
   [key: string]: {
@@ -48,12 +47,6 @@ export const chainInfoMap: {
     openSeaSlug: 'matic',
     blockExplorerUrl: 'https://polygonscan.com',
   },
-  '324': {
-    id: '324',
-    name: 'ZkSync',
-    openSeaSlug: 'zksync',
-    blockExplorerUrl: 'https://explorer.zksync.io',
-  },
 }
 
 export const BLOCKED_USERNAMES = [
@@ -68,22 +61,14 @@ export const BLOCKED_USERNAMES = [
   'search',
 ]
 
-export const SUPPORTED_CHAINS = [
-  'ethereum',
-  'base',
-  'arbitrum',
-  'optimism',
-  'polygon',
-  'zksync',
-]
+export const SUPPORTED_CHAINS = ['ethereum', 'base', 'arbitrum', 'optimism', 'polygon']
 
 export const CHAIN_LABELS = {
   ethereum: 'Ethereum',
   base: 'Base',
-  arbitrum: 'Arbitrum',
-  optimism: 'Optimism',
   polygon: 'Polygon',
-  zksync: 'ZkSync',
+  optimism: 'Optimism',
+  arbitrum: 'Arbitrum',
 }
 
 export const CHAIN_SLUGS_TO_CHAIN_IDS = {
@@ -94,7 +79,6 @@ export const CHAIN_SLUGS_TO_CHAIN_IDS = {
   optimism: 10,
   polygon: 137,
   matic: 137,
-  zksync: 324,
 }
 
 export const CHAIN_IDS_TO_CHAINS = {
@@ -103,7 +87,6 @@ export const CHAIN_IDS_TO_CHAINS = {
   42161: 'Arbitrum',
   10: 'Optimism',
   137: 'Polygon',
-  324: 'Zksync',
 }
 
 export const ALCHEMY_CHAIN_SLUGS = {
@@ -114,7 +97,6 @@ export const ALCHEMY_CHAIN_SLUGS = {
   optimism: 'opt-mainnet',
   polygon: 'polygon-mainnet',
   matic: 'polygon-mainnet',
-  zksync: 'zksync-mainnet',
 }
 
 export const ALCHEMY_CHAIN_ID_SLUGS = {
@@ -123,7 +105,6 @@ export const ALCHEMY_CHAIN_ID_SLUGS = {
   42161: 'arb-mainnet',
   10: 'opt-mainnet',
   137: 'polygon-mainnet',
-  324: 'zksync-mainnet',
 }
 
 export const NFT_VERIFY_LIMIT = 40

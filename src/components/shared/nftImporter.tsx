@@ -28,7 +28,7 @@ const NftImporter: FC<{
   const [currentWallet, setCurrentWallet] = useState<string>('')
   const [nftLink, setNftLink] = useState<string>('')
   const [currentChain, setCurrentChain] = useState<
-    'ethereum' | 'eth' | 'base' | 'arbitrum' | 'optimism' | 'polygon' | 'matic' | 'zksync'
+    'ethereum' | 'eth' | 'base' | 'arbitrum' | 'optimism' | 'polygon' | 'matic'
   >('ethereum')
   const [nfts, setNfts] = useState<NFTUpload[]>([])
   const [nextPageKey, setNextPageKey] = useState<string | null>(null)
@@ -278,8 +278,7 @@ const NftImporter: FC<{
                         | 'arbitrum'
                         | 'optimism'
                         | 'polygon'
-                        | 'matic'
-                        | 'zksync',
+                        | 'matic',
                     )
                   }
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white'

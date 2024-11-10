@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, polygon, zksync } from 'viem/chains'
+import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 import { Asset, assetTypeMap, OfferInfo, PreparedAsset } from '@/types/main'
 
@@ -255,7 +255,6 @@ export const getAlchemyRpcUrl = (chain: (typeof supportedChains)[number]) => {
     [optimism.id]: 'opt-mainnet',
     [polygon.id]: 'polygon-mainnet',
     [arbitrum.id]: 'arb-mainnet',
-    [zksync.id]: 'zksync-mainnet',
   }
 
   const networkName = alchemyNetworkMap[chain.id]
@@ -272,7 +271,6 @@ export const getInfuraRpcUrl = (chain: (typeof supportedChains)[number]) => {
     [optimism.id]: 'optimism-mainnet',
     [polygon.id]: 'polygon-mainnet',
     [arbitrum.id]: 'arbitrum-mainnet',
-    [zksync.id]: 'zksync-mainnet',
   }
 
   const networkName = infuraNetworkMap[chain.id]
