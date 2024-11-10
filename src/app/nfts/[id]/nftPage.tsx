@@ -163,17 +163,16 @@ const MobileActionButtons: React.FC<{ makeOffer: () => void; pinItem: () => void
   makeOffer,
   pinItem,
 }) => (
-  <div className='flex gap-x-2 fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg lg:hidden'>
+  <div className='flex gap-x-2 fixed bottom-0 left-0 right-0 bg-white p-3 shadow-lg lg:hidden border-t border-gray-200'>
     <button
       onClick={makeOffer}
-      className={`flex-1 py-3 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-50 hover:bg-yellow-100`}
+      className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-400 hover:bg-yellow-500`}
     >
-      <span className='text-2xl mr-2'>🤝</span>
-      <span className='text-gray-800 text-lg font-semibold'>Offer</span>
+      <span className='text-gray-800 text-lg font-semibold'>Make Offer</span>
     </button>
     <button
       onClick={pinItem}
-      className={`py-3 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-red-50 hover:bg-red-100`}
+      className={`py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-gray-100 hover:bg-gray-200`}
     >
       <span className='text-2xl'>📌</span>
     </button>

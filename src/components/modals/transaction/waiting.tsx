@@ -2,7 +2,7 @@ import { Checkmark, Close } from '@/icons'
 
 const WaitingTx = ({ onClose }: { onClose: () => void }) => {
   return (
-    <div className='w-full max-w-2xl bg-white rounded-lg shadow-xl animate-fadeIn h-full'>
+    <div className='w-full lg:max-w-2xl bg-white lg:rounded-2xl shadow-xl animate-fadeIn h-full'>
       <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div className='flex flex-col'>
           <h2 className='text-xl text-gray-900 font-medium mb-1'>Deposit Complete</h2>

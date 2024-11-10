@@ -158,7 +158,7 @@ const CancelTx = ({
       onRequestClose={closeModal}
       style={customStyles}
     >
-      <div className='bg-white rounded-3xl shadow-lg flex flex-col overflow-hidden'>
+      <div className='bg-white lg:rounded-2xl shadow-lg flex flex-col overflow-hidden h-full'>
         <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
           <div className='flex flex-col'>
             <h2 className='text-xl text-gray-900 font-medium mb-1'>Cancel Trade</h2>

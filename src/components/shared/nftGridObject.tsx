@@ -7,8 +7,7 @@ import { NFTGridItem } from '@/types/supabase'
 const NFTGridObject: FC<{
   item: NFTGridItem
   newOffer: (nft: NFTGridItem) => void
-  pinItem: (nft: NFTGridItem) => void
-}> = ({ item, newOffer, pinItem }) => {
+}> = ({ item, newOffer }) => {
   const navigateToUser = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
     window.open(`/${item.nft_user_id_username}`, '_blank')
@@ -42,26 +41,16 @@ const NFTGridObject: FC<{
           />
         </div>
       </div>
-      <div className='mt-2 flex gap-x-2 gap-y-2 w-full p-0.5 overflow-hidden'>
+      <div className='mt-2.5 flex gap-x-2 gap-y-2 w-full p-0.5 overflow-hidden'>
         <div className='flex w-full gap-x-2'>
           <button
-            className='mb-1 w-full flex justify-center items-center bg-yellow-50 px-3 py-1 rounded-md hover:bg-yellow-100 transition-colors duration-200 shadow-md'
+            className='mb-1 w-full flex justify-center items-center bg-yellow-400 px-3 py-2 rounded-md hover:bg-yellow-500 transition-colors duration-200 shadow-md'
             onClick={(e) => {
               e.preventDefault()
               newOffer(item)
             }}
           >
-            <span className='flex items-center mr-2 text-2xl'>🤝</span>
-            <span className='text-gray-800 font-semibold'>Offer</span>
-          </button>
-          <button
-            className={`mb-1 flex justify-center items-center bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200 shadow-md`}
-            onClick={(e) => {
-              e.preventDefault()
-              pinItem(item)
-            }}
-          >
-            <span className='flex items-center text-lg'>📌</span>
+            <span className='text-gray-800 font-semibold'>Make Offer</span>
           </button>
         </div>
       </div>

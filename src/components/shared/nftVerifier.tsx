@@ -45,7 +45,7 @@ const NFTGroupSelection: React.FC<{
         >
           <div className='flex items-center gap-5'>
             <div className='w-12 h-12 flex shrink-0 items-center justify-center'>
-              <ChainLogo chainId={Number(group.chainId)} />
+              <ChainLogo className='w-10 h-10' chainId={Number(group.chainId)} />
             </div>
             <div className='flex-grow space-y-1'>
               <div className='text-gray-900 font-medium'>
@@ -349,7 +349,7 @@ const NFTVerifier: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className='p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r'>
             <div className='flex items-center gap-3'>
               <div className='w-20 h-20 flex items-center'>
-                <Verified chainId={1} isVerified={true} />
+                <Verified className='w-10 h-10' chainId={1} isVerified={true} />
               </div>
               <p className='text-blue-700'>
                 Verifying your NFTs lets other users know you&apos;re the confirmed owner.

@@ -29,8 +29,6 @@ const CreateTx: React.FC<{
   const { setOpen } = useModal()
   const { isConnected } = useAccount()
 
-  console.log('create trade modal', 'users', users, 'assets', assets)
-
   const {
     createTradeContract,
     isCreatingContract,
@@ -170,7 +168,7 @@ const CreateTx: React.FC<{
     return (
       <div className='flex flex-col'>
         <button
-          onClick={createTradeContract}
+          onClick={handleCreateTrade}
           className={`rounded-full flex items-center justify-center text-lg px-8 py-4 bg-blue-500 text-white`}
         >
           Create Contract
@@ -180,7 +178,7 @@ const CreateTx: React.FC<{
   }
 
   return (
-    <div className='bg-white rounded-3xl shadow-lg flex flex-col overflow-hidden'>
+    <div className='bg-white lg:rounded-2xl shadow-lg flex flex-col overflow-hidden h-full'>
       <div className='flex justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div className='flex flex-col'>
           <h2 className='text-xl text-gray-900 font-medium mb-1'>Create Swap Contract</h2>

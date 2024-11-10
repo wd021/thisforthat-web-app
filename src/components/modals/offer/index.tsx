@@ -57,14 +57,14 @@ const Header: FC<{
   )
 }
 const Footer: FC<{ makeOffer: () => void }> = ({ makeOffer }) => (
-  <div className='p-6 bg-white border-t border-gray-200'>
+  <div className='p-4 bg-white border-t border-gray-200'>
     <button
       className='w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-3 px-6 
       rounded-xl shadow-sm hover:shadow-md cursor-pointer font-semibold text-xl
       transition-all duration-200 flex items-center justify-center space-x-2'
       onClick={makeOffer}
     >
-      <span>Create Offer</span>
+      <span>Make Offer</span>
     </button>
   </div>
 )
@@ -218,7 +218,7 @@ const Offer: FC<{
         style={customStyles}
       >
         {!showOverlayScreen ? (
-          <div className='flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden h-full'>
+          <div className='flex flex-col bg-white lg:rounded-2xl shadow-2xl overflow-hidden h-full'>
             <Header isCounterOffer={!!offerId} onClose={closeModal} chainId={chainId} />
             {!offerId && (
               <div className='border-b border-gray-200 bg-white'>
@@ -289,7 +289,7 @@ const Offer: FC<{
           </div>
         ) : (
           <AnimatePresence>
-            <div className='flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden h-screen'>
+            <div className='flex flex-col bg-white lg:rounded-2xl shadow-2xl overflow-hidden h-screen'>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

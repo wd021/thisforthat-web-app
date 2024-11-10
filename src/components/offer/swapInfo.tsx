@@ -193,7 +193,7 @@ const TradeOffer: FC<TradeOfferProps> = ({
       <div className='flex w-full'>
         {/* Compact View */}
         {!isExpanded && (
-          <div className='bg-gray-50 rounded-lg p-4 w-full'>
+          <div className='bg-gray-50 rounded-lg p-4 w-full overflow-x-auto hide-scrollbar'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-4'>
                 <div className='flex -space-x-2'>

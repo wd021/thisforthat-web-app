@@ -92,11 +92,10 @@ const NoResultsState: React.FC<{ mainTab: MainTabOption; subTab: SubTabOption }>
 const NFTGrid: React.FC<{
   items: NFTGridItem[]
   newOffer: (item: NFTGridItem) => void
-  pinItem: (item: NFTGridItem) => void
-}> = ({ items, newOffer, pinItem }) => (
+}> = ({ items, newOffer }) => (
   <div className='p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:px-12 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 mb-24'>
     {items.map((item) => (
-      <NFTGridObject key={item.nft_id} item={item} newOffer={newOffer} pinItem={pinItem} />
+      <NFTGridObject key={item.nft_id} item={item} newOffer={newOffer} />
     ))}
   </div>
 )
@@ -270,28 +269,6 @@ const Homepage: React.FC = () => {
     setOfferModalInfo(modalInfo)
   }
 
-  const pinItem = async (nft: NFTGridItem) => {
-    if (!user) {
-      showToast(`⚠️ You have to login first`, 2500)
-      return
-    }
-
-    showToast(`✅ NFT pinned`, 1500)
-
-    const { error } = await supabase
-      .from('user_pins')
-      .upsert([{ user_id: user?.id, nft_id: nft.nft_id }], {
-        onConflict: 'user_id,nft_id',
-        ignoreDuplicates: true,
-      })
-
-    if (error) {
-      showToast(`⚠️ Error pinning NFT`, 2500)
-      console.error('Error pinning NFT:', error)
-      return
-    }
-  }
-
   const handleTabChange = (newMainTab: MainTabOption, newSubTab?: SubTabOption) => {
     if (!(newMainTab === 'nft' && newSubTab === 'latest') && !user) {
       showToast(`⚠️ You have to login first`, 2500)
@@ -347,7 +324,7 @@ const Homepage: React.FC = () => {
             />
           </div>
         ) : (
-          <NFTGrid items={items as NFTGridItem[]} newOffer={newOffer} pinItem={pinItem} />
+          <NFTGrid items={items as NFTGridItem[]} newOffer={newOffer} />
         )}
         {items.length > 0 && hasMore && (
           <div className='w-full flex items-center justify-center my-4'>

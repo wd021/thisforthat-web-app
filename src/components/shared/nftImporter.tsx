@@ -217,7 +217,7 @@ const NftImporter: FC<{
   }
 
   return (
-    <div className='flex flex-col w-full space-y-6'>
+    <div className='flex flex-col w-full space-y-4'>
       {/* Search Mode Tabs */}
       <div className='flex rounded-lg bg-gray-100 p-1'>
         <button
@@ -256,7 +256,7 @@ const NftImporter: FC<{
               />
             </div>
           ) : (
-            <>
+            <div className='flex gap-x-2 w-full'>
               <div className='flex-grow'>
                 <input
                   type='text'
@@ -266,7 +266,7 @@ const NftImporter: FC<{
                   className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                 />
               </div>
-              <div className='w-full sm:w-32'>
+              <div className='sm:w-32'>
                 <select
                   value={currentChain}
                   onChange={(e) =>
@@ -293,7 +293,7 @@ const NftImporter: FC<{
                   ))}
                 </select>
               </div>
-            </>
+            </div>
           )}
           <button
             onClick={handleSearch}
@@ -350,7 +350,7 @@ const NftImporter: FC<{
           </div>
         ) : nfts.length > 0 ? (
           <div className='space-y-4'>
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4'>
+            <div className='grid grid-cols-3 md:grid-cols-4 gap-4 p-4'>
               {nfts.map((nft) => (
                 <div
                   key={nft.id}

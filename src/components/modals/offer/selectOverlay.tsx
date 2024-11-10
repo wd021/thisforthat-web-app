@@ -108,7 +108,7 @@ const SelectNFT: FC<{
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className='bg-white rounded-lg p-6 w-full h-full max-w-2xl flex flex-col'
+        className='bg-white lg:rounded-lg p-4 w-full h-full max-w-2xl flex flex-col'
       >
         <div className='flex items-center justify-between mb-2'>
           <div>
