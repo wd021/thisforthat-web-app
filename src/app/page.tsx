@@ -5,6 +5,17 @@ import Homepage from '@/components/home'
 import { useIsMobile } from '@/hooks'
 
 export default function Home() {
+  console.log(`
+  ████████╗███████╗████████╗
+  ╚══██╔══╝██╔════╝╚══██╔══╝
+    ██║   █████╗     ██║   
+    ██║   ██╔══╝     ██║   
+    ██║   ██║        ██║   
+    ╚═╝   ╚═╝        ╚═╝
+
+    This For That - NFTs were made to be swapped
+`)
+
   const isMobile = useIsMobile()
 
   return (

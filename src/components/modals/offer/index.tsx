@@ -115,7 +115,6 @@ const Offer: FC<{
   }
 
   const makeOffer = async () => {
-    console.log('make offer', user, activeTab)
     if (!user) return
 
     if (activeTab === 'trade') {
@@ -159,8 +158,6 @@ const Offer: FC<{
               counterparty_assets: counterpartyItems,
             },
           })
-
-          console.log('create counter offer', data)
 
           if (error) throw error
 

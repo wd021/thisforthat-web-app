@@ -18,8 +18,6 @@ const TransactionFeed: React.FC<{
   const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  console.log('items', items)
-
   useEffect(() => {
     const fetchNewStatuses = async () => {
       // Get IDs of new, incomplete transactions

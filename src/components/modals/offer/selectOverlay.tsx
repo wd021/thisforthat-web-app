@@ -40,8 +40,6 @@ const SelectNFT: FC<{
       .not('nfts', 'is', null)
       .range(rangeStart, rangeEnd)
 
-    console.log('data', data)
-
     if (error) {
       showToast(`⚠️ Error fetching NFTs`, 2500)
       console.error('Error fetching NFTs:', error)

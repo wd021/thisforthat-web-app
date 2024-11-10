@@ -125,8 +125,6 @@ export async function verifyNFTs(
 
     const { validVerifications } = await response.json()
 
-    console.log('validVerifications', validVerifications)
-
     return { error: null, validVerifications }
   } catch (error) {
     return {
@@ -148,8 +146,6 @@ export async function completeTradeWithApi(offer_id: string, token: string): Pro
         Authorization: `Bearer ${token}`,
       },
     })
-
-    console.log('complete trade response', response)
 
     if (!response.ok) {
       const errorText = await response.text()
