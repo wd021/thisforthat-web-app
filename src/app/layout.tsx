@@ -6,6 +6,8 @@ import { AuthProvider } from '@/providers/authProvider'
 import { ToastProvider } from '@/providers/toastProvider'
 import { Web3Provider } from '@/providers/web3Provider'
 
+import { CSPostHogProvider } from './providers'
+
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -79,16 +81,18 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
     <html lang='en'>
       <body>
-        <Web3Provider>
-          <AuthProvider>
-            <ToastProvider>
-              <Layout>
-                <Navbar />
-                {children}
-              </Layout>
-            </ToastProvider>
-          </AuthProvider>
-        </Web3Provider>
+        <CSPostHogProvider>
+          <Web3Provider>
+            <AuthProvider>
+              <ToastProvider>
+                <Layout>
+                  <Navbar />
+                  {children}
+                </Layout>
+              </ToastProvider>
+            </AuthProvider>
+          </Web3Provider>
+        </CSPostHogProvider>
       </body>
     </html>
   )
