@@ -25,7 +25,7 @@ const NFTGridObject: FC<{
               className='w-6 h-6 rounded-full'
               onClick={navigateToUser}
             />
-            <span className='text-lg ml-2 text-gray-700 font-semibold'>
+            <span className='text-lg ml-2 text-gray-700 font-semibold truncate'>
               {item?.nft_user_id_username}
             </span>
           </div>

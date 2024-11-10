@@ -43,7 +43,7 @@ const NFTSidebar: React.FC<{
                 alt={nft.user_profile.username}
                 className='w-10 h-10 rounded-full'
               />
-              <div className='text-xl font-bold ml-2'>{nft.user_profile.username}</div>
+              <div className='text-xl font-bold ml-2 truncate'>{nft.user_profile.username}</div>
             </Link>
             <VerifiedBadge
               id={nft.id}

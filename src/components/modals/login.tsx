@@ -107,8 +107,8 @@ const Logo: React.FC = () => (
 const Features: React.FC = () => (
   <div className='gap-y-2 flex flex-col my-4'>
     <div className='text-lg px-16'>
-      NFTs were made to be swapped. Meet fellow enthusiasts, make trades, negotiate, and have a
-      blast while building your collection.
+      NFTs were made to be swapped. Meet fellow NFT enthusiasts, make trades, negotiate, and
+      have a blast while building your collection.
     </div>
   </div>
 )

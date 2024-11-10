@@ -168,7 +168,7 @@ export function createTokenIdRecipientMapping(tradeAssets: any[]): Record<string
   return tradeAssets.reduce(
     (mapping, asset) => {
       const { token, recipient, tokenId } = asset
-      const key = `${token}_${tokenId.toString()}`
+      const key = `${token}_${tokenId.toString()}`.toLowerCase()
       mapping[key] = recipient
       return mapping
     },

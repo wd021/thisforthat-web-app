@@ -20,7 +20,9 @@ const NFTImageWrapper: React.FC<{ item: UserNFT; profile: Profile }> = ({ item, 
           alt={profile?.username}
           className='w-6 h-6 rounded-full'
         />
-        <span className='text-lg ml-2 text-gray-700 font-semibold'>{profile?.username}</span>
+        <span className='text-lg ml-2 text-gray-700 font-semibold truncate'>
+          {profile?.username}
+        </span>
       </div>
       <VerifiedBadge
         id={item.nft_id}
