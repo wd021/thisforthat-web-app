@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import TransactionCard from '@/components/transaction'
-import { useTradeStatuses } from '@/hooks'
-import { useToast } from '@/providers/toastProvider'
 import { TxCancelModalInfo, TxModalInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
 
@@ -11,45 +9,7 @@ const TransactionFeed: React.FC<{
   setTxModalInfo: (modalInfo: TxModalInfo) => void
   setTxCancelModalInfo: (modalInfo: TxCancelModalInfo) => void
 }> = ({ items, setTxModalInfo, setTxCancelModalInfo }) => {
-  const { showToast } = useToast()
-  const { getStatuses } = useTradeStatuses()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [statusMap, setStatusMap] = useState<Map<string | number, any>>(new Map())
-  const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-
-  useEffect(() => {
-    const fetchNewStatuses = async () => {
-      // Get IDs of new, incomplete transactions
-      const newTradeIds = items
-        .filter((item) => !item.onchain_done && !statusMap.has(item.onchain_trade_id!))
-        .map((item) => item.onchain_trade_id!)
-        .filter(Boolean)
-
-      if (newTradeIds.length === 0) return
-
-      setIsLoading(true)
-      try {
-        const newStatuses = await getStatuses(newTradeIds)
-
-        const newMap = new Map(statusMap)
-        newStatuses.forEach((status, id) => {
-          if (status.info) {
-            newMap.set(id, status.info)
-          }
-        })
-
-        setStatusMap(newMap)
-      } catch (error) {
-        console.error('Error fetching trade statuses:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchNewStatuses()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, getStatuses])
 
   return (
     <>
@@ -126,82 +86,8 @@ const TransactionFeed: React.FC<{
         <TransactionCard
           key={item.offer_id}
           transaction={item}
-          onchainStatusLoading={isLoading}
-          onchainInfo={item.onchain_trade_id ? statusMap.get(item.onchain_trade_id) : null}
-          showTxModal={() => {
-            const txModalInfo = {
-              transactionInfo: {
-                status: item.status,
-                offerId: item.offer_id,
-                onchain: {
-                  id: item.onchain_trade_id,
-                  hash: item.onchain_tx,
-                  done: item.onchain_done,
-                },
-                chainId: item.chain_id,
-                users: {
-                  creator: {
-                    id: item.creator_id,
-                    username: item.creator_username,
-                    profile_pic_url: item.creator_profile_pic_url,
-                    wallet: item.creator_wallet,
-                  },
-                  counterparty: {
-                    id: item.counterparty_id,
-                    username: item.counterparty_username,
-                    profile_pic_url: item.counterparty_profile_pic_url,
-                    wallet: item.counterparty_wallet,
-                  },
-                },
-                assets: {
-                  creator: item.creator_assets,
-                  counterparty: item.counterparty_assets,
-                },
-              },
-              onchainInfo: item.onchain_trade_id ? statusMap.get(item.onchain_trade_id) : null,
-            }
-
-            if (item.onchain_trade_id && !statusMap.has(item.onchain_trade_id)) {
-              showToast('⚠️ Unable to connect to network. Please try again later.')
-            } else {
-              setTxModalInfo(txModalInfo)
-            }
-          }}
-          showTxCancelModal={() => {
-            if (!item.onchain_trade_id || !item.onchain_tx) {
-              showToast('⚠️ Unable to connect to network. Please try again later.')
-              return
-            }
-
-            const txCancelModalInfo = {
-              transactionInfo: {
-                status: item.status,
-                offerId: item.offer_id,
-                onchain: {
-                  id: item.onchain_trade_id as string,
-                  hash: item.onchain_tx as string,
-                  done: item.onchain_done,
-                },
-                chainId: item.chain_id,
-                users: {
-                  creator: {
-                    id: item.creator_id,
-                    username: item.creator_username,
-                    profile_pic_url: item.creator_profile_pic_url,
-                    wallet: item.creator_wallet,
-                  },
-                  counterparty: {
-                    id: item.counterparty_id,
-                    username: item.counterparty_username,
-                    profile_pic_url: item.counterparty_profile_pic_url,
-                    wallet: item.counterparty_wallet,
-                  },
-                },
-              },
-            }
-
-            setTxCancelModalInfo(txCancelModalInfo)
-          }}
+          setTxModalInfo={setTxModalInfo}
+          setTxCancelModalInfo={setTxCancelModalInfo}
         />
       ))}
     </>

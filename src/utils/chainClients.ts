@@ -1,9 +1,8 @@
 import { createPublicClient, fallback, http } from 'viem'
-import { arbitrum, base, mainnet, optimism, polygon, zksync } from 'viem/chains'
 
+// import { anvil } from 'viem/chains'
+import { supportedChains } from './constants'
 import { getAlchemyRpcUrl, getInfuraRpcUrl } from './helpers'
-
-const supportedChains = [mainnet, base, optimism, polygon, arbitrum, zksync] as const
 
 export const getPublicClient = (chain: (typeof supportedChains)[number]) => {
   const rpcUrls = [
@@ -16,6 +15,14 @@ export const getPublicClient = (chain: (typeof supportedChains)[number]) => {
     chain,
     transport: fallback(rpcUrls.map((url) => http(url))),
   })
+
+  // when testing on anvil, point to the anvil rpc url
+  /*
+  return createPublicClient({
+    chain: anvil,
+    transport: http(),
+  })
+  */
 }
 
 export const getChainClient = (chainId: number) => {

@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, polygon, zksync } from 'wagmi/chains'
+import { anvil, arbitrum, base, mainnet, optimism, polygon, zksync } from 'wagmi/chains'
 
 export const supportedChains: readonly [
   typeof mainnet,
@@ -7,7 +7,8 @@ export const supportedChains: readonly [
   typeof optimism,
   typeof polygon,
   typeof zksync,
-] = [mainnet, base, arbitrum, optimism, polygon, zksync]
+  typeof anvil,
+] = [mainnet, base, arbitrum, optimism, polygon, zksync, anvil]
 
 export const chainInfoMap: {
   [key: string]: {

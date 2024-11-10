@@ -1,5 +1,6 @@
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
+
 import { LoadingIndicator } from '../shared'
 
 const StatusMessage: React.FC<{ status: string }> = ({ status }) => {
@@ -35,11 +36,13 @@ const StatusMessage: React.FC<{ status: string }> = ({ status }) => {
 const Footer = ({
   transaction,
   onchainInfo,
+  onchainLoading,
   showTxModal,
   showTxCancelModal,
 }: {
   transaction: TransactionData
-  onchainInfo: OnchainTradeInfo
+  onchainInfo: OnchainTradeInfo | null
+  onchainLoading: boolean
   showTxModal: () => void
   showTxCancelModal: () => void
 }) => {
@@ -62,7 +65,7 @@ const Footer = ({
   return (
     <div className='flex items-center justify-between'>
       <div className='flex-1 mr-8 max-w-[300px]'>
-        {tradeStarted && onchainActive && !onchainCancelled && !tradeEnded && (
+        {tradeStarted && onchainActive && !onchainCancelled && !tradeEnded && onchainInfo && (
           <>
             <div className='w-full h-2 bg-gray-100 rounded-full overflow-hidden'>
               <div
@@ -116,8 +119,10 @@ const Footer = ({
             Deposit
           </button>
         </div>
-      ) : (
+      ) : onchainLoading ? (
         <LoadingIndicator className='!w-4 !h-4 mr-2' />
+      ) : (
+        <div className='text-sm text-gray-600'>checking status</div>
       )}
     </div>
   )

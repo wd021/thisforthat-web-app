@@ -31,12 +31,6 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
   const [txModalInfo, setTxModalInfo] = useState<TxModalInfo | null>(null)
   const [txCancelModalInfo, setTxCancelModalInfo] = useState<TxCancelModalInfo | null>(null)
 
-  const { tradeInfo, isLoading } = useTradeInfo(
-    txInfo?.chain_id || null,
-    txInfo?.onchain_trade_id || null,
-    txInfo?.onchain_done as boolean,
-  )
-
   const fetchOfferInfo = async () => {
     try {
       const { data, error } = await supabase
@@ -67,11 +61,7 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, loading])
 
-  if (
-    !txInfo ||
-    !ONCHAIN_STATUSES.includes(txInfo.status) ||
-    (txInfo.status === 'accepted' && !tradeInfo)
-  ) {
+  if (!txInfo || !ONCHAIN_STATUSES.includes(txInfo.status)) {
     return (
       <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
         <LoadingIndicator />
@@ -89,78 +79,8 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
             key={txInfo.offer_id}
             fullPage={true}
             transaction={txInfo}
-            onchainStatusLoading={isLoading}
-            onchainInfo={tradeInfo!}
-            showTxModal={() => {
-              const txModalInfo = {
-                transactionInfo: {
-                  status: txInfo.status,
-                  offerId: txInfo.offer_id,
-                  onchain: {
-                    id: txInfo.onchain_trade_id,
-                    hash: txInfo.onchain_tx,
-                    done: txInfo.onchain_done,
-                  },
-                  chainId: txInfo.chain_id,
-                  users: {
-                    creator: {
-                      id: txInfo.creator_id,
-                      username: txInfo.creator_username,
-                      profile_pic_url: txInfo.creator_profile_pic_url,
-                      wallet: txInfo.creator_wallet,
-                    },
-                    counterparty: {
-                      id: txInfo.counterparty_id,
-                      username: txInfo.counterparty_username,
-                      profile_pic_url: txInfo.counterparty_profile_pic_url,
-                      wallet: txInfo.counterparty_wallet,
-                    },
-                  },
-                  assets: {
-                    creator: txInfo.creator_assets,
-                    counterparty: txInfo.counterparty_assets,
-                  },
-                },
-                onchainInfo: tradeInfo!,
-              }
-
-              setTxModalInfo(txModalInfo)
-            }}
-            showTxCancelModal={() => {
-              if (!txInfo.onchain_trade_id || !txInfo.onchain_tx) {
-                showToast('⚠️ Unable to connect to network. Please try again later.')
-                return
-              }
-
-              const txCancelModalInfo = {
-                transactionInfo: {
-                  status: txInfo.status,
-                  offerId: txInfo.offer_id,
-                  onchain: {
-                    id: txInfo.onchain_trade_id,
-                    hash: txInfo.onchain_tx,
-                    done: txInfo.onchain_done,
-                  },
-                  chainId: txInfo.chain_id,
-                  users: {
-                    creator: {
-                      id: txInfo.creator_id,
-                      username: txInfo.creator_username,
-                      profile_pic_url: txInfo.creator_profile_pic_url,
-                      wallet: txInfo.creator_wallet,
-                    },
-                    counterparty: {
-                      id: txInfo.counterparty_id,
-                      username: txInfo.counterparty_username,
-                      profile_pic_url: txInfo.counterparty_profile_pic_url,
-                      wallet: txInfo.counterparty_wallet,
-                    },
-                  },
-                },
-              }
-
-              setTxCancelModalInfo(txCancelModalInfo)
-            }}
+            setTxModalInfo={setTxModalInfo}
+            setTxCancelModalInfo={setTxCancelModalInfo}
           />
         </div>
       )}

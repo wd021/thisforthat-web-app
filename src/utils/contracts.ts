@@ -4,6 +4,8 @@ type ContractAddresses = {
   [chainId: number]: Address
 }
 
+// when testing on anvil, make contracts on other chains point to the same address if using assets from mainnet to test
+
 export const CONTRACT_ADDRESSES: ContractAddresses = {
   1: '0x...' as Address, // ethereum
   8453: '0x...' as Address, // base

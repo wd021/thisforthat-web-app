@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
+import { useTradeInfo } from '@/hooks'
 import { useSyncApiWithChain } from '@/hooks/supabase'
 import { Expand, SwapArrows } from '@/icons'
-import { OnchainTradeInfo } from '@/types/main'
+import { useToast } from '@/providers/toastProvider'
+import { OnchainTradeInfo, TxCancelModalInfo, TxModalInfo } from '@/types/main'
 import { NFTAsset, TransactionData } from '@/types/supabase'
 import { getChainInfo } from '@/utils/helpers'
 
@@ -75,19 +77,21 @@ const TradeSection = ({
   username: string
   profilePic: string
   assets: NFTAsset[]
-  onchainInfo: OnchainTradeInfo
+  onchainInfo: OnchainTradeInfo | null
   status: string
 }) => {
   const isCompleted = status === 'onchain_cancelled' || status === 'onchain_completed'
-  const depositedCount = assets.reduce((count, asset) => {
-    const isDeposited = onchainInfo?.assets.some(
-      (onchainAsset) =>
-        onchainAsset.token.toLowerCase() === asset.collection_contract.toLowerCase() &&
-        onchainAsset.tokenId.toString() === asset.token_id &&
-        onchainAsset.isDeposited,
-    )
-    return isDeposited ? count + 1 : count
-  }, 0)
+  const depositedCount = onchainInfo
+    ? assets.reduce((count, asset) => {
+        const isDeposited = onchainInfo?.assets.some(
+          (onchainAsset) =>
+            onchainAsset.token.toLowerCase() === asset.collection_contract.toLowerCase() &&
+            onchainAsset.tokenId.toString() === asset.token_id &&
+            onchainAsset.isDeposited,
+        )
+        return isDeposited ? count + 1 : count
+      }, 0)
+    : '-'
 
   return (
     <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
@@ -122,12 +126,18 @@ const TradeSection = ({
 const Transaction: React.FC<{
   fullPage?: boolean
   transaction: TransactionData
-  onchainStatusLoading: boolean
-  onchainInfo: OnchainTradeInfo
-  showTxModal: () => void
-  showTxCancelModal: () => void
-}> = ({ fullPage = false, transaction, onchainInfo, showTxModal, showTxCancelModal }) => {
-  useSyncApiWithChain(onchainInfo, transaction)
+  setTxModalInfo: (modalInfo: TxModalInfo) => void
+  setTxCancelModalInfo: (modalInfo: TxCancelModalInfo) => void
+}> = ({ fullPage = false, transaction, setTxModalInfo, setTxCancelModalInfo }) => {
+  const { showToast } = useToast()
+
+  const { tradeInfo: onchainInfo, isLoading: onchainLoading } = useTradeInfo(
+    transaction?.chain_id || null,
+    transaction?.onchain_trade_id || null,
+    transaction?.onchain_done as boolean,
+  )
+
+  useSyncApiWithChain(onchainInfo || null, transaction)
 
   const [isExpanded, setIsExpanded] = useState(fullPage)
 
@@ -197,14 +207,14 @@ const Transaction: React.FC<{
               username={transaction.creator_username}
               profilePic={transaction.creator_profile_pic_url}
               assets={transaction.creator_assets}
-              onchainInfo={onchainInfo}
+              onchainInfo={onchainInfo || null}
               status={transaction.status}
             />
             <TradeSection
               username={transaction.counterparty_username}
               profilePic={transaction.counterparty_profile_pic_url}
               assets={transaction.counterparty_assets}
-              onchainInfo={onchainInfo}
+              onchainInfo={onchainInfo || null}
               status={transaction.status}
             />
           </div>
@@ -213,9 +223,82 @@ const Transaction: React.FC<{
 
       <Footer
         transaction={transaction}
-        onchainInfo={onchainInfo}
-        showTxModal={showTxModal}
-        showTxCancelModal={showTxCancelModal}
+        onchainInfo={onchainInfo || null}
+        onchainLoading={onchainLoading}
+        showTxModal={() => {
+          if (!onchainInfo) {
+            showToast('⚠️ Unable to connect to network. Please try again later.')
+          } else {
+            const txModalInfo = {
+              transactionInfo: {
+                status: transaction.status,
+                offerId: transaction.offer_id,
+                onchain: {
+                  id: transaction.onchain_trade_id,
+                  hash: transaction.onchain_tx,
+                  done: transaction.onchain_done,
+                },
+                chainId: transaction.chain_id,
+                users: {
+                  creator: {
+                    id: transaction.creator_id,
+                    username: transaction.creator_username,
+                    profile_pic_url: transaction.creator_profile_pic_url,
+                    wallet: transaction.creator_wallet,
+                  },
+                  counterparty: {
+                    id: transaction.counterparty_id,
+                    username: transaction.counterparty_username,
+                    profile_pic_url: transaction.counterparty_profile_pic_url,
+                    wallet: transaction.counterparty_wallet,
+                  },
+                },
+                assets: {
+                  creator: transaction.creator_assets,
+                  counterparty: transaction.counterparty_assets,
+                },
+              },
+              onchainInfo: onchainInfo,
+            }
+
+            setTxModalInfo(txModalInfo)
+          }
+        }}
+        showTxCancelModal={() => {
+          if (!transaction.onchain_trade_id || !transaction.onchain_tx) {
+            showToast('⚠️ Unable to connect to network. Please try again later.')
+            return
+          }
+
+          const txCancelModalInfo = {
+            transactionInfo: {
+              status: transaction.status,
+              offerId: transaction.offer_id,
+              onchain: {
+                id: transaction.onchain_trade_id as string,
+                hash: transaction.onchain_tx as string,
+                done: transaction.onchain_done,
+              },
+              chainId: transaction.chain_id,
+              users: {
+                creator: {
+                  id: transaction.creator_id,
+                  username: transaction.creator_username,
+                  profile_pic_url: transaction.creator_profile_pic_url,
+                  wallet: transaction.creator_wallet,
+                },
+                counterparty: {
+                  id: transaction.counterparty_id,
+                  username: transaction.counterparty_username,
+                  profile_pic_url: transaction.counterparty_profile_pic_url,
+                  wallet: transaction.counterparty_wallet,
+                },
+              },
+            },
+          }
+
+          setTxCancelModalInfo(txCancelModalInfo)
+        }}
       />
     </div>
   )

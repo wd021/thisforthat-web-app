@@ -14,16 +14,18 @@ const config = createConfig(
     chains: supportedChains,
     transports: Object.fromEntries(
       supportedChains.map((chain) => {
-        const alchemyUrl = getAlchemyRpcUrl(chain)
-        const infuraUrl = getInfuraRpcUrl(chain)
-        return [
-          chain.id,
-          fallback([
-            ...(alchemyUrl ? [http(alchemyUrl)] : []),
-            ...(infuraUrl ? [http(infuraUrl)] : []),
-            http(chain.rpcUrls.default.http[0]),
-          ]),
-        ]
+        const alchemyUrl = chain.id !== 31_337 ? getAlchemyRpcUrl(chain) : null
+        const infuraUrl = chain.id !== 31_337 ? getInfuraRpcUrl(chain) : null
+        return chain.id !== 31_337
+          ? [
+              chain.id,
+              fallback([
+                ...(alchemyUrl ? [http(alchemyUrl)] : []),
+                ...(infuraUrl ? [http(infuraUrl)] : []),
+                http(chain.rpcUrls.default.http[0]),
+              ]),
+            ]
+          : [chain.id, http()]
       }),
     ),
     walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
