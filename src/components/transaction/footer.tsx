@@ -1,5 +1,6 @@
 import { OnchainTradeInfo } from '@/types/main'
 import { TransactionData } from '@/types/supabase'
+import { LoadingIndicator } from '../shared'
 
 const StatusMessage: React.FC<{ status: string }> = ({ status }) => {
   const getStatusConfig = () => {
@@ -115,7 +116,9 @@ const Footer = ({
             Deposit
           </button>
         </div>
-      ) : null}
+      ) : (
+        <LoadingIndicator className='!w-4 !h-4 mr-2' />
+      )}
     </div>
   )
 }
