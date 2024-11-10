@@ -226,7 +226,7 @@ const Transaction: React.FC<{
         onchainInfo={onchainInfo || null}
         onchainLoading={onchainLoading}
         showTxModal={() => {
-          if (!onchainInfo) {
+          if (transaction.onchain_trade_id && !onchainInfo) {
             showToast('⚠️ Unable to connect to network. Please try again later.')
           } else {
             const txModalInfo = {
@@ -258,7 +258,7 @@ const Transaction: React.FC<{
                   counterparty: transaction.counterparty_assets,
                 },
               },
-              onchainInfo: onchainInfo,
+              onchainInfo: transaction.onchain_trade_id ? onchainInfo! : null,
             }
 
             setTxModalInfo(txModalInfo)
