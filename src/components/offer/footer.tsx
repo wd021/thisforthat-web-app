@@ -162,7 +162,7 @@ const Footer: React.FC<{
   const isPending = STATUS_PENDING.includes(status)
 
   return (
-    <div className='flex items-center justify-end mt-4'>
+    <div className='flex items-center justify-end mt-2 md:mt-4'>
       {isPending ? (
         <>
           {isCounterparty ? (

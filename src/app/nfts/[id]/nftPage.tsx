@@ -41,7 +41,7 @@ const NFTSidebar: React.FC<{
                   nft.user_profile.profile_pic_url
                 }
                 alt={nft.user_profile.username}
-                className='w-8 h-8 rounded-full'
+                className='w-10 h-10 rounded-full'
               />
               <div className='text-xl font-bold ml-2'>{nft.user_profile.username}</div>
             </Link>
@@ -51,7 +51,7 @@ const NFTSidebar: React.FC<{
               collectionName={nft.collection_name}
               tokenId={nft.token_id}
               isVerified={nft.is_verified}
-              className='w-8 h-8 flex items-center justify-center shrink-0'
+              className='w-10 h-10 flex items-center justify-center shrink-0'
               chainId={nft.chain_id.toString()}
               collectionContract={nft.collection_contract}
             />
@@ -145,14 +145,13 @@ const ActionButtons: React.FC<{
   <div className={`flex gap-x-2 p-0.5 ${className} lg:mb-2`}>
     <button
       onClick={makeOffer}
-      className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-50 hover:bg-yellow-100`}
+      className={`flex-1 py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-yellow-400 hover:bg-yellow-500`}
     >
-      <span className='text-3xl mr-2'>🤝</span>
-      <span className='text-gray-800 text-xl font-semibold'>Offer</span>
+      <span className='text-gray-800 text-xl font-semibold'>Make Offer</span>
     </button>
     <button
       onClick={pinItem}
-      className={`py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-red-50 hover:bg-red-100`}
+      className={`py-2 px-4 rounded-md transition-colors duration-200 shadow-md flex items-center justify-center bg-gray-50 hover:bg-gray-100`}
     >
       <span className='text-2xl'>📌</span>
     </button>
@@ -243,7 +242,7 @@ const NFTPage: React.FC<{
       return
     }
 
-    showToast(`✅ NFT pinned`, 1500)
+    showToast(`📌 NFT pinned`, 1500)
 
     const { error } = await supabase
       .from('user_pins')

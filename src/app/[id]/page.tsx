@@ -220,7 +220,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
         onConflict: 'user_id,nft_id',
         ignoreDuplicates: true,
       })
-      showToast(`✅ NFT pinned`, 1500)
+      showToast(`📌 NFT pinned`, 1500)
     } catch (error) {
       showToast(`⚠️ Error pinning NFT`, 2500)
       console.error('Error pinning NFT:', error)

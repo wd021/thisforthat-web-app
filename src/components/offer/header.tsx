@@ -15,12 +15,12 @@ const Icons = {
     </svg>
   ),
   ChevronDown: () => (
-    <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <svg className='w-6 h-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
     </svg>
   ),
   ChevronUp: () => (
-    <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <svg className='w-6 h-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 15l7-7 7 7' />
     </svg>
   ),
@@ -42,7 +42,7 @@ const UserInfo: React.FC<{ username: string; profilePic: string }> = ({
         className='w-full h-full object-cover'
       />
     </Link>
-    <span className='text-sm font-medium'>{username}</span>
+    <span className='text-sm font-semibold'>{username}</span>
   </div>
 )
 
@@ -58,7 +58,7 @@ const FavoriteButton: React.FC<{
     }}
     className={`p-1.5 hover:bg-gray-100 rounded-full ${isFavorited ? 'text-yellow-500' : 'text-gray-500'} hover:text-yellow-500 transition-colors`}
   >
-    <Star className={`${fullPage ? 'w6 h-6' : 'w-4 h-4'}`} filled={isFavorited} />
+    <Star className={`w-6 h-6`} filled={isFavorited} />
   </button>
 )
 
@@ -76,22 +76,24 @@ const Header = ({
   setIsExpanded: (isExpanded: boolean) => void
 }) => {
   return (
-    <div className='flex items-center justify-between p-2 pt-0 pb-4'>
-      <div className='flex items-center space-x-2'>
-        <ChainLogo chainId={offer.chain_id} className='w-5 h-5' />
-        <div className='flex items-center gap-x-1'>
-          <UserInfo
-            username={offer.creator_username}
-            profilePic={offer.creator_profile_pic_url}
-          />
-          <Icons.ChevronRight />
-          <UserInfo
-            username={offer.counterparty_username}
-            profilePic={offer.counterparty_profile_pic_url}
-          />
+    <div className='flex items-center justify-between pl-2 pt-0 pb-2 md:pb-4'>
+      <div className='flex items-center gap-x-2'>
+        <ChainLogo chainId={offer.chain_id} className='w-6 h-6' />
+        <div className='flex items-center space-x-2 bg-yellow-100 rounded-full py-2 px-3'>
+          <div className='flex items-center gap-x-1'>
+            <UserInfo
+              username={offer.creator_username}
+              profilePic={offer.creator_profile_pic_url}
+            />
+            <Icons.ChevronRight />
+            <UserInfo
+              username={offer.counterparty_username}
+              profilePic={offer.counterparty_profile_pic_url}
+            />
+          </div>
         </div>
       </div>
-      <div className='flex items-center space-x-2.5'>
+      <div className='flex items-center'>
         <FavoriteButton
           fullPage={fullPage}
           isFavorited={offer.favorited_by_user}
@@ -105,7 +107,7 @@ const Header = ({
               className='p-1.5 text-gray-500 hover:bg-gray-100 rounded-full'
               onClick={(e) => e.stopPropagation()}
             >
-              <Expand className='w-4 h-4' />
+              <Expand className='w-6 h-6' />
             </Link>
             <button
               onClick={(e) => {

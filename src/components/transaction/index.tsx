@@ -35,7 +35,7 @@ const CompactView: React.FC<{
   creatorAssets: NFTAsset[]
   counterpartyAssets: NFTAsset[]
 }> = ({ creatorAssets, counterpartyAssets }) => (
-  <div className='bg-gray-50 rounded-lg p-4 overflow-hidden overflow-x-auto hide-scrollbar'>
+  <div className='bg-gray-50 rounded-lg p-3 overflow-hidden overflow-x-auto hide-scrollbar'>
     <div className='flex items-center justify-between'>
       <div className='flex items-center space-x-4'>
         <AssetPreviewGroup assets={creatorAssets} />
@@ -90,16 +90,18 @@ const TradeSection = ({
 
   return (
     <div className='p-3 rounded-lg bg-gray-50 space-y-2 w-full'>
-      <div className='flex items-center gap-2 mb-2'>
-        <Link href={`/${username}`} target='_blank'>
-          <img
-            src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
-            alt={username}
-            className='w-6 h-6 rounded-full ml-2 object-cover'
-          />
-        </Link>
-        <div className='flex items-center justify-between w-full'>
-          <span className='text-sm font-medium'>{username}</span>
+      <div className='flex justify-between'>
+        <div className='flex items-center gap-2 mb-2'>
+          <Link href={`/${username}`} target='_blank'>
+            <img
+              src={process.env.NEXT_PUBLIC_CLOUDFLARE_PUBLIC_URL + profilePic}
+              alt={username}
+              className='w-6 h-6 rounded-full ml-2 object-cover'
+            />
+          </Link>
+          <span className='text-sm font-semibold'>{username}</span>
+        </div>
+        <div>
           {!isCompleted && (
             <span className='text-xs text-gray-600'>
               {depositedCount} of {assets.length} deposited
@@ -136,9 +138,9 @@ const Transaction: React.FC<{
 
   return (
     <div
-      className={`p-4 w-full bg-white rounded-xl shadow-md 
+      className={`p-2 md:p-4 w-full bg-white rounded-xl shadow-md 
         ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} 
-        transition-all duration-200 space-y-4`}
+        transition-all duration-200 space-y-2 md:space-y-4`}
       onClick={handleClick}
     >
       <Header
@@ -155,10 +157,10 @@ const Transaction: React.FC<{
         />
       ) : (
         <>
-          <div className='flex gap-4 text-sm ml-2'>
+          <div className='flex py-2 md:py-1 gap-2 md:gap-4 ml-3'>
             <Link
               href={`/offers/${transaction.offer_id}`}
-              className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+              className='text-gray-600 hover:text-gray-900 flex items-center gap-0.5 font-semibold'
               onClick={(e) => {
                 e.stopPropagation()
               }}
@@ -168,7 +170,7 @@ const Transaction: React.FC<{
             </Link>
             <Link
               href='https://www.etherscan.io'
-              className='text-gray-500 hover:text-gray-900 flex items-center gap-0.5'
+              className='text-gray-600 hover:text-gray-900 flex items-center gap-0.5 font-semibold'
               onClick={(e) => {
                 e.stopPropagation()
               }}

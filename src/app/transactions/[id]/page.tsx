@@ -66,7 +66,11 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, loading])
 
-  if (!txInfo || !ONCHAIN_STATUSES.includes(txInfo.status) || !tradeInfo) {
+  if (
+    !txInfo ||
+    !ONCHAIN_STATUSES.includes(txInfo.status) ||
+    (txInfo.status === 'accepted' && !tradeInfo)
+  ) {
     return (
       <div className='w-full flex flex-col items-center justify-center mt-[150px]'>
         <LoadingIndicator />
@@ -85,7 +89,7 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
             fullPage={true}
             transaction={txInfo}
             onchainStatusLoading={isLoading}
-            onchainInfo={tradeInfo}
+            onchainInfo={tradeInfo!}
             showTxModal={() => {
               const txModalInfo = {
                 transactionInfo: {
@@ -116,7 +120,7 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
                     counterparty: txInfo.counterparty_assets,
                   },
                 },
-                onchainInfo: tradeInfo,
+                onchainInfo: tradeInfo!,
               }
 
               setTxModalInfo(txModalInfo)

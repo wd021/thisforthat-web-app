@@ -29,8 +29,8 @@ const LikeButton: FC<LikeButtonProps> = ({
     }}
     className={`ml-3 inline-flex  items-center space-x-1 p-1  hover:bg-gray-100  rounded-full transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500 ${className}`}
   >
-    <Heart className='h-4 w-4' fill={isLiked ? 'currentColor' : 'none'} />
-    {likesCount > 0 && <span className='text-xs font-medium'>{likesCount}</span>}
+    <Heart className='h-5 w-5' fill={isLiked ? 'currentColor' : 'none'} />
+    {likesCount > 0 && <span className='text-sm font-medium'>{likesCount}</span>}
   </button>
 )
 
@@ -61,7 +61,7 @@ const OfferSide: FC<OfferSideProps> = ({
         className='w-6 h-6 rounded-full ml-2 object-cover'
       />
       <div className='flex items-center justify-between w-full'>
-        <span className='text-sm font-medium'>{username}</span>
+        <span className='text-sm font-semibold'>{username}</span>
       </div>
     </div>
     <div className='space-y-2 w-full overflow-hidden'>
@@ -75,7 +75,7 @@ const OfferSide: FC<OfferSideProps> = ({
             target='_blank'
             className='flex items-center space-x-2 flex-1 overflow-hidden'
           >
-            <div className={`relative flex ${isExpanded ? 'h-12 w-12' : 'h-10 w-10'}`}>
+            <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-12 w-12'}`}>
               <NFTImage
                 src={asset.image}
                 alt={asset.name}
@@ -144,7 +144,7 @@ const TradeOffer: FC<TradeOfferProps> = ({
             }
           }}
         >
-          <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-12 w-12'}`}>
+          <div className={`relative flex ${isExpanded ? 'h-14 w-14' : 'h-14 w-14'}`}>
             <NFTImage
               src={openAsset.image}
               alt={openAsset.name}
@@ -193,12 +193,12 @@ const TradeOffer: FC<TradeOfferProps> = ({
       <div className='flex w-full'>
         {/* Compact View */}
         {!isExpanded && (
-          <div className='bg-gray-50 rounded-lg p-4 w-full overflow-x-auto hide-scrollbar'>
+          <div className='bg-gray-50 rounded-lg p-3 w-full overflow-x-auto hide-scrollbar'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-4'>
                 <div className='flex -space-x-2'>
                   {offer.creator_assets.map((asset) => (
-                    <div key={asset.nft_id} className='w-12 h-12'>
+                    <div key={asset.nft_id} className='w-14 h-14'>
                       <NFTImage
                         src={asset.image}
                         alt={asset.name}
@@ -214,7 +214,7 @@ const TradeOffer: FC<TradeOfferProps> = ({
                 </div>
                 <div className='flex -space-x-2'>
                   {offer.counterparty_assets.map((asset) => (
-                    <div key={asset.nft_id} className='w-12 h-12'>
+                    <div key={asset.nft_id} className='w-14 h-14'>
                       <NFTImage
                         src={asset.image}
                         alt={asset.name}

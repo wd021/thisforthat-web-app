@@ -52,7 +52,7 @@ export const Offer: React.FC<OfferCardProps> = ({
 
   return (
     <div
-      className={`p-4 w-full bg-white rounded-xl shadow-md ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} transition-all duration-200`}
+      className={`p-2 md:p-4 w-full bg-white rounded-xl shadow-md ${!fullPage ? 'hover:shadow-lg cursor-pointer' : ''} transition-all duration-200`}
       onClick={() => {
         if (!fullPage) {
           setIsExpanded(!isExpanded)

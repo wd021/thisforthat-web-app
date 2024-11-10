@@ -16,12 +16,12 @@ const Icons = {
     </svg>
   ),
   ChevronDown: () => (
-    <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <svg className='w-6 h-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
     </svg>
   ),
   ChevronUp: () => (
-    <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <svg className='w-6 h-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 15l7-7 7 7' />
     </svg>
   ),
@@ -39,9 +39,7 @@ const UserInfo: React.FC<{ username: string; profilePic: string }> = ({
         className='w-full h-full object-cover'
       />
     </div>
-    <span className='text-sm font-medium text-gray-700 group-hover:text-gray-900'>
-      {username}
-    </span>
+    <span className='text-sm font-semibold'>{username}</span>
   </Link>
 )
 
@@ -52,25 +50,25 @@ const Header: React.FC<{
   setIsExpanded: (isExpanded: boolean) => void
 }> = ({ fullPage, transaction, isExpanded, setIsExpanded }) => {
   return (
-    <div className='flex items-center justify-between p-2 py-0'>
-      <div className='flex items-center space-x-2'>
-        <ChainLogo chainId={transaction.chain_id} className='w-5 h-5' />
-        <div className='flex items-center gap-x-1'>
-          <UserInfo
-            username={transaction.creator_username}
-            profilePic={transaction.creator_profile_pic_url}
-          />
-          <div className='px-0.5'>
+    <div className='flex items-center justify-between pl-2 py-0'>
+      <div className='flex items-center gap-x-2'>
+        <ChainLogo chainId={transaction.chain_id} className='w-6 h-6' />
+        <div className='flex items-center space-x-2 bg-yellow-100 rounded-full py-2 px-3'>
+          <div className='flex items-center gap-x-1'>
+            <UserInfo
+              username={transaction.creator_username}
+              profilePic={transaction.creator_profile_pic_url}
+            />
             <Icons.ChevronRight />
+            <UserInfo
+              username={transaction.counterparty_username}
+              profilePic={transaction.counterparty_profile_pic_url}
+            />
           </div>
-          <UserInfo
-            username={transaction.counterparty_username}
-            profilePic={transaction.counterparty_profile_pic_url}
-          />
         </div>
       </div>
 
-      <div className='flex items-center space-x-2.5'>
+      <div className='flex items-center'>
         {!fullPage && (
           <>
             <Link
@@ -79,7 +77,7 @@ const Header: React.FC<{
               className='p-1.5 text-gray-500 hover:bg-gray-100 rounded-full'
               onClick={(e) => e.stopPropagation()}
             >
-              <Expand className='w-4 h-4' />
+              <Expand className='w-6 h-6' />
             </Link>
             <button
               onClick={(e) => {
