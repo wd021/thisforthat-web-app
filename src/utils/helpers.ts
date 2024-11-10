@@ -1,56 +1,8 @@
-import { createPublicClient, http } from 'viem'
-import { anvil } from 'viem/chains'
+import { arbitrum, base, mainnet, optimism, polygon, zksync } from 'viem/chains'
 
-import ABI from '@/contracts/abi.json'
 import { Asset, assetTypeMap, OfferInfo, PreparedAsset } from '@/types/main'
-import { OnchainTradeInfo, OnchainTradeInfoAsset } from '@/types/main'
-import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
-interface ChainInfo {
-  id: string
-  name: string
-  openSeaSlug: string
-  blockExplorerUrl: string
-}
-
-export const chainInfoMap: { [key: string]: ChainInfo } = {
-  '1': {
-    id: '1',
-    name: 'Ethereum',
-    openSeaSlug: 'ethereum',
-    blockExplorerUrl: 'https://etherscan.io',
-  },
-  '8453': {
-    id: '8453',
-    name: 'Base',
-    openSeaSlug: 'base',
-    blockExplorerUrl: 'https://basescan.org',
-  },
-  '42161': {
-    id: '42161',
-    name: 'Arbitrum',
-    openSeaSlug: 'arbitrum',
-    blockExplorerUrl: 'https://arbiscan.io',
-  },
-  '10': {
-    id: '10',
-    name: 'Optimism',
-    openSeaSlug: 'optimism',
-    blockExplorerUrl: 'https://optimistic.etherscan.io',
-  },
-  '137': {
-    id: '137',
-    name: 'Polygon',
-    openSeaSlug: 'matic',
-    blockExplorerUrl: 'https://polygonscan.com',
-  },
-  '324': {
-    id: '324',
-    name: 'ZkSync',
-    openSeaSlug: 'zksync',
-    blockExplorerUrl: 'https://explorer.zksync.io',
-  },
-}
+import { chainInfoMap, supportedChains } from './constants'
 
 export async function uploadFile(
   formData: FormData,
@@ -160,6 +112,7 @@ export async function completeTradeWithApi(offer_id: string, token: string): Pro
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createTokenIdRecipientMapping(tradeAssets: any[]): Record<string, string> {
   return tradeAssets.reduce(
     (mapping, asset) => {
@@ -222,7 +175,14 @@ export function timeAgoShort(date: Date): string {
   return Math.floor(seconds) + 's'
 }
 
-export const getChainInfo = (chainId: string): ChainInfo => {
+export const getChainInfo = (
+  chainId: string,
+): {
+  id: string
+  name: string
+  openSeaSlug: string
+  blockExplorerUrl: string
+} => {
   const chain = chainInfoMap[chainId]
   if (!chain) {
     console.warn(`Chain ID ${chainId} not found, defaulting to Ethereum`)
@@ -268,68 +228,6 @@ export const prepareAllAssets = (offerInfo: OfferInfo): PreparedAsset[][] => {
   ]
 }
 
-const formatTradeInfo = (
-  isActive: boolean,
-  depositedAssetCount: bigint,
-  totalAssetCount: bigint,
-  assets: OnchainTradeInfoAsset[],
-): OnchainTradeInfo => {
-  return {
-    isActive,
-    depositedAssetCount: Number(depositedAssetCount),
-    totalAssetCount: Number(totalAssetCount),
-    assets,
-  }
-}
-
-const decodeAsset = (asset: OnchainTradeInfoAsset): OnchainTradeInfoAsset => {
-  if (typeof asset === 'object' && 'token' in asset) {
-    return asset as OnchainTradeInfoAsset
-  }
-  const { token, tokenId, amount, assetType, recipient, isDeposited } = asset
-  return { token, tokenId, amount, assetType, recipient, isDeposited }
-}
-
-export async function getTradeInfo(tradeId: string | number): Promise<{
-  tradeInfo: OnchainTradeInfo | undefined
-  isError: boolean
-}> {
-  try {
-    const publicClient = createPublicClient({
-      chain: anvil,
-      transport: http(),
-    })
-
-    const [isActive, depositedAssetCount, totalAssetCount, encodedAssets] =
-      (await publicClient.readContract({
-        address: CONTRACT_ADDRESSES[31337],
-        abi: ABI,
-        functionName: 'getTradeInfo',
-        args: [BigInt(tradeId)],
-      })) as [boolean, bigint, bigint, OnchainTradeInfoAsset[]]
-
-    const decodedAssets = encodedAssets.map(decodeAsset)
-
-    const tradeInfo = formatTradeInfo(
-      isActive,
-      depositedAssetCount,
-      totalAssetCount,
-      decodedAssets,
-    )
-
-    return {
-      tradeInfo,
-      isError: false,
-    }
-  } catch (error) {
-    console.error('Error fetching trade info:', error)
-    return {
-      tradeInfo: undefined,
-      isError: true,
-    }
-  }
-}
-
 export const trimAddress = (
   addr: string,
   startLength: number = 4,
@@ -348,4 +246,38 @@ export const trimAddress = (
   }
 
   return `${addr.slice(0, startLength)}...${addr.slice(-endLength)}`
+}
+
+export const getAlchemyRpcUrl = (chain: (typeof supportedChains)[number]) => {
+  const alchemyNetworkMap: Record<number, string> = {
+    [mainnet.id]: 'eth-mainnet',
+    [base.id]: 'base-mainnet',
+    [optimism.id]: 'opt-mainnet',
+    [polygon.id]: 'polygon-mainnet',
+    [arbitrum.id]: 'arb-mainnet',
+    [zksync.id]: 'zksync-mainnet',
+  }
+
+  const networkName = alchemyNetworkMap[chain.id]
+  if (networkName) {
+    return `https://${networkName}.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+  }
+  return null
+}
+
+export const getInfuraRpcUrl = (chain: (typeof supportedChains)[number]) => {
+  const infuraNetworkMap: Record<number, string> = {
+    [mainnet.id]: 'mainnet',
+    [base.id]: 'base-mainnet',
+    [optimism.id]: 'optimism-mainnet',
+    [polygon.id]: 'polygon-mainnet',
+    [arbitrum.id]: 'arbitrum-mainnet',
+    [zksync.id]: 'zksync-mainnet',
+  }
+
+  const networkName = infuraNetworkMap[chain.id]
+  if (networkName) {
+    return `https://${networkName}.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
+  }
+  return null
 }

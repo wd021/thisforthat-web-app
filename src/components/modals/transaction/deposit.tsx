@@ -10,12 +10,14 @@ import DepositCard from './depositCard'
 const DepositTx = ({
   assets,
   onchainDeposited,
+  chainId,
   tradeId,
   onClose,
   onFinish,
 }: {
   assets: SimplifiedNFTAsset[]
   onchainDeposited: { token: `0x${string}`; tokenId: bigint }[]
+  chainId: number
   tradeId: string
   onClose: () => void
   onFinish: () => void
@@ -51,6 +53,7 @@ const DepositTx = ({
           return (
             <DepositCard
               key={index}
+              chainId={chainId}
               tradeId={tradeId}
               asset={asset}
               depositedAssets={onchainDone}

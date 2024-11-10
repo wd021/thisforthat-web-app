@@ -1,3 +1,60 @@
+import { arbitrum, base, mainnet, optimism, polygon, zksync } from 'wagmi/chains'
+
+export const supportedChains: readonly [
+  typeof mainnet,
+  typeof base,
+  typeof arbitrum,
+  typeof optimism,
+  typeof polygon,
+  typeof zksync,
+] = [mainnet, base, arbitrum, optimism, polygon, zksync]
+
+export const chainInfoMap: {
+  [key: string]: {
+    id: string
+    name: string
+    openSeaSlug: string
+    blockExplorerUrl: string
+  }
+} = {
+  '1': {
+    id: '1',
+    name: 'Ethereum',
+    openSeaSlug: 'ethereum',
+    blockExplorerUrl: 'https://etherscan.io',
+  },
+  '8453': {
+    id: '8453',
+    name: 'Base',
+    openSeaSlug: 'base',
+    blockExplorerUrl: 'https://basescan.org',
+  },
+  '42161': {
+    id: '42161',
+    name: 'Arbitrum',
+    openSeaSlug: 'arbitrum',
+    blockExplorerUrl: 'https://arbiscan.io',
+  },
+  '10': {
+    id: '10',
+    name: 'Optimism',
+    openSeaSlug: 'optimism',
+    blockExplorerUrl: 'https://optimistic.etherscan.io',
+  },
+  '137': {
+    id: '137',
+    name: 'Polygon',
+    openSeaSlug: 'matic',
+    blockExplorerUrl: 'https://polygonscan.com',
+  },
+  '324': {
+    id: '324',
+    name: 'ZkSync',
+    openSeaSlug: 'zksync',
+    blockExplorerUrl: 'https://explorer.zksync.io',
+  },
+}
+
 export const BLOCKED_USERNAMES = [
   'about',
   'account',

@@ -11,7 +11,13 @@ import ABI from '@/contracts/abi.json'
 import { useToast } from '@/providers/toastProvider'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
-export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }) {
+export default function useCancelTrade({
+  chainId,
+  tradeId,
+}: {
+  chainId: number
+  tradeId: string | bigint
+}) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { showToast } = useToast()
@@ -43,7 +49,7 @@ export default function useCancelTrade({ tradeId }: { tradeId: string | bigint }
       const tradeBigInt = typeof tradeId === 'string' ? BigInt(tradeId) : tradeId
 
       const { request } = await publicClient.simulateContract({
-        address: CONTRACT_ADDRESSES[31337] as Address,
+        address: CONTRACT_ADDRESSES[chainId] as Address,
         abi: ABI,
         functionName: 'cancelTrade',
         args: [tradeBigInt],

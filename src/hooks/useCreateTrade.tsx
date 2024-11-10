@@ -126,7 +126,7 @@ export default function useCreateTrade({
       })
 
       const { request } = await publicClient.simulateContract({
-        address: CONTRACT_ADDRESSES[31337] as Address,
+        address: CONTRACT_ADDRESSES[chainId] as Address,
         abi: ABI,
         functionName: 'createTrade',
         args: [participants, assetsArg],
@@ -148,7 +148,7 @@ export default function useCreateTrade({
     } finally {
       setIsCreatingContract(false)
     }
-  }, [users, assets, address, publicClient, writeContract, showToast])
+  }, [chainId, users, assets, address, publicClient, writeContract, showToast])
 
   return {
     createTradeContract,

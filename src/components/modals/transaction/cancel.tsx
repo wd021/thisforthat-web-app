@@ -50,6 +50,7 @@ const CancelTx = ({
     error: cancelError,
     isError,
   } = useCancelTrade({
+    chainId: transactionInfo.chainId,
     tradeId: transactionInfo.onchain.id,
   })
 

@@ -5,7 +5,11 @@ type ContractAddresses = {
 }
 
 export const CONTRACT_ADDRESSES: ContractAddresses = {
-  1: '0x...' as Address, // mainnet
-  11155111: '0x...' as Address, // sepolia
-  31337: '0xA899118f4BCCb62F8c6A37887a4F450D8a4E92E0' as Address, // anvil
+  1: '0x...' as Address, // ethereum
+  8453: '0x...' as Address, // base
+  42161: '0x...' as Address, // arbitrum
+  10: '0x...' as Address, // optimism
+  137: '0x...' as Address, // polygon
+  324: '0x...' as Address, // zksync
+  31337: '0x...' as Address, // anvil (local testnet)
 }

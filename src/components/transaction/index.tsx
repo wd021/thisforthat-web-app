@@ -5,6 +5,7 @@ import { useSyncApiWithChain } from '@/hooks/supabase'
 import { Expand, SwapArrows } from '@/icons'
 import { OnchainTradeInfo } from '@/types/main'
 import { NFTAsset, TransactionData } from '@/types/supabase'
+import { getChainInfo } from '@/utils/helpers'
 
 import { NFTImage } from '../shared'
 
@@ -136,6 +137,8 @@ const Transaction: React.FC<{
     }
   }
 
+  const explorerLink = getChainInfo(transaction.chain_id.toString()).blockExplorerUrl
+
   return (
     <div
       className={`p-2 md:p-4 w-full bg-white rounded-xl shadow-md 
@@ -160,6 +163,7 @@ const Transaction: React.FC<{
           <div className='flex py-2 md:py-1 gap-2 md:gap-4 ml-3'>
             <Link
               href={`/offers/${transaction.offer_id}`}
+              target='_blank'
               className='text-gray-600 hover:text-gray-900 flex items-center gap-0.5 font-semibold'
               onClick={(e) => {
                 e.stopPropagation()
@@ -169,7 +173,8 @@ const Transaction: React.FC<{
               <Expand className='w-4 h-4' />
             </Link>
             <Link
-              href='https://www.etherscan.io'
+              href={`${explorerLink}/tx/${transaction.onchain_tx}`}
+              target='_blank'
               className='text-gray-600 hover:text-gray-900 flex items-center gap-0.5 font-semibold'
               onClick={(e) => {
                 e.stopPropagation()

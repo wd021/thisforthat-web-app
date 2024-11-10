@@ -1,9 +1,13 @@
+// TODO: implementation doesn't take into account multiple chains. Need to refactor to support multiple chains.
+
+/*
+
 import { useCallback } from 'react'
 import { usePublicClient } from 'wagmi'
 
 import ABI from '@/contracts/abi.json'
-import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 import { PreparedAsset } from '@/types/main'
+import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
 interface TradeInfo {
   isActive: boolean
@@ -35,7 +39,7 @@ export class TradeStatusManager {
 
     try {
       const result = await this.publicClient.readContract({
-        address: CONTRACT_ADDRESSES[31337],
+        address: CONTRACT_ADDRESSES[1],
         abi: ABI,
         functionName: 'getMultipleTradeStatuses',
         args: [tradeIds.map((id) => BigInt(id))],
@@ -157,3 +161,5 @@ export default function useTradeStatuses() {
     ),
   }
 }
+
+*/

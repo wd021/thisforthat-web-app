@@ -158,6 +158,7 @@ const TransactionModal: React.FC<{
             onchainDeposited={
               onchainInfo ? onchainInfo.assets.filter((a) => a.isDeposited) : []
             }
+            chainId={transactionInfo.chainId}
             tradeId={tradeId!}
             onClose={closeModal}
             onFinish={async () => {

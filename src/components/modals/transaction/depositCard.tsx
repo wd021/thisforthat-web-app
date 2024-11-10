@@ -13,11 +13,13 @@ import { SimplifiedNFTAsset } from '@/types/supabase'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 
 const DepositCard = ({
+  chainId,
   tradeId,
   asset,
   depositedAssets,
   onFinish,
 }: {
+  chainId: number
   tradeId: string
   asset: SimplifiedNFTAsset
   depositedAssets: {
@@ -44,14 +46,14 @@ const DepositCard = ({
     isWritePending: isApprovalPending,
     isConfirming: isApprovalConfirming,
     isConfirmed: isApprovalConfirmed,
-  } = useApproveAsset(CONTRACT_ADDRESSES[31337])
+  } = useApproveAsset(CONTRACT_ADDRESSES[chainId])
 
   const {
     deposit,
     isWritePending: isDepositPending,
     isConfirming: isDepositConfirming,
     isConfirmed: isDepositConfirmed,
-  } = useDepositAsset(CONTRACT_ADDRESSES[31337], BigInt(tradeId))
+  } = useDepositAsset(CONTRACT_ADDRESSES[chainId], BigInt(tradeId))
 
   useEffect(() => {
     const checkAssetApproval = async () => {

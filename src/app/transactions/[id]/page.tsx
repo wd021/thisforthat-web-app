@@ -32,6 +32,7 @@ const Transactions: React.FC<NFTPageProps> = ({ params }) => {
   const [txCancelModalInfo, setTxCancelModalInfo] = useState<TxCancelModalInfo | null>(null)
 
   const { tradeInfo, isLoading } = useTradeInfo(
+    txInfo?.chain_id || null,
     txInfo?.onchain_trade_id || null,
     txInfo?.onchain_done as boolean,
   )

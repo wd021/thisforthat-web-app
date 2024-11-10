@@ -1,11 +1,10 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createPublicClient, http } from 'viem'
-import { anvil, mainnet } from 'viem/chains'
 
 import ABI from '@/contracts/abi.json'
 import { OnchainTradeInfo } from '@/types/main'
+import { getChainClient } from '@/utils/chainClients'
 import { CONTRACT_ADDRESSES } from '@/utils/contracts'
 import { createTokenIdRecipientMapping } from '@/utils/helpers'
 
@@ -57,14 +56,10 @@ export async function POST(req: Request) {
       return new Response('Trade status incorrect', { status: 400 })
     }
 
-    // 3. Check onchain trade status
-    const publicClient = createPublicClient({
-      chain: anvil,
-      transport: http(),
-    })
+    const publicClient = getChainClient(offerData.chain_id)
 
     const tradeInfo = (await publicClient.readContract({
-      address: CONTRACT_ADDRESSES[31337],
+      address: CONTRACT_ADDRESSES[offerData.chain_id],
       abi: ABI,
       functionName: 'getTradeInfo',
       args: [BigInt(offerData.onchain_trade_id)],

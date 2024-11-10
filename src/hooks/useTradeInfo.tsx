@@ -19,14 +19,18 @@ const formatTradeInfo = (
   }
 }
 
-export default function useTradeInfo(tradeId: string | number | null, done: boolean) {
+export default function useTradeInfo(
+  chainId: string | number | null,
+  tradeId: string | number | null,
+  done: boolean,
+) {
   const {
     data: tradeData,
     isError,
     isLoading,
     refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESSES[31337],
+    address: chainId ? CONTRACT_ADDRESSES[Number(chainId)] : '0x...',
     abi: ABI,
     functionName: 'getTradeInfo',
     args: tradeId ? [BigInt(tradeId)] : undefined,
