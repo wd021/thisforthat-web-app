@@ -200,12 +200,7 @@ const MobileTabBar: React.FC<MobileTabBarProps> = ({ mainTab, subTab, onNavigati
             }`}
             onClick={() => handleMainTabClick('transactions')}
           >
-            <TabContent
-              type='transactions'
-              emoji='⛓️'
-              label='Transactions'
-              sublabel='Onchain'
-            />
+            <TabContent type='transactions' emoji='⛓️' label='Transact' sublabel='Onchain' />
           </button>
         </div>
       </div>
