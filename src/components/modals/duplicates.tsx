@@ -3,10 +3,11 @@ import Modal from 'react-modal'
 import Link from 'next/link'
 
 import { useIsMobile } from '@/hooks'
-import { getModalStyles } from '@/styles'
 import { Close } from '@/icons'
+import { getModalStyles } from '@/styles'
 
 const Duplicates: React.FC<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   users: any[]
   closeModal: () => void
 }> = ({ users, closeModal }) => {

@@ -148,7 +148,7 @@ const Offer: FC<{
           if (error) throw error
           showToast(`🎉 Offer sent to ${users.counterparty.username}`, 2500)
         } else {
-          const { data, error } = await supabase.rpc('create_counter_offer', {
+          const { error } = await supabase.rpc('create_counter_offer', {
             p_creator_id: users.creator.id,
             p_counterparty_id: users.counterparty.id,
             p_chain_id: chainId,

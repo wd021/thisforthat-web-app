@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 import { Navbar } from '@/components'
 import { AuthProvider } from '@/providers/authProvider'
@@ -61,16 +61,10 @@ export const metadata: Metadata = {
       },
     ],
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    viewportFit: 'cover',
-  },
 }
 
-export const viewport = {
-  themeColor: '#000000',
+export const viewport: Viewport = {
+  themeColor: 'black',
 }
 
 interface RootLayoutProps {

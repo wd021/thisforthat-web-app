@@ -47,10 +47,9 @@ const UserInfo: React.FC<{ username: string; profilePic: string }> = ({
 )
 
 const FavoriteButton: React.FC<{
-  fullPage: boolean
   isFavorited: boolean
   onClick: () => void
-}> = ({ fullPage, isFavorited, onClick }) => (
+}> = ({ isFavorited, onClick }) => (
   <button
     onClick={(e) => {
       e.stopPropagation()
@@ -94,11 +93,7 @@ const Header = ({
         </div>
       </div>
       <div className='flex items-center'>
-        <FavoriteButton
-          fullPage={fullPage}
-          isFavorited={offer.favorited_by_user}
-          onClick={onFavorite}
-        />
+        <FavoriteButton isFavorited={offer.favorited_by_user} onClick={onFavorite} />
         {!fullPage && (
           <>
             <Link

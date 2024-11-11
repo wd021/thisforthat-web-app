@@ -162,6 +162,7 @@ export default function useCommentSection({
     return () => {
       channel.unsubscribe()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offerId, user?.id])
 
   // Effect for initial scroll

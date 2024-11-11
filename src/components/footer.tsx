@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
+
 import { DISCORD_LINK } from '@/utils/constants'
 
 const Footer: FC = () => {

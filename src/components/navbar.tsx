@@ -19,6 +19,7 @@ const Navbar: FC = () => {
   const { user, loading, profile, hasProfile, updateLastSeen } = useAuth()
   const isMobile = useIsMobile()
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [notifications, setNotifications] = useState<any[]>([])
   const [newNotificationsCount, setNewNotificationsCount] = useState(0)
 
@@ -26,6 +27,7 @@ const Navbar: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const [searchTerm, setSearchTerm] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchResults, setSearchResults] = useState<{ nfts: any[]; users: any[] }>({
     nfts: [],
     users: [],
@@ -63,6 +65,7 @@ const Navbar: FC = () => {
     setIsSearching(false)
   }, [])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((term: string) => performSearch(term), 300),
     [performSearch],
@@ -203,6 +206,7 @@ const Navbar: FC = () => {
     if (profile) {
       getLatestNotifications()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile])
 
   return (

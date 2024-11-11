@@ -126,6 +126,7 @@ const TransactionModal: React.FC<{
         setComponentToShow('completed')
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, componentToShow])
 
   const renderContent = () => {

@@ -14,7 +14,6 @@ import { useAuth } from '@/providers/authProvider'
 import { useToast } from '@/providers/toastProvider'
 import { OfferModalInfo, TxModalInfo, UserTabOption } from '@/types/main'
 import { NFTGridItem, OfferData, Profile } from '@/types/supabase'
-import { supabase } from '@/utils/supabaseClient'
 
 const ProfileHeader = ({
   profile,
@@ -209,24 +208,6 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     setOfferModalInfo(offerModalInfo)
   }
 
-  const handlePinItem = async (nft: NFTGridItem) => {
-    if (!user) {
-      showToast(`⚠️ You have to login first`, 2500)
-      return
-    }
-
-    try {
-      await supabase.from('user_pins').upsert([{ user_id: user.id, nft_id: nft.nft_id }], {
-        onConflict: 'user_id,nft_id',
-        ignoreDuplicates: true,
-      })
-      showToast(`📌 NFT pinned`, 1500)
-    } catch (error) {
-      showToast(`⚠️ Error pinning NFT`, 2500)
-      console.error('Error pinning NFT:', error)
-    }
-  }
-
   const handleTabChange = (newTabOption: UserTabOption) => {
     if (newTabOption === tabOption) return
 
@@ -247,12 +228,7 @@ const UserPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     return tabOption !== 'offers' ? (
       <div className='p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-6 mb-24'>
         {(items as NFTGridItem[]).map((item) => (
-          <NFTGridObject
-            key={item.nft_id}
-            item={item}
-            newOffer={handleNewOffer}
-            pinItem={handlePinItem}
-          />
+          <NFTGridObject key={item.nft_id} item={item} newOffer={handleNewOffer} />
         ))}
       </div>
     ) : (

@@ -35,7 +35,7 @@ interface AlchemyResponse {
 }
 
 async function fetchNFTsForOwner(
-  chain: string,
+  chain: keyof typeof ALCHEMY_CHAIN_ID_SLUGS,
   ownerAddress: string,
   contractAddresses: string[],
 ) {

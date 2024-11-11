@@ -69,6 +69,7 @@ export default function useCancelTrade({
       }
       throw err
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tradeId, address, publicClient, writeContract, showToast])
 
   return {
